@@ -1,4 +1,5 @@
 @use '../../styles/tokens' as *;
+@use '../../styles/typography' as *;
 
 :host {
     display: inline-block;
@@ -9,15 +10,13 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 16px;
+    gap: $spacing-sm;
+    padding: $spacing-sm $spacing-lg;
     border-radius: $radius-sm;
-    font-family: $font-family;
-    font-weight: 600;
-    font-size: $font-size-sm;
-    line-height: 24.5px;
     cursor: pointer;
-    transition: all 0.2s ease;
-    border: 1px solid transparent;
+    transition: all 0.2s ease-in-out;
+    border: none;
+    @include typography-button;
     background: none;
     min-height: 36.5px;
     outline: none;
