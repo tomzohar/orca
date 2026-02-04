@@ -1,0 +1,72 @@
+@use '../../../styles/tokens' as *;
+
+:host {
+    display: block;
+    margin-bottom: $spacing-md;
+}
+
+.orca-alert {
+    display: flex;
+    align-items: flex-start;
+    padding: $spacing-md;
+    border-radius: $radius-md;
+    color: $text-primary;
+    font-family: $font-family;
+
+    &-icon {
+        margin-right: $spacing-md;
+        flex-shrink: 0;
+    }
+
+    &-content {
+        flex: 1;
+    }
+
+    &-title {
+        font-weight: 600;
+        margin-bottom: $spacing-xs;
+        font-size: $font-size-md;
+    }
+
+    &-message {
+        font-size: $font-size-sm;
+        opacity: 0.9;
+    }
+
+    // Types
+    &.success {
+        background-color: rgba(76, 175, 80, 0.1);
+        border: 1px solid rgba(76, 175, 80, 0.2);
+
+        .orca-alert-icon {
+            color: #81c784;
+        }
+    }
+
+    &.info {
+        background-color: rgba(41, 121, 255, 0.1);
+        border: 1px solid rgba(41, 121, 255, 0.2);
+
+        .orca-alert-icon {
+            color: $primary-color;
+        }
+    }
+
+    &.warning {
+        background-color: rgba(255, 152, 0, 0.1);
+        border: 1px solid rgba(255, 152, 0, 0.2);
+
+        .orca-alert-icon {
+            color: #ffb74d;
+        }
+    }
+
+    &.error {
+        background-color: rgba(255, 82, 82, 0.1);
+        border: 1px solid rgba(255, 82, 82, 0.2);
+
+        .orca-alert-icon {
+            color: $error-color;
+        }
+    }
+}

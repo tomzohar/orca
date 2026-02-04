@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'ui-design-system',
+  selector: 'orca-design-system',
   imports: [],
   templateUrl: './design-system.html',
   styleUrl: './design-system.scss',
 })
-export class DesignSystem {}
+export class DesignSystem { }

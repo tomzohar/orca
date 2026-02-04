@@ -1,0 +1,17 @@
+<button
+  mat-ripple
+  [type]="config().type!"
+  [disabled]="config().disabled!"
+  [class]="'orca-button ' + config().variant"
+  (click)="onClick($event)"
+>
+  @if (config().icon) {
+    <orca-icon
+      [config]="{
+        ...config().icon!,
+      }"
+      class="button-icon"
+    ></orca-icon>
+  }
+  <ng-content></ng-content>
+</button>

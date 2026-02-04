@@ -1,0 +1,24 @@
+@use '../../../styles/tokens' as *;
+
+:host {
+    display: inline-block;
+}
+
+::ng-deep {
+    .mat-mdc-checkbox {
+        --mdc-checkbox-selected-focus-icon-color: #{$primary-color};
+        --mdc-checkbox-selected-hover-icon-color: #{$primary-color};
+        --mdc-checkbox-selected-icon-color: #{$primary-color};
+        --mdc-checkbox-selected-pressed-icon-color: #{$primary-color};
+        --mdc-checkbox-unselected-focus-icon-color: #{$border-color};
+        --mdc-checkbox-unselected-hover-icon-color: #{$border-color};
+        --mdc-checkbox-unselected-icon-color: #{$border-color};
+        --mdc-checkbox-unselected-pressed-icon-color: #{$border-color};
+
+        .mdc-label {
+            color: $text-primary;
+            font-family: $font-family;
+            font-size: $font-size-md;
+        }
+    }
+}

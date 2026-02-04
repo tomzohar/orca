@@ -2,7 +2,7 @@
   "name": "design-system",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/design-system/src",
-  "prefix": "ui",
+  "prefix": "orca",
   "projectType": "library",
   "release": {
     "version": {
@@ -61,7 +61,8 @@
         "outputDir": "dist/storybook/design-system",
         "configDir": "libs/design-system/.storybook",
         "browserTarget": "design-system:build-storybook",
-        "compodoc": false
+        "compodoc": false,
+        "styles": ["libs/design-system/src/lib/styles/theme.scss"]
       },
       "configurations": {
         "ci": {

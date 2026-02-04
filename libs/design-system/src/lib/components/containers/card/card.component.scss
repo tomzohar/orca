@@ -1,0 +1,54 @@
+@use '../../../styles/tokens' as *;
+
+:host {
+    display: block;
+}
+
+.orca-card {
+    border-radius: $radius-lg !important;
+    background-color: $surface-color !important;
+    color: $text-primary !important;
+    font-family: $font-family !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    &.elevated {
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4) !important;
+        border: none !important;
+    }
+
+    &.outlined {
+        box-shadow: none !important;
+        border: 1px solid rgba(0, 229, 255, 0.12) !important;
+        background-color: rgba(0, 30, 60, 0.3) !important;
+    }
+
+    .mat-mdc-card-header {
+        padding: $spacing-md $spacing-lg;
+
+        .mat-mdc-card-title {
+            font-size: 20px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: $text-primary;
+        }
+
+        .mat-mdc-card-subtitle {
+            color: $text-secondary;
+            font-size: $font-size-sm;
+            margin-top: $spacing-xs;
+        }
+    }
+
+    .mat-mdc-card-content {
+        padding: $spacing-md $spacing-lg $spacing-lg;
+        font-size: $font-size-md;
+        line-height: 1.5;
+        color: $text-secondary;
+    }
+
+    .mat-mdc-card-actions {
+        padding: 0 $spacing-lg $spacing-md;
+        justify-content: flex-end;
+    }
+}

@@ -1,0 +1,80 @@
+@use '../../styles/tokens' as *;
+
+:host {
+    display: block;
+    width: 100%;
+}
+
+
+.orca-input-field {
+    width: 100%;
+
+    .mdc-text-field--outlined {
+        background-color: $surface-color;
+        border-radius: $radius-md;
+        min-height: 56px;
+
+        // Focused border
+        &.mdc-text-field--focused:not(.mdc-text-field--invalid) {
+            .mdc-notched-outline {
+
+                .mdc-notched-outline__leading,
+                .mdc-notched-outline__notch,
+                .mdc-notched-outline__trailing {
+                    border-color: $primary-color !important;
+                    border-width: 2px !important;
+                }
+            }
+        }
+
+        // Error border
+        &.mdc-text-field--invalid {
+            .mdc-notched-outline {
+
+                .mdc-notched-outline__leading,
+                .mdc-notched-outline__notch,
+                .mdc-notched-outline__trailing {
+                    border-color: $error-color !important;
+                }
+            }
+        }
+    }
+
+    // Label color
+    .mdc-floating-label {
+        color: $text-secondary !important;
+        font-family: $font-family;
+
+        &.mdc-floating-label--float-above {
+            font-size: 16px; // Keeping it readable as per Figma focused state
+        }
+    }
+
+    &.mat-focused .mdc-floating-label {
+        color: $primary-color !important;
+    }
+
+    &.has-error .mdc-floating-label {
+        color: $error-color !important;
+    }
+
+    // Input text
+    input.mat-mdc-input-element {
+        color: $text-primary !important;
+        font-family: $font-family;
+        font-size: $font-size-md;
+    }
+
+    // Placeholder
+    input.mat-mdc-input-element::placeholder {
+        color: rgba($text-primary, 0.4);
+    }
+
+    .mat-mdc-form-field-infix,
+    .mat-mdc-form-field-flex {
+        // &:focus-visible {
+        border: none;
+        outline: none;
+        // }
+    }
+}

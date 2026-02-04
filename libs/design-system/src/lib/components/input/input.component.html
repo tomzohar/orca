@@ -1,0 +1,20 @@
+<mat-form-field
+  appearance="outline"
+  class="orca-input-field"
+  [class.has-error]="config().error"
+>
+  @if (config().label) {
+    <mat-label>{{ config().label }}</mat-label>
+  }
+  <input
+    matInput
+    [type]="config().type!"
+    [placeholder]="config().placeholder!"
+    [disabled]="config().disabled!"
+    [value]="value()"
+    (input)="onInput($event)"
+  />
+  @if (config().error) {
+    <mat-error>{{ config().error }}</mat-error>
+  }
+</mat-form-field>

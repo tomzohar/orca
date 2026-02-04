@@ -1,10 +1,10 @@
-@use 'tokens' as *;
+@use './tokens' as *;
 @use '@angular/material' as mat;
 
 @include mat.core();
 
-$orca-primary: mat.m2-define-palette(mat.$m2-indigo-palette);
-$orca-accent: mat.m2-define-palette(mat.$m2-pink-palette, A200, A100, A400);
+$orca-primary: mat.m2-define-palette(mat.$m2-blue-palette, 600); // Closest to #2979ff
+$orca-accent: mat.m2-define-palette(mat.$m2-light-blue-palette, A200, A100, A400);
 
 $orca-theme: mat.m2-define-dark-theme((color: (primary: $orca-primary,
                 accent: $orca-accent,
@@ -15,6 +15,48 @@ $orca-theme: mat.m2-define-dark-theme((color: (primary: $orca-primary,
 body {
     margin: 0;
     font-family: $font-family;
-    background-color: $background;
-    color: $text;
+    background-color: $background-color;
+    color: $text-primary;
+}
+
+// Global component refinements
+.mat-mdc-button-base {
+    border-radius: $radius-sm !important;
+}
+
+.mat-mdc-form-field {
+    --mdc-filled-plugin-container-color: #{$surface-color};
+    --mdc-outlined-plugin-container-color: #{$surface-color};
+}
+
+.mat-mdc-snack-bar-container {
+    --mdc-snackbar-container-color: #{$surface-color};
+    --mdc-snackbar-supporting-text-color: #{$text-primary};
+    border: 1px solid $border-color;
+    border-radius: $radius-md !important;
+
+    .mdc-snackbar__surface {
+        background-color: transparent !important;
+    }
+}
+
+.mat-mdc-dialog-container {
+    --mdc-dialog-container-color: #{$background-color};
+    --mdc-dialog-supporting-text-color: #{$text-secondary};
+    --mdc-dialog-subhead-color: #{$text-primary};
+
+    .mdc-dialog__surface {
+        border: 1px solid $border-color;
+        border-radius: $radius-lg !important;
+        background-color: $background-color !important;
+    }
+
+    .mat-mdc-dialog-title {
+        color: $primary-color !important;
+        font-family: $font-family !important;
+        font-size: 20px !important;
+        font-weight: 600 !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+    }
 }

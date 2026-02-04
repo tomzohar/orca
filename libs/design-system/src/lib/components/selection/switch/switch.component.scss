@@ -1,0 +1,29 @@
+@use '../../../styles/tokens' as *;
+
+:host {
+    display: inline-block;
+}
+
+::ng-deep {
+    .mat-mdc-slide-toggle {
+        --mdc-switch-selected-focus-handle-color: #{$primary-color};
+        --mdc-switch-selected-hover-handle-color: #{$primary-color};
+        --mdc-switch-selected-handle-color: #{$primary-color};
+        --mdc-switch-selected-pressed-handle-color: #{$primary-color};
+        --mdc-switch-selected-focus-track-color: #{$primary-color};
+        --mdc-switch-selected-hover-track-color: #{$primary-color};
+        --mdc-switch-selected-track-color: #{$primary-color};
+        --mdc-switch-selected-pressed-track-color: #{$primary-color};
+
+        .mdc-label {
+            color: $text-primary;
+            font-family: $font-family;
+            font-size: $font-size-md;
+        }
+
+        // Custom track opacity for active state as per Figma (50%)
+        .mdc-switch--selected .mdc-switch__track {
+            opacity: 0.5 !important;
+        }
+    }
+}

@@ -2,7 +2,11 @@
   "name": "@orca/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start:client": "npx nx serve client",
+    "start:server": "npx nx serve server",
+    "storybook": "npx nx storybook design-system"
+  },
   "private": true,
   "devDependencies": {
     "@angular-devkit/core": "~21.1.0",

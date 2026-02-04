@@ -1,15 +1,32 @@
 // Design Tokens
 
-$primary: #00B4D8;
-$secondary: #48CAE4;
-$accent: #CAF0F8;
-$background: #03045E;
-$text: #FFFFFF;
+// Colors
+$primary-color: #2979ff;
+$secondary-color: rgba(41, 121, 255, 0.5);
+$background-color: #001e3c; // Based on input bg rgba(0, 30, 60, 0.5)
+$surface-color: rgba(0, 30, 60, 0.5);
+$text-primary: #ffffff;
+$text-secondary: #b0bec5;
+$text-disabled: rgba(255, 255, 255, 0.3);
+$border-color: rgba(255, 255, 255, 0.23);
+$border-disabled: rgba(255, 255, 255, 0.12);
+$error-color: #ff5252;
 
+// Spacing
 $spacing-xs: 4px;
-$spacing-s: 8px;
-$spacing-m: 16px;
-$spacing-l: 24px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
 $spacing-xl: 32px;
 
+// Typography
 $font-family: 'Inter', sans-serif;
+$font-size-xs: 12px;
+$font-size-sm: 14px;
+$font-size-md: 16px;
+
+// Border Radius
+$radius-sm: 4px;
+$radius-md: 8px;
+$radius-lg: 12px;
+$radius-xl: 16px;
