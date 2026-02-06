@@ -4,10 +4,14 @@ import { AGENT_JOBS_REPOSITORY } from './repositories/agent-jobs.repository.inte
 import { AgentJobEntity, AgentJobStatus } from './entities/agent-job.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
+import { AGENT_RUNNER } from './interfaces/agent-runner.interface';
+import { JobCreatedEvent } from './events/agent-job-events';
+
 describe('AgentJobsService', () => {
     let service: AgentJobsService;
     let repository: any;
     let eventEmitter: EventEmitter2;
+    let runner: any;
 
     const mockRepository = {
         create: jest.fn(),
@@ -22,18 +26,24 @@ describe('AgentJobsService', () => {
         emit: jest.fn(),
     };
 
+    const mockRunner = {
+        run: jest.fn().mockResolvedValue(undefined),
+    };
+
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 AgentJobsService,
                 { provide: AGENT_JOBS_REPOSITORY, useValue: mockRepository },
                 { provide: EventEmitter2, useValue: mockEventEmitter },
+                { provide: AGENT_RUNNER, useValue: mockRunner },
             ],
         }).compile();
 
         service = module.get<AgentJobsService>(AgentJobsService);
         repository = module.get(AGENT_JOBS_REPOSITORY);
         eventEmitter = module.get<EventEmitter2>(EventEmitter2);
+        runner = module.get(AGENT_RUNNER);
     });
 
     afterEach(() => {
@@ -65,7 +75,8 @@ describe('AgentJobsService', () => {
                 prompt,
                 assignee: undefined,
             });
-            expect(eventEmitter.emit).toHaveBeenCalledWith('agent-job.created', mockJob);
+            expect(eventEmitter.emit).toHaveBeenCalledWith('agent-job.created', new JobCreatedEvent(mockJob));
+            expect(runner.run).toHaveBeenCalledWith(mockJob);
             expect(result).toEqual(mockJob);
         });
     });

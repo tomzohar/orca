@@ -1,7 +1,9 @@
 import { Injectable, Logger, NotFoundException, Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AgentJobEntity, AgentJobStatus } from './entities/agent-job.entity';
+import { AgentJobEntity } from './entities/agent-job.entity';
 import { AGENT_JOBS_REPOSITORY, IAgentJobsRepository } from './repositories/agent-jobs.repository.interface';
+import { AGENT_RUNNER, IAgentRunner } from './interfaces/agent-runner.interface';
+import { JobCreatedEvent } from './events/agent-job-events';
 
 @Injectable()
 export class AgentJobsService {
@@ -10,6 +12,8 @@ export class AgentJobsService {
     constructor(
         @Inject(AGENT_JOBS_REPOSITORY)
         private readonly repository: IAgentJobsRepository,
+        @Inject(AGENT_RUNNER)
+        private readonly runner: IAgentRunner,
         private readonly eventEmitter: EventEmitter2,
     ) { }
 
@@ -19,11 +23,11 @@ export class AgentJobsService {
             assignee,
         });
 
-        this.eventEmitter.emit('agent-job.created', job);
+        this.eventEmitter.emit('agent-job.created', new JobCreatedEvent(job));
 
         // Fire and forget async processing
-        this.processJob(job.id).catch((err) =>
-            this.logger.error(`Error processing job ${job.id}`, err)
+        this.runner.run(job).catch((err) =>
+            this.logger.error(`Error running job ${job.id}`, err)
         );
 
         return job;
@@ -39,49 +43,5 @@ export class AgentJobsService {
             throw new NotFoundException(`Job with ID ${id} not found`);
         }
         return job;
-    }
-
-    // Simulated async processing
-    private async processJob(jobId: number) {
-        this.logger.log(`Starting job ${jobId}`);
-
-        // Update to RUNNING
-        const runningJob = await this.repository.update(jobId, { status: AgentJobStatus.RUNNING });
-        this.eventEmitter.emit('agent-job.updated', runningJob);
-
-        // Simulate thinking/steps
-        const steps = [
-            { msg: 'Analyzing prompt...', delay: 1000 },
-            { msg: 'Planning Agent steps...', delay: 1500 },
-            { msg: 'Generating code...', delay: 2000 },
-            { msg: 'Verifying solution...', delay: 1000 },
-        ];
-
-        for (const step of steps) {
-            await new Promise(resolve => setTimeout(resolve, step.delay));
-
-            const updatedJob = await this.repository.addLog(jobId, step.msg);
-            this.eventEmitter.emit('agent-job.updated', updatedJob);
-        }
-
-        // Final Artifact
-        const artifact = {
-            filename: 'main.py',
-            content: `print("Hello from Agent Job ${jobId}")\n# Prompt: ...`
-        };
-
-        // Update to COMPLETED
-        await this.repository.addArtifact(jobId, artifact);
-
-        await this.repository.update(jobId, {
-            status: AgentJobStatus.COMPLETED,
-        });
-
-        // Add completion log
-        const finalJob = await this.repository.addLog(jobId, 'Job Completed');
-
-        this.eventEmitter.emit('agent-job.updated', finalJob);
-
-        this.logger.log(`Job ${jobId} completed`);
     }
 }
