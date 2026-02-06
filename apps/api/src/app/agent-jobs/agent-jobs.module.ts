@@ -6,14 +6,16 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { AGENT_JOBS_REPOSITORY } from './repositories/agent-jobs.repository.interface';
 import { PrismaAgentJobsRepository } from './repositories/prisma-agent-jobs.repository';
 import { AGENT_RUNNER } from './interfaces/agent-runner.interface';
-import { SimulatedAgentRunner } from './services/simulated-agent-runner';
+import { LangGraphAgentRunner } from './services/lang-graph-agent-runner';
 import { ARTIFACT_STORAGE } from './interfaces/artifact-storage.interface';
 import { DbArtifactStorage } from './services/db-artifact-storage';
+import { LlmModule } from '../shared/llm/llm.module';
 
 @Module({
     imports: [
         PrismaModule,
         EventEmitterModule.forRoot(),
+        LlmModule,
     ],
     controllers: [AgentJobsController],
     providers: [
@@ -24,7 +26,7 @@ import { DbArtifactStorage } from './services/db-artifact-storage';
         },
         {
             provide: AGENT_RUNNER,
-            useClass: SimulatedAgentRunner,
+            useClass: LangGraphAgentRunner,
         },
         {
             provide: ARTIFACT_STORAGE,

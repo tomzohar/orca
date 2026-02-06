@@ -13,32 +13,36 @@ Orca is an autonomous software orchestration platform. We are currently in the *
 - **Framework:** NestJS + Prisma (PostgreSQL).
 - **Core Module:** `agent-jobs`
 - **Data Model:**
-  - `AgentJob`: The core unit of work.
-  - `AgentJobLog`: Relational table for streaming logs (1:N with Job).
-  - `AgentJobArtifact`: Relational table for file outputs (1:N with Job).
-- **Status:**
-  - ✅ "Blackboard" Schema implemented (relational tables).
-  - ✅ Service layer refactored for decoupling (`IAgentRunner`, `IArtifactStorage`).
-  - ✅ Granular SSE event stream implemented (`log_added`, `status_changed`, etc.).
-  - ✅ Unit tests updated and passing.
+  - `AgentJob`: The core unit of work (Blackboard pattern).
+  - `AgentJobLog`: Relational table for streaming logs.
+  - `AgentJobArtifact`: Relational table for file outputs.
+- **AI/LLM:**
+  - **Service:** `LlmService` supporting OpenAI, Anthropic, and Google Gemini.
+  - **Agent Runner:** `LangGraphAgentRunner` executing LangChain graphs.
+  - **Status:**
+    - ✅ "Blackboard" Schema implemented.
+    - ✅ Granular SSE event stream (`log_added`, `artifact_added`).
+    - ✅ Integrated Google Gemini Flash/Pro models.
+    - ✅ Database fully operational.
 
 ### Frontend (`apps/web`)
 
 - **Framework:** Angular 18+ (Zoneless/Signals) + Angular Material.
 - **Components:**
-  - `AgentPocComponent`: Simple interface to spawn agents and view logs.
+  - `AgentPocComponent`: Real-time agent interaction interface.
 - **Status:**
-  - ✅ Basic UI for spawning jobs.
-  - ✅ Handles granular SSE event payloads using Angular Signals.
+  - ✅ Connects to backend via proxy.
+  - ✅ Consumes SSE stream for live updates.
+  - ✅ Displays logs and artifacts in real-time.
 
 ## 3. Recent Accomplishments
 
-- **Database Migration:** Transitioned from JSON-based `logs` and `artifacts` columns to dedicated relational tables (`init_blackboard_tables`).
-- **Architecture Decoupling:** Extracted Agent execution logic into `IAgentRunner` and Artifact storage into `IArtifactStorage` providers.
-- **Granular Event System:** Moved from generic `agent-job.updated` events to specific domain events (`JobLogAddedEvent`, etc.) for efficient real-time updates.
+- **LLM Integration:** Integrated Google Gemini models via `LlmService` and configured `LangGraph` execution.
+- **Infrastructure Fixes:** Resolved database connection issues and verified Docker environment.
+- **End-to-End Flow:** Verified complete flow from Frontend -> API -> LLM -> Database -> Frontend (via SSE).
 
 ## 4. Next Steps
 
-1.  **Frontend Update:** Refactor `agent-poc` to handle granular SSE events (e.g., `log_added` event) instead of refetching/receiving the whole job object.
-2.  **Agent Logic:** Implement actual agent integration (LangGraph) by providing a new implementation of `IAgentRunner`.
-3.  **Artifact Storage:** Implement S3/Cloud storage provider for `IArtifactStorage`.
+1.  **Orchestration Logic:** Implement smarter agent routing and complex LangGraph workflows (e.g., specific coding agents vs. planning agents).
+2.  **Artifact Handling:** Enhance frontend to render different artifact types (code diffs, preview) beyond simple text/file download.
+3.  **Refactor & Polish:** Clean up POC code in frontend and enhance error handling.

@@ -31,6 +31,27 @@ The control plane manages the lifecycle of tasks and agents.
 - **Job Dispatcher:** Instantiates the appropriate Agent for the task, managing resource allocation.
 - **Idle Monitoring:** A background process that detects system inactivity to trigger proactive agents (e.g., for backlog review or innovation proposals).
 
+### 1.4 Orchestration Algorithm
+
+The current "Spawning" & "Blackboard" flow functions as follows:
+
+1.  **Job Creation (The Trigger):**
+    - A user or system event triggers a `POST /agent-jobs` request.
+    - The `AgentJobsService` creates a new `AgentJob` record in the database (The Blackboard) with status `PENDING`.
+
+2.  **Dispatcher & Execution:**
+    - The Service immediately dispatches the job to the `IAgentRunner` (currently `LangGraphAgentRunner`).
+    - The Runner initializes the LLM (e.g., Gemini) / Agent Graph with the job's context.
+    - **Tools as Actuators:** The agent is equipped with specific tools that wrap the "Blackboard" repository:
+      - `logTool`: Writes progress to `AgentJobLog`.
+      - `saveArtifactTool`: Writes outputs to `AgentJobArtifact`.
+
+3.  **Real-Time Feedback Loop:**
+    - As the Agent thinks and acts, it calls these tools.
+    - Each tool execution updates the Database **AND** emits a domain event (e.g., `JobLogAddedEvent`).
+    - The `AgentJobsController` listens for these events and pushes them to the frontend via Server-Sent Events (SSE).
+    - This ensures the "Blackboard" is always the source of truth, while the user sees live updates.
+
 ## 2. Control Dashboard
 
 The Human-in-the-Loop interface for monitoring and intervention.
