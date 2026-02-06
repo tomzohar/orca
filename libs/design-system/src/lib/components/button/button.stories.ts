@@ -18,6 +18,7 @@ export const Primary: Story = {
         props: args,
         template: `<orca-button [config]="config">Primary Button</orca-button>`,
     }),
+
 };
 
 export const Secondary: Story = {
@@ -42,7 +43,7 @@ export const Ghost: Story = {
 
 export const Disabled: Story = {
     args: {
-        config: { variant: 'primary', disabled: true },
+        config: { variant: 'ghost', disabled: true },
     },
     render: (args) => ({
         props: args,

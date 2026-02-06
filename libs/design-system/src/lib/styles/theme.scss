@@ -71,8 +71,8 @@ p {
 }
 
 .mat-mdc-form-field {
-    --mdc-filled-plugin-container-color: #{$surface-color};
-    --mdc-outlined-plugin-container-color: #{$surface-color};
+    --mdc-filled-plugin-container-color: #{$secondary-color};
+    --mdc-outlined-plugin-container-color: #{$secondary-color};
 }
 
 .mat-mdc-snack-bar-container {
@@ -105,4 +105,13 @@ p {
         letter-spacing: 1px !important;
         text-transform: uppercase !important;
     }
+}
+
+// .mat-mdc-floating-label,
+.mdc-floating-label--float-above {
+    color: $color-accent !important;
+}
+
+.mat-mdc-text-field-wrapper {
+    background-color: $surface-color;
 }

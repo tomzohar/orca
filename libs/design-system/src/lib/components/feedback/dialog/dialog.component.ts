@@ -18,7 +18,7 @@ const DEFAULT_CONFIG: DialogConfig = {
                 <header class="orca-dialog-header">
                     <div class="header-text">
                         @if (config().title) {
-                            <h2>{{ config().title }}</h2>
+                            <h4>{{ config().title }}</h4>
                         }
                         @if (config().subtitle) {
                             <p class="subtitle">{{ config().subtitle }}</p>

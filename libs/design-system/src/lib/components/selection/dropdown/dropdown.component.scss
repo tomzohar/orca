@@ -1,0 +1,128 @@
+@use '../../../styles/tokens' as *;
+@use '../../../styles/typography' as *;
+
+:host {
+    display: block;
+    width: 100%;
+}
+
+.orca-dropdown-field {
+    width: 100%;
+    position: relative;
+
+    ::ng-deep {
+        .mat-mdc-form-field-flex {
+            background-color: $surface-color !important;
+            border-radius: $radius-md !important;
+            min-height: 56px;
+        }
+
+        .mdc-text-field {
+            padding: 0;
+        }
+
+        .mat-mdc-select-trigger {
+            justify-content: space-between;
+            padding: 0 $spacing-md;
+        }
+
+        .mat-mdc-notch-piece.mdc-notched-outline__notch {
+            border-left: none !important;
+        }
+    }
+
+}
+
+.orca-dropdown-field:not(.has-error) {
+
+
+    ::ng-deep {
+        .mat-mdc-select-value {
+            color: $text-primary !important;
+            font-family: $font-family;
+            font-size: $font-size-md;
+        }
+
+        .mat-mdc-select-placeholder {
+            color: rgba($text-primary, 0.5) !important;
+        }
+
+        .mat-mdc-select-arrow {
+            color: $text-secondary !important;
+        }
+
+        .mdc-floating-label {
+            // color: $text-secondary !important;
+            font-family: $font-family;
+
+            &.mdc-floating-label--float-above {
+                font-size: 16px;
+            }
+        }
+
+        &.mat-focused .mdc-floating-label {
+            color: $primary-color !important;
+        }
+    }
+}
+
+.orca-dropdown-field.has-error {
+    ::ng-deep {
+
+        .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+        .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+        .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+            border-color: $error-color !important;
+        }
+
+        .mdc-text-field--outlined.mdc-text-field--focused:not(.mdc-text-field--invalid) .mdc-notched-outline__leading,
+        .mdc-text-field--outlined.mdc-text-field--focused:not(.mdc-text-field--invalid) .mdc-notched-outline__notch,
+        .mdc-text-field--outlined.mdc-text-field--focused:not(.mdc-text-field--invalid) .mdc-notched-outline__trailing {
+            border-color: $error-color !important;
+            border-width: 2px !important;
+        }
+
+        .mat-mdc-notch-piece.mdc-notched-outline__notch {
+            border-left: none !important;
+        }
+    }
+}
+
+.orca-error-message {
+    @include typography-body-3;
+    color: $error-color;
+    // margin-top: 4px;
+    padding: 0 16px;
+    position: absolute;
+    top: 76px;
+    left: 0px;
+}
+
+// Global styles for the dropdown panel
+::ng-deep .mat-mdc-select-panel {
+    background-color: #001e3c !important; // Matching Figma bg-[#001e3c]
+    border-radius: $radius-md !important;
+    padding-top: 8px !important;
+    box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12) !important;
+
+    .mat-mdc-option {
+        min-height: 36px !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+
+        .mdc-list-item__primary-text {
+            color: $text-primary !important;
+            font-family: $font-family !important;
+            font-size: 16px !important;
+        }
+
+        &:hover:not(.mat-mdc-option-disabled),
+        &.mat-mdc-option-active {
+            background-color: rgba($primary-color, 0.08) !important;
+        }
+
+        &.mdc-list-item--selected:not(.mat-mdc-option-disabled) {
+            background-color: rgba($primary-color, 0.16) !important;
+        }
+    }
+}

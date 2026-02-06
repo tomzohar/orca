@@ -97,3 +97,17 @@ export interface DialogConfig {
     backdropClass?: string;
     actions?: DialogAction[];
 }
+
+export interface DropdownOption {
+    label: string;
+    value: any;
+    disabled?: boolean;
+}
+
+export interface DropdownConfig {
+    label?: string;
+    placeholder?: string;
+    disabled?: boolean;
+    error?: string;
+    options: DropdownOption[];
+}

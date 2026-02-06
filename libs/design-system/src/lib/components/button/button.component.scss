@@ -25,13 +25,18 @@
         background-color: $primary-color;
         color: $text-primary;
 
+        &:disabled {
+            background-color: $color-disabled;
+        }
+
         &:hover:not(:disabled) {
             filter: brightness(1.1);
         }
     }
 
     &.secondary {
-        border-color: $secondary-color;
+        border: 1px solid;
+        border-color: $primary-color;
         color: $primary-color;
 
         &:hover:not(:disabled) {
@@ -41,10 +46,6 @@
 
     &.ghost {
         color: $primary-color;
-
-        &:hover:not(:disabled) {
-            background-color: rgba($primary-color, 0.08);
-        }
     }
 
     &.icon-button {
@@ -72,6 +73,6 @@
         cursor: not-allowed;
         border-color: $border-disabled;
         color: $text-disabled;
-        background-color: transparent;
+        // background-color: transparent;
     }
 }

@@ -1,0 +1,24 @@
+<mat-form-field
+  appearance="outline"
+  class="orca-dropdown-field"
+  [class.has-error]="!!config().error"
+>
+  @if (config().label) {
+    <mat-label>{{ config().label }}</mat-label>
+  }
+  <mat-select
+    [placeholder]="config().placeholder || ''"
+    [disabled]="config().disabled || false"
+    [value]="value()"
+    (selectionChange)="onSelectionChange($event)"
+  >
+    @for (option of config().options; track option.value) {
+      <mat-option [value]="option.value" [disabled]="option.disabled">
+        {{ option.label }}
+      </mat-option>
+    }
+  </mat-select>
+</mat-form-field>
+@if (config().error) {
+  <div class="orca-error-message">{{ config().error }}</div>
+}

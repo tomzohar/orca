@@ -1,3 +1,5 @@
+@use '../../../styles/tokens' as *;
+
 .orca-dialog-container {
     background: var(--background-color, #1a1e2e);
     border-radius: var(--radius-lg, 12px);
@@ -10,26 +12,44 @@
     color: var(--text-primary, #e2e8f0);
 }
 
-.xs { width: 320px; }
-.sm { width: 440px; }
-.md { width: 560px; }
-.lg { width: 800px; }
-.xl { width: 1140px; }
-.full { width: 95vw; height: 95vh; }
+.xs {
+    width: 320px;
+}
+
+.sm {
+    width: 440px;
+}
+
+.md {
+    width: 560px;
+}
+
+.lg {
+    width: 800px;
+}
+
+.xl {
+    width: 1140px;
+}
+
+.full {
+    width: 95vw;
+    height: 95vh;
+}
 
 .orca-dialog-header {
-    padding: var(--spacing-lg, 20px) var(--spacing-xl, 24px);
+    padding: $spacing-md $spacing-md;
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     border-bottom: 1px solid var(--border-color, #2d3748);
 }
 
-.header-text h2 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-}
+// .header-text h2 {
+//     margin: 0;
+//     font-size: 1.25rem;
+//     font-weight: 600;
+// }
 
 .subtitle {
     margin: 4px 0 0;

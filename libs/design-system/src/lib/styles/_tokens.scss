@@ -3,14 +3,17 @@
 // Colors
 $primary-color: #2979ff;
 $secondary-color: rgba(41, 121, 255, 0.5);
-$background-color: #001e3c; // Based on input bg rgba(0, 30, 60, 0.5)
-$surface-color: rgba(0, 30, 60, 0.5);
-$text-primary: #ffffff;
+$background-color: #001021; // Based on input bg rgba(0, 30, 60, 0.5)
+$surface-color: #001E3C;
+$text-primary: #d5d5d5;
 $text-secondary: #b0bec5;
 $text-disabled: rgba(255, 255, 255, 0.3);
+$text-muted: rgba(255, 255, 255, 0.7);
 $border-color: rgba(255, 255, 255, 0.23);
 $border-disabled: rgba(255, 255, 255, 0.12);
 $error-color: #ff5252;
+$color-accent: #00E5FF;
+$color-disabled: rgb(115, 122, 150);
 
 // Spacing
 $spacing-xs: 4px;
