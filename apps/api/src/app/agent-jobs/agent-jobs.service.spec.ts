@@ -14,6 +14,8 @@ describe('AgentJobsService', () => {
         findById: jest.fn(),
         update: jest.fn(),
         findAll: jest.fn(),
+        addLog: jest.fn().mockResolvedValue({}),
+        addArtifact: jest.fn().mockResolvedValue({}),
     };
 
     const mockEventEmitter = {

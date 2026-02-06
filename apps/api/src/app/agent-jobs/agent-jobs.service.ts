@@ -57,23 +57,11 @@ export class AgentJobsService {
             { msg: 'Verifying solution...', delay: 1000 },
         ];
 
-        const logs = [];
-
         for (const step of steps) {
             await new Promise(resolve => setTimeout(resolve, step.delay));
-            const logEntry = {
-                message: step.msg,
-                timestamp: new Date().toISOString()
-            };
-            logs.push(logEntry);
 
-            const current = await this.repository.findById(jobId);
-            if (current) {
-                const updatedJob = await this.repository.update(jobId, {
-                    logs: [...(current.logs || []), logEntry]
-                });
-                this.eventEmitter.emit('agent-job.updated', updatedJob);
-            }
+            const updatedJob = await this.repository.addLog(jobId, step.msg);
+            this.eventEmitter.emit('agent-job.updated', updatedJob);
         }
 
         // Final Artifact
@@ -83,13 +71,16 @@ export class AgentJobsService {
         };
 
         // Update to COMPLETED
-        const current = await this.repository.findById(jobId);
-        const completedJob = await this.repository.update(jobId, {
+        await this.repository.addArtifact(jobId, artifact);
+
+        await this.repository.update(jobId, {
             status: AgentJobStatus.COMPLETED,
-            logs: [...(current?.logs || []), { message: 'Job Completed', timestamp: new Date().toISOString() }],
-            artifacts: [artifact]
         });
-        this.eventEmitter.emit('agent-job.updated', completedJob);
+
+        // Add completion log
+        const finalJob = await this.repository.addLog(jobId, 'Job Completed');
+
+        this.eventEmitter.emit('agent-job.updated', finalJob);
 
         this.logger.log(`Job ${jobId} completed`);
     }

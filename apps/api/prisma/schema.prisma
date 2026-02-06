@@ -26,12 +26,29 @@ enum JobStatus {
 }
 
 model AgentJob {
-  id        Int       @id @default(autoincrement())
+  id        Int                @id @default(autoincrement())
   prompt    String
   assignee  String?
-  status    JobStatus @default(PENDING)
-  logs      Json[]    @default([])
-  artifacts Json[]    @default([])
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  status    JobStatus          @default(PENDING)
+  logs      AgentJobLog[]
+  artifacts AgentJobArtifact[]
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+}
+
+model AgentJobLog {
+  id        Int      @id @default(autoincrement())
+  jobId     Int
+  job       AgentJob @relation(fields: [jobId], references: [id])
+  message   String
+  timestamp DateTime @default(now())
+}
+
+model AgentJobArtifact {
+  id        Int      @id @default(autoincrement())
+  jobId     Int
+  job       AgentJob @relation(fields: [jobId], references: [id])
+  filename  String
+  content   String
+  createdAt DateTime @default(now())
 }

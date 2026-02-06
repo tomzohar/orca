@@ -6,13 +6,16 @@ export enum AgentJobStatus {
 }
 
 export interface AgentJobLog {
+    id: number;
     message: string;
-    timestamp: string;
+    timestamp: Date;
 }
 
 export interface AgentJobArtifact {
+    id: number;
     filename: string;
     content: string;
+    createdAt: Date;
 }
 
 export class AgentJobEntity {

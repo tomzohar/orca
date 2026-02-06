@@ -7,4 +7,6 @@ export interface IAgentJobsRepository {
     findById(id: number): Promise<AgentJobEntity | null>;
     update(id: number, data: Partial<AgentJobEntity>): Promise<AgentJobEntity>;
     findAll(filters?: { assignee?: string }): Promise<AgentJobEntity[]>;
+    addLog(jobId: number, message: string): Promise<AgentJobEntity>;
+    addArtifact(jobId: number, artifact: { filename: string; content: string }): Promise<AgentJobEntity>;
 }
