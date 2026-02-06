@@ -49,6 +49,7 @@
       "continuous": true,
       "executor": "@angular/build:dev-server",
       "options": {
+        "watch": true,
         "proxyConfig": "apps/web/proxy.conf.json"
       },
       "configurations": {
