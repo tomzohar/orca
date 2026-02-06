@@ -9,8 +9,7 @@ export class DialogService {
     private cdkDialog = inject(Dialog);
 
     open<R = unknown, D = unknown>(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        componentOrTemplate: Type<any> | TemplateRef<any>,
+        componentOrTemplate: Type<unknown> | TemplateRef<unknown>,
         config: DialogConfig & { data?: D } = {}
     ): DialogRef<R> {
         const cdkConfig: CdkDialogConfig<D> = {
@@ -20,7 +19,6 @@ export class DialogService {
             backdropClass: config.backdropClass || 'orca-dialog-backdrop',
         };
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         return this.cdkDialog.open<R, D>(componentOrTemplate as any, cdkConfig as any);
     }
 

@@ -12,6 +12,7 @@ export interface InputConfig {
     placeholder?: string;
     disabled?: boolean;
     error?: string;
+    hint?: string;
     type?: string;
 }
 
@@ -98,16 +99,17 @@ export interface DialogConfig {
     actions?: DialogAction[];
 }
 
-export interface DropdownOption {
+export interface DropdownOption<T> {
     label: string;
-    value: any;
+    value: T;
     disabled?: boolean;
 }
 
-export interface DropdownConfig {
+export interface DropdownConfig<T> {
     label?: string;
     placeholder?: string;
     disabled?: boolean;
     error?: string;
-    options: DropdownOption[];
+    hint?: string;
+    options: DropdownOption<T>[];
 }

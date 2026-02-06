@@ -3,7 +3,6 @@
 
 :host {
     display: inline-block;
-    width: auto;
 }
 
 .orca-button {
@@ -18,7 +17,7 @@
     border: none;
     @include typography-button;
     background: none;
-    min-height: 36.5px;
+    min-height: $button-min-height;
     outline: none;
 
     &.primary {
@@ -49,8 +48,8 @@
     }
 
     &.icon-button {
-        padding: 6px;
-        min-width: 36.5px;
+        padding: $spacing-xs;
+        min-width: $button-min-height;
         border-radius: 50%;
         color: $primary-color;
 

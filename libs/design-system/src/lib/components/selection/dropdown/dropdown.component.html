@@ -1,15 +1,11 @@
-<mat-form-field
-  appearance="outline"
-  class="orca-dropdown-field"
-  [class.has-error]="!!config().error"
->
+<mat-form-field appearance="outline" class="orca-dropdown-field">
   @if (config().label) {
     <mat-label>{{ config().label }}</mat-label>
   }
   <mat-select
     [placeholder]="config().placeholder || ''"
-    [disabled]="config().disabled || false"
-    [value]="value()"
+    [formControl]="control"
+    [errorStateMatcher]="errorStateMatcher"
     (selectionChange)="onSelectionChange($event)"
   >
     @for (option of config().options; track option.value) {
@@ -18,7 +14,10 @@
       </mat-option>
     }
   </mat-select>
+  @if (config().hint) {
+    <mat-hint>{{ config().hint }}</mat-hint>
+  }
+  @if (config().error) {
+    <mat-error>{{ config().error }}</mat-error>
+  }
 </mat-form-field>
-@if (config().error) {
-  <div class="orca-error-message">{{ config().error }}</div>
-}

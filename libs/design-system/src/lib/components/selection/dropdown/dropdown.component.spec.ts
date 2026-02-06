@@ -12,7 +12,7 @@ describe('DropdownComponent', () => {
         { label: 'Option 2', value: 'opt2' },
     ];
 
-    const defaultConfig: DropdownConfig = {
+    const defaultConfig: DropdownConfig<unknown> = {
         label: 'Test Label',
         placeholder: 'Test Placeholder',
         options: mockOptions,
@@ -60,7 +60,7 @@ describe('DropdownComponent', () => {
         fixture.detectChanges();
 
         const compiled = fixture.nativeElement as HTMLElement;
-        const errorElement = compiled.querySelector('.orca-error-message');
+        const errorElement = compiled.querySelector('mat-error');
         expect(errorElement).toBeTruthy();
         expect(errorElement?.textContent).toContain('Error Message');
     });

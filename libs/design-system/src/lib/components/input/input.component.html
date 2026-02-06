@@ -10,10 +10,13 @@
     matInput
     [type]="config().type!"
     [placeholder]="config().placeholder!"
-    [disabled]="config().disabled!"
-    [value]="value()"
+    [formControl]="control"
+    [errorStateMatcher]="errorStateMatcher"
     (input)="onInput($event)"
   />
+  @if (config().hint) {
+    <mat-hint>{{ config().hint }}</mat-hint>
+  }
   @if (config().error) {
     <mat-error>{{ config().error }}</mat-error>
   }

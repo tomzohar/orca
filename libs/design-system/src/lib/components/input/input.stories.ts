@@ -23,6 +23,20 @@ export const Default: Story = {
     }),
 };
 
+export const WithHint: Story = {
+    args: {
+        config: {
+            label: 'Label',
+            placeholder: 'Enter text...',
+            hint: 'This is a helpful hint.',
+        },
+    },
+    render: (args) => ({
+        props: args,
+        template: `<orca-input [config]="config"></orca-input>`,
+    }),
+};
+
 export const WithValue: Story = {
     args: {
         config: {
@@ -54,6 +68,7 @@ export const ErrorState: Story = {
         config: {
             label: 'Error State',
             error: 'Critical system failure',
+            hint: 'Check your logs for details.',
         },
         value: 'Invalid value',
     },

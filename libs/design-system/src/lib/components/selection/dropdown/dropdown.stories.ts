@@ -31,11 +31,12 @@ const options = [
     { label: 'Maintenance', value: 'maintenance' },
 ];
 
-export const Default: Story = {
+export const WithHint: Story = {
     args: {
         config: {
             label: 'Select Status',
             placeholder: 'Choose a status',
+            hint: 'This is a helpful hint.',
             options: options,
         },
     },

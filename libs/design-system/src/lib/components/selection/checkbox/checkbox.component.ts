@@ -14,8 +14,8 @@ const DEFAULT_CONFIG: CheckboxConfig = {
   template: `
     <mat-checkbox
       [checked]="checked()"
-      [disabled]="config().disabled!"
-      [indeterminate]="config().indeterminate!"
+      [disabled]="config().disabled"
+      [indeterminate]="config().indeterminate"
       [color]="'primary'"
       (change)="onChange($event.checked)"
     >

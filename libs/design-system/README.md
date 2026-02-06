@@ -24,9 +24,20 @@ npx nx g @nx/angular:component <component-name> --project=design-system --export
 
 Then, create a story for it:
 
+````bash
 ```bash
 npx nx g @nx/angular:stories --project=design-system
-```
+````
+
+## Component Development Guidelines
+
+### Wrapping Angular Material
+
+When wrapping Angular Material components (like `mat-input` or `mat-select`) in a custom component:
+
+- **Use Reactive Forms API**: Prefer an internal `FormControl` synchronized with your component's signals/inputs.
+- **Error State Management**: Correctly trigger the Material error state by using a custom `ErrorStateMatcher` that references the internal `FormControl`. This ensures that `mat-error` and `mat-hint` toggle correctly and adhere to Material's native validation triggers.
+- **Model Synchronization**: Use Angular's `model()` or `input()` signals to bridge the custom component's API with the internal `FormControl` for a seamless developer experience.
 
 ## Styling & Tokens
 
