@@ -6,6 +6,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "./client"
 }
 
 datasource db {
@@ -15,4 +16,22 @@ datasource db {
 
 model Test {
   id Int @id @default(autoincrement())
+}
+
+enum JobStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+model AgentJob {
+  id        Int       @id @default(autoincrement())
+  prompt    String
+  assignee  String?
+  status    JobStatus @default(PENDING)
+  logs      Json[]    @default([])
+  artifacts Json[]    @default([])
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

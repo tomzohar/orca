@@ -14,6 +14,7 @@ export interface InputConfig {
     error?: string;
     hint?: string;
     type?: string;
+    rows?: number;
 }
 
 export interface CheckboxConfig {

@@ -70,6 +70,13 @@
     },
     "lint": {
       "executor": "@nx/eslint:lint"
+    },
+    "prisma-generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "prisma generate --schema=prisma/schema.prisma",
+        "cwd": "apps/api"
+      }
     }
   },
   "tags": []

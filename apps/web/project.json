@@ -19,7 +19,10 @@
             "input": "apps/web/public"
           }
         ],
-        "styles": ["apps/web/src/styles.css"]
+        "styles": ["apps/web/src/styles.scss"],
+        "stylePreprocessorOptions": {
+          "includePaths": ["libs/design-system/src/lib/styles"]
+        }
       },
       "configurations": {
         "production": {

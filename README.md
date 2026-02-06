@@ -90,6 +90,29 @@ Human-in-the-Loop interface for monitoring and intervention, featuring a Live Fe
    npm run storybook
    ```
 
+## Database & Prisma
+
+This project uses PostgreSQL and Prisma ORM.
+
+### 1. Start the Database
+
+A `docker-compose.yml` is provided at the root to start a local PostgreSQL instance:
+
+```bash
+docker compose up -d
+```
+
+### 2. Generate Prisma Client
+
+To ensure the TypeScript server and local builds have the latest types, you must generate the client locally.
+
+```bash
+npx nx prisma-generate api
+```
+
+> [!NOTE]
+> The generated client is stored locally in `apps/api/prisma/client` and is ignored by git. This ensures maximum stability for IDE synchronization.
+
 ## Running Tasks
 
 To run tasks with Nx use:
