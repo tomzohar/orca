@@ -1,6 +1,6 @@
 # Orca: Autonomous Software Orchestrator
 
-<a alt="Nx logo" href="https://nx.dev" target="_blank" rel="noreferrer"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="45"></a>
+<img src="apps/web/public/assets/orca_logo_cropped_svg.svg" alt="Orca Logo" width="120">
 
 ## Vision
 
