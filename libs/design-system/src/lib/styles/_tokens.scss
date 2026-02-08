@@ -11,9 +11,17 @@ $text-disabled: rgba(255, 255, 255, 0.3);
 $text-muted: rgba(255, 255, 255, 0.7);
 $border-color: rgba(255, 255, 255, 0.23);
 $border-disabled: rgba(255, 255, 255, 0.12);
+$border-accent-subtle: rgba(0, 229, 255, 0.1);
 $error-color: #ff5252;
 $color-accent: #00E5FF;
 $color-disabled: rgb(115, 122, 150);
+
+// Translucent Surfaces
+$surface-topbar: rgba(0, 16, 33, 0.8);
+$surface-sidebar: #001021;
+$surface-search: rgba(255, 255, 255, 0.05);
+$surface-accent-muted: rgba(0, 229, 255, 0.08);
+$status-online: #69f0ae;
 
 // Spacing
 $spacing-xs: 4px;

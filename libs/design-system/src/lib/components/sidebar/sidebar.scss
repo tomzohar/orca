@@ -1,0 +1,73 @@
+@use '../../styles/tokens' as tokens;
+
+:host {
+  display: block;
+  width: var(--sidebar-width, 239px);
+}
+
+.orca-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: tokens.$surface-sidebar;
+  border-right: 1px solid tokens.$border-accent-subtle;
+  width: 100%;
+  color: tokens.$text-primary;
+
+  .sidebar-header {
+    height: 64px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid tokens.$border-disabled;
+  }
+
+  .sidebar-list {
+    flex: 1;
+    padding-top: 8px;
+
+    .sidebar-item.mat-mdc-list-item {
+      margin: 0;
+      border-radius: 0;
+      color: white;
+      height: 48px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease-in-out;
+
+      mat-icon {
+        color: white;
+        margin-right: tokens.$spacing-lg;
+      }
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      &.active {
+        background-color: tokens.$surface-accent-muted;
+        border-left-color: tokens.$color-accent;
+
+        mat-icon {
+          color: white;
+        }
+
+        span {
+          font-weight: normal;
+        }
+      }
+
+      span {
+        font-size: 16px;
+        font-family: 'Inter', sans-serif;
+      }
+    }
+  }
+
+  .sidebar-footer {
+    border-top: 1px solid tokens.$border-disabled;
+    padding: tokens.$spacing-md;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+}

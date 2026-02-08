@@ -18,7 +18,10 @@ const DEFAULT_CONFIG: ButtonConfig = {
 })
 export class ButtonComponent {
     config = input<ButtonConfig, Partial<ButtonConfig> | undefined>(DEFAULT_CONFIG, {
-        transform: (value) => ({ ...DEFAULT_CONFIG, ...value })
+        transform: (value) => {
+            if (!value) return DEFAULT_CONFIG;
+            return { ...DEFAULT_CONFIG, ...value };
+        }
     });
 
     clicked = output<MouseEvent>();

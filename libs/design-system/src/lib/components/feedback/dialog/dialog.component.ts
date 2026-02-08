@@ -26,7 +26,7 @@ const DEFAULT_CONFIG: DialogConfig = {
                     </div>
                     @if (config().showCloseButton) {
                         <orca-button 
-                            [config]="{ variant: 'icon-button', icon: { name: 'close' } }" 
+                            [config]="{ variant: 'primary', icon: { name: 'close' } }" 
                             (clicked)="closed.emit()"
                         ></orca-button>
                     }

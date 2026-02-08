@@ -1,7 +1,7 @@
 export type DesignSystemColor = 'primary' | 'accent' | 'warn';
 
 export interface ButtonConfig {
-    variant?: 'primary' | 'secondary' | 'ghost' | 'icon-button';
+    variant?: 'primary' | 'secondary' | 'ghost';
     disabled?: boolean;
     type?: 'button' | 'submit' | 'reset';
     icon?: IconConfig;
@@ -15,6 +15,8 @@ export interface InputConfig {
     hint?: string;
     type?: string;
     rows?: number;
+    prefixIcon?: IconConfig;
+    size?: 'sm' | 'md';
 }
 
 export interface CheckboxConfig {

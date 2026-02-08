@@ -2,6 +2,8 @@ import { Component, DestroyRef, inject, input, model, effect, forwardRef } from 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { IconComponent } from '../icon/icon.component';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { FormsModule, FormControl, ReactiveFormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { InputConfig } from '../../types/component.types';
@@ -26,7 +28,7 @@ class OrcaErrorStateMatcher implements ErrorStateMatcher {
 @Component({
     selector: 'orca-input',
     standalone: true,
-    imports: [MatFormFieldModule, MatInputModule, FormsModule, ReactiveFormsModule],
+    imports: [MatFormFieldModule, MatInputModule, MatIconModule, IconComponent, FormsModule, ReactiveFormsModule],
     templateUrl: './input.component.html',
     styleUrl: './input.component.scss',
     providers: [
@@ -47,8 +49,8 @@ export class InputComponent implements ControlValueAccessor {
     control = new FormControl<string>('');
     errorStateMatcher = new OrcaErrorStateMatcher(() => this.config());
 
-    onChange: (value: string) => void = () => { };
-    onTouched: () => void = () => { };
+    onChange: (value: string) => void = () => { /* Intended empty */ };
+    onTouched: () => void = () => { /* Intended empty */ };
 
     constructor() {
         effect(() => {

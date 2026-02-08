@@ -1,0 +1,25 @@
+<div class="orca-sidebar">
+  <div class="sidebar-header">
+    <ng-content select="[header]"></ng-content>
+  </div>
+
+  <mat-nav-list class="sidebar-list">
+    @for (item of config().items; track item.id) {
+    <a
+      mat-list-item
+      tabindex="0"
+      [class.active]="item.isActive"
+      (click)="onItemClick(item)"
+      (keydown.enter)="onItemClick(item)"
+      class="sidebar-item"
+    >
+      <orca-icon matListItemIcon [config]="item.icon"></orca-icon>
+      <span matListItemTitle>{{ item.label }}</span>
+    </a>
+    }
+  </mat-nav-list>
+
+  <div class="sidebar-footer">
+    <ng-content select="[footer]"></ng-content>
+  </div>
+</div>

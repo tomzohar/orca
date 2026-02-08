@@ -48,8 +48,8 @@ export class DropdownComponent implements ControlValueAccessor {
     control = new FormControl<unknown>(null);
     errorStateMatcher = new OrcaErrorStateMatcher(() => this.config());
 
-    onChange: (value: unknown) => void = () => { };
-    onTouched: () => void = () => { };
+    onChange: (value: unknown) => void = () => { /* Intended empty */ };
+    onTouched: () => void = () => { /* Intended empty */ };
 
     constructor() {
         effect(() => {

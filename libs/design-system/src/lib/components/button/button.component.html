@@ -2,7 +2,10 @@
   mat-ripple
   [type]="config().type"
   [disabled]="config().disabled"
-  [class]="'orca-button ' + config().variant"
+  class="orca-button"
+  [class.primary]="config().variant === 'primary'"
+  [class.secondary]="config().variant === 'secondary'"
+  [class.ghost]="config().variant === 'ghost'"
   (click)="onClick($event)"
 >
   @if (config().icon; as icon) {

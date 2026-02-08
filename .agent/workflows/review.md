@@ -18,18 +18,22 @@ Use this workflow to verify that new features or refactored code adhere to the O
 
 - [ ] **SCSS Imports**: Are styles importing via the alias?
   - **Correct**: `@use 'orca-styles' as *;` or `@use 'orca-styles' as orca;`
-  - **Incorrect**: Relative imports like `@use '../../../../libs/design-system/...'`
-- [ ] **Design Tokens**: Check for hardcoded colors or spacing. Ensure `tokens.$spacing-*` and `tokens.$color-*` (or namespaced variants) are used.
-- [ ] **Orca Components**: Ensure orca components are used instead of raw Material components (`mat-card`, etc.).
+  - **Exception**: Within the `design-system` library, use relative paths for internal tokens to ensure build stability.
+- [ ] **Design Tokens**: Check for hardcoded colors or spacing. Ensure `tokens.$spacing-*` and `tokens.$color-*` are used.
+- [ ] **Avoid `!important`**: Styles should use `:host` and structural selectors instead of `!important` wherever possible.
+- [ ] **Orca Components**: Ensure orca components are used instead of raw Material components (`mat-card`, `mat-icon`, etc.).
+  - **Check**: Use `orca-icon` instead of direct `<mat-icon>` tags.
 
 ### 2. Angular Best Practices
 
-- [ ] **Control Flow**: Use modern Angular control flow (`@if`, `@for`, `@switch`) instead of legacy directives (`*ngIf`, `*ngFor`).
-- [ ] **Form Integration**: If a custom input component is used, does it correctly implement `ControlValueAccessor` to support `ngModel` or Reactive Forms?
-- [ ] **Performance**: Check for unnecessary `ChangeDetectorRef.detectChanges()` calls. Prefer signals or Observable-based change detection.
+- [ ] **Control Flow**: Use modern Angular control flow (`@if`, `@for`) instead of legacy directives.
+- [ ] **Standalone Components**: Avoid redundant imports like `CommonModule` in standalone components.
+- [ ] **Component Composition**: Components should not style projected content (`ng-content`). Projection slots should be styled by the content provider.
+- [ ] **Input Configuration**: Ensure components handle optional configuration properties gracefully, using `transform` on `input()` signals where appropriate.
 
 ### 3. Verification Steps
 
+- [ ] **Unit tests**: high quality unit tests for all components and services
 - [ ] **Build Check**: Run `nx build web` and ensure it passes.
 - [ ] **Visual Audit**: Open the browser and check:
   - No red build overlays.
