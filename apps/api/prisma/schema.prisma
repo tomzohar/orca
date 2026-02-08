@@ -23,6 +23,7 @@ enum JobStatus {
   RUNNING
   COMPLETED
   FAILED
+  WAITING_FOR_USER
 }
 
 enum AgentType {

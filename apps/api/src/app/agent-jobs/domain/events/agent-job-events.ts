@@ -1,5 +1,5 @@
 import { AgentJobEntity, AgentJobStatus } from '../entities/agent-job.entity';
-import { AgentJobLog } from '../../../../prisma/client';
+import { AgentJobLog } from '../../../../../prisma/client';
 
 export class JobCreatedEvent {
     constructor(public readonly job: AgentJobEntity) { }

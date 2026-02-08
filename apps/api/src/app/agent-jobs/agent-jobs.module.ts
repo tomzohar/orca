@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { AgentJobsController } from './agent-jobs.controller';
-import { AgentJobsService } from './agent-jobs.service';
 import { PrismaModule } from '../prisma/prisma.module';
-import { AGENT_JOBS_REPOSITORY } from './repositories/agent-jobs.repository.interface';
-import { PrismaAgentJobsRepository } from './repositories/prisma-agent-jobs.repository';
-import { AGENT_RUNNER } from './interfaces/agent-runner.interface';
-import { LocalAgentRunner } from './services/local-agent-runner';
-import { DockerAgentRunner } from './services/docker-agent-runner';
-import { ARTIFACT_STORAGE } from './interfaces/artifact-storage.interface';
-import { DbArtifactStorage } from './services/db-artifact-storage';
 import { LlmModule } from '../shared/llm/llm.module';
-import { AgentType } from './entities/agent-job.entity';
+import { AgentJobsService } from './agent-jobs.service';
+import { AgentJobsController } from './api/agent-jobs.controller';
+import { PrismaAgentJobsRepository } from './data/repositories/prisma-agent-jobs.repository';
+import { AgentType } from './domain/entities/agent-job.entity';
+import { AGENT_JOBS_REPOSITORY } from './domain/interfaces/agent-jobs.repository.interface';
+import { AGENT_RUNNER } from './domain/interfaces/agent-runner.interface';
+import { ARTIFACT_STORAGE } from './domain/interfaces/artifact-storage.interface';
+import { DockerAgentRunner } from './execution/services/docker-agent-runner';
+import { LocalAgentRunner } from './execution/services/local-agent-runner';
+import { DbArtifactStorage } from './storage/services/db-artifact-storage';
 
 @Module({
     imports: [

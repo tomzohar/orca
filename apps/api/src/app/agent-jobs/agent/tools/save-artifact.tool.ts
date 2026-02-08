@@ -1,6 +1,6 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { IArtifactStorage } from '../../interfaces/artifact-storage.interface';
+import { IArtifactStorage } from '../../domain/interfaces/artifact-storage.interface';
 
 export const createSaveArtifactTool = (
     jobId: number,

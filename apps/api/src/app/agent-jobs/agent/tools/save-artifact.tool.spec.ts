@@ -1,5 +1,5 @@
 import { createSaveArtifactTool } from './save-artifact.tool';
-import { IArtifactStorage } from '../../interfaces/artifact-storage.interface';
+import { type IArtifactStorage } from '../../domain/interfaces/artifact-storage.interface';
 
 describe('createSaveArtifactTool', () => {
     let mockArtifactStorage: jest.Mocked<IArtifactStorage>;

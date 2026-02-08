@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../prisma/prisma.service';
-import { AgentJobEntity, AgentJobStatus, AgentType } from '../entities/agent-job.entity';
-import { IAgentJobsRepository } from './agent-jobs.repository.interface';
-import { Prisma, AgentType as PrismaAgentType } from '../../../../prisma/client';
+import { Prisma, AgentType as PrismaAgentType } from '../../../../../prisma/client';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { AgentJobEntity, AgentJobStatus, AgentType } from '../../domain/entities/agent-job.entity';
+import type { IAgentJobsRepository } from '../../domain/interfaces/agent-jobs.repository.interface';
 
 type AgentJobWithRelations = Prisma.AgentJobGetPayload<{
     include: { logs: true; artifacts: true };

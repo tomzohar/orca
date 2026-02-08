@@ -1,15 +1,15 @@
+import { HumanMessage } from '@langchain/core/messages';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AgentJobEntity, AgentJobStatus } from '../entities/agent-job.entity';
-import { JobArtifactAddedEvent, JobLogAddedEvent, JobStatusChangedEvent } from '../events/agent-job-events';
-import { IAgentRunner } from '../interfaces/agent-runner.interface';
-import { ARTIFACT_STORAGE, IArtifactStorage } from '../interfaces/artifact-storage.interface';
-import { AGENT_JOBS_REPOSITORY, IAgentJobsRepository } from '../repositories/agent-jobs.repository.interface';
-import { LlmService } from '../../shared/llm/llm.service';
-import { createLogTool } from '../agent/tools/log-progress.tool';
-import { createSaveArtifactTool } from '../agent/tools/save-artifact.tool';
-import { createAgentGraph } from '../agent/agent.graph';
-import { HumanMessage } from '@langchain/core/messages';
+import { LlmService } from '../../../shared/llm/llm.service';
+import { createAgentGraph } from '../../agent/agent.graph';
+import { createLogTool } from '../../agent/tools/log-progress.tool';
+import { createSaveArtifactTool } from '../../agent/tools/save-artifact.tool';
+import { AgentJobEntity, AgentJobStatus } from '../../domain/entities/agent-job.entity';
+import { JobArtifactAddedEvent, JobLogAddedEvent, JobStatusChangedEvent } from '../../domain/events/agent-job-events';
+import { AGENT_JOBS_REPOSITORY, type IAgentJobsRepository } from '../../domain/interfaces/agent-jobs.repository.interface';
+import type { IAgentRunner } from '../../domain/interfaces/agent-runner.interface';
+import { ARTIFACT_STORAGE, type IArtifactStorage } from '../../domain/interfaces/artifact-storage.interface';
 
 @Injectable()
 export class LocalAgentRunner implements IAgentRunner {

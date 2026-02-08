@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AgentJobsController } from './agent-jobs.controller';
-import { AgentJobsService } from './agent-jobs.service';
-import { AgentJobEntity, AgentJobStatus } from './entities/agent-job.entity';
+import { AgentJobsService } from '../agent-jobs.service';
+import { AgentJobEntity, AgentJobStatus, AgentType } from '../domain/entities/agent-job.entity';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 
 describe('AgentJobsController', () => {
@@ -43,7 +43,7 @@ describe('AgentJobsController', () => {
 
             const result = await controller.createJob({ prompt });
 
-            expect(service.createJob).toHaveBeenCalledWith(prompt, undefined);
+            expect(service.createJob).toHaveBeenCalledWith(prompt, undefined, AgentType.LANGGRAPH);
             expect(result).toEqual(mockJob);
         });
     });

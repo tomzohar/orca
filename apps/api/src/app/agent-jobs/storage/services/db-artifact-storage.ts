@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { IArtifactStorage } from '../interfaces/artifact-storage.interface';
-import { AGENT_JOBS_REPOSITORY, IAgentJobsRepository } from '../repositories/agent-jobs.repository.interface';
+import type { IArtifactStorage } from '../../domain/interfaces/artifact-storage.interface';
+import { AGENT_JOBS_REPOSITORY, type IAgentJobsRepository } from '../../domain/interfaces/agent-jobs.repository.interface';
 
 @Injectable()
 export class DbArtifactStorage implements IArtifactStorage {

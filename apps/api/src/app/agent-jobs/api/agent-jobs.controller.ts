@@ -1,10 +1,10 @@
-import { Controller, Post, Body, Get, Param, ParseIntPipe, Sse, MessageEvent, Query } from '@nestjs/common';
+import { Body, Controller, Get, MessageEvent, Param, ParseIntPipe, Post, Query, Sse } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
-import { AgentJobsService } from './agent-jobs.service';
+import { Observable, Subject, filter, map } from 'rxjs';
+import { AgentJobsService } from '../agent-jobs.service';
+import { AgentType } from '../domain/entities/agent-job.entity';
+import { JobArtifactAddedEvent, JobCreatedEvent, JobLogAddedEvent, JobStatusChangedEvent } from '../domain/events/agent-job-events';
 import { CreateAgentJobDto } from './dto/create-agent-job.dto';
-import { AgentType } from './entities/agent-job.entity';
-import { Observable, Subject, map, filter } from 'rxjs';
-import { JobArtifactAddedEvent, JobCreatedEvent, JobLogAddedEvent, JobStatusChangedEvent } from './events/agent-job-events';
 
 type AgentJobEvent = JobCreatedEvent | JobStatusChangedEvent | JobLogAddedEvent | JobArtifactAddedEvent;
 

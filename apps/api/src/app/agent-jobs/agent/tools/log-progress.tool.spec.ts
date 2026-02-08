@@ -1,5 +1,5 @@
 import { createLogTool } from './log-progress.tool';
-import { IAgentJobsRepository } from '../../repositories/agent-jobs.repository.interface';
+import { type IAgentJobsRepository } from '../../domain/interfaces/agent-jobs.repository.interface';
 
 describe('createLogTool', () => {
     let mockRepository: jest.Mocked<IAgentJobsRepository>;

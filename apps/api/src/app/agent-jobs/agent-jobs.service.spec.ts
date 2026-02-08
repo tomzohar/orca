@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AgentJobsService } from './agent-jobs.service';
-import { AGENT_JOBS_REPOSITORY } from './repositories/agent-jobs.repository.interface';
-import { AgentJobEntity, AgentJobStatus } from './entities/agent-job.entity';
+import { AGENT_JOBS_REPOSITORY } from './domain/interfaces/agent-jobs.repository.interface';
+import { AgentJobEntity, AgentJobStatus, AgentType } from './domain/entities/agent-job.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { AGENT_RUNNER } from './interfaces/agent-runner.interface';
-import { JobCreatedEvent } from './events/agent-job-events';
+import { AGENT_RUNNER } from './domain/interfaces/agent-runner.interface';
+import { JobCreatedEvent } from './domain/events/agent-job-events';
 
 describe('AgentJobsService', () => {
     let service: AgentJobsService;
@@ -36,14 +36,14 @@ describe('AgentJobsService', () => {
                 AgentJobsService,
                 { provide: AGENT_JOBS_REPOSITORY, useValue: mockRepository },
                 { provide: EventEmitter2, useValue: mockEventEmitter },
-                { provide: AGENT_RUNNER, useValue: mockRunner },
+                { provide: AGENT_RUNNER, useValue: () => mockRunner },
             ],
         }).compile();
 
         service = module.get<AgentJobsService>(AgentJobsService);
         repository = module.get(AGENT_JOBS_REPOSITORY);
         eventEmitter = module.get<EventEmitter2>(EventEmitter2);
-        runner = module.get(AGENT_RUNNER);
+        runner = mockRunner;
     });
 
     afterEach(() => {
@@ -74,6 +74,7 @@ describe('AgentJobsService', () => {
             expect(repository.create).toHaveBeenCalledWith({
                 prompt,
                 assignee: undefined,
+                type: AgentType.LANGGRAPH,
             });
             expect(eventEmitter.emit).toHaveBeenCalledWith('agent-job.created', new JobCreatedEvent(mockJob));
             expect(runner.run).toHaveBeenCalledWith(mockJob);

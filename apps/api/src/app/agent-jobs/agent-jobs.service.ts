@@ -1,9 +1,9 @@
-import { Injectable, Logger, NotFoundException, Inject } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AgentJobEntity, AgentType } from './entities/agent-job.entity';
-import { AGENT_JOBS_REPOSITORY, IAgentJobsRepository } from './repositories/agent-jobs.repository.interface';
-import { AGENT_RUNNER, IAgentRunner } from './interfaces/agent-runner.interface';
-import { JobCreatedEvent } from './events/agent-job-events';
+import { AgentJobEntity, AgentType } from './domain/entities/agent-job.entity';
+import { JobCreatedEvent } from './domain/events/agent-job-events';
+import { AGENT_JOBS_REPOSITORY, type IAgentJobsRepository } from './domain/interfaces/agent-jobs.repository.interface';
+import { AGENT_RUNNER, type IAgentRunner } from './domain/interfaces/agent-runner.interface';
 
 @Injectable()
 export class AgentJobsService {

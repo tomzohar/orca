@@ -15,7 +15,14 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 - **Architecture:** **Pluggable Strategy Pattern**
   - `AgentRunnerFactory`: Dispatches jobs based on `AgentType`.
   - **Quick Mode (`LocalAgentRunner`)**: In-process LangGraph execution (Fast, Database-only artifacts).
-  - **Deep Mode (`DockerAgentRunner`)**: Isolated Docker execution (`orca-agent` image) for complex tasks.
+- [x] **Deep Mode (Dockerized Agent)**:
+  - [x] Create `apps/agent-scaffold` with Claude Agent SDK.
+  - [x] Implement `DockerAgentRunner` in backend.
+  - [x] Integrate with `AgentJobs` module.
+  - [x] Verify tool use (File System, Bash).
+- [x] **Log Formatting**: Parse raw JSON logs into human-readable updates.
+- [x] **Artifact Capture**: Store agent file outputs (`Write` & `Edit` via `fs.watch`) in DB.
+- [x] **Feedback Loop**: Agent can request user input (`AskUserQuestion`), triggering `WAITING_FOR_USER` status.
 - **Data Model:**
   - `AgentJob`: Includes `agentType` logic.
   - `AgentJobLog` & `AgentJobArtifact`: Relational tables for streaming outputs.
@@ -42,13 +49,8 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 - **Frontend UI:** Added "Agent Mode" selection and validated End-to-End flow.
 - **Bug Fixes:** Resolved Angular `ControlValueAccessor` issues in `DropdownComponent`.
 
-## 4. Next Steps (Claude SDK Implementation)
+## 4. Next Steps (Orchestration & UI)
 
-We are now ready to implement the actual **Claude Agent** logic inside the Docker container.
-
-1.  **Agent Entry Point:** Create the `main.ts` (or `main.py`) script inside `apps/agent-scaffold` that initializes the Claude Agent.
-2.  **Tool Implementation:**
-    - **File System Tools:** Give the agent access to read/write files in the mounted `/app` directory.
-    - **Bash Tool:** Allow the agent to run approved shell commands.
-3.  **Communication Protocol:** Ensure the Agent script logs structured output that `DockerAgentRunner` can parse (for better UI feedback).
-4.  **Error Handling:** Handle API limits and container crashes gracefully.
+1.  **Orchestration Logic:** Handle the `WAITING_FOR_USER` state in the frontend (display question, accept input).
+2.  **Resume Job:** Implement API to resume a job with user feedback.
+3.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.

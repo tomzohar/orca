@@ -19,12 +19,18 @@ RUN apt-get update && apt-get install -y \
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
-# Install the Claude Agent SDK (Global install to persist across volume mounts)
-RUN npm install -g @anthropic-ai/claude-agent-sdk
+# Set up the agent directory
+WORKDIR /agent
 
-# Create a working directory
+# Initialize package.json and install dependencies locally
+RUN npm init -y && \
+    npm install @anthropic-ai/claude-agent-sdk tsx typescript @types/node
+
+# Copy the agent scaffold source code
+COPY . /agent
+
+# Create a working directory for the user's project
 WORKDIR /app
 
-# The entrypoint will be defined by the runner (e.g., executing a python script that uses the SDK)
-# For now, we keep it open or set a default shell.
+# The entrypoint will be defined by the runner, but we can set a default
 CMD ["/bin/bash"]

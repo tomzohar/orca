@@ -3,6 +3,7 @@ export enum AgentJobStatus {
     RUNNING = 'RUNNING',
     COMPLETED = 'COMPLETED',
     FAILED = 'FAILED',
+    WAITING_FOR_USER = 'WAITING_FOR_USER',
 }
 
 export enum AgentType {

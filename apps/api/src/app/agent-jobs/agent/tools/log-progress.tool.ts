@@ -1,6 +1,6 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
-import { IAgentJobsRepository } from '../../repositories/agent-jobs.repository.interface';
+import { IAgentJobsRepository } from '../../domain/interfaces/agent-jobs.repository.interface';
 
 export const createLogTool = (
     jobId: number,
