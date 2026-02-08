@@ -12,8 +12,8 @@ import { createAgentGraph } from '../agent/agent.graph';
 import { HumanMessage } from '@langchain/core/messages';
 
 @Injectable()
-export class LangGraphAgentRunner implements IAgentRunner {
-    private readonly logger = new Logger(LangGraphAgentRunner.name);
+export class LocalAgentRunner implements IAgentRunner {
+    private readonly logger = new Logger(LocalAgentRunner.name);
 
     constructor(
         @Inject(AGENT_JOBS_REPOSITORY)

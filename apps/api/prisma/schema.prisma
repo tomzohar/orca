@@ -25,11 +25,17 @@ enum JobStatus {
   FAILED
 }
 
+enum AgentType {
+  CLAUDE_SDK
+  LANGGRAPH
+}
+
 model AgentJob {
-  id        Int                @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
+  type      AgentType @default(LANGGRAPH)
   prompt    String
   assignee  String?
-  status    JobStatus          @default(PENDING)
+  status    JobStatus @default(PENDING)
   logs      AgentJobLog[]
   artifacts AgentJobArtifact[]
   createdAt DateTime           @default(now())

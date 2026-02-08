@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { AgentJobEntity, AgentJobStatus } from '../entities/agent-job.entity';
+import { AgentJobEntity, AgentJobStatus, AgentType } from '../entities/agent-job.entity';
 import { IAgentJobsRepository } from './agent-jobs.repository.interface';
-import { Prisma } from '../../../../prisma/client';
+import { Prisma, AgentType as PrismaAgentType } from '../../../../prisma/client';
 
 type AgentJobWithRelations = Prisma.AgentJobGetPayload<{
     include: { logs: true; artifacts: true };
@@ -12,11 +12,12 @@ type AgentJobWithRelations = Prisma.AgentJobGetPayload<{
 export class PrismaAgentJobsRepository implements IAgentJobsRepository {
     constructor(private readonly prisma: PrismaService) { }
 
-    async create(data: { prompt: string; assignee?: string }): Promise<AgentJobEntity> {
+    async create(data: { prompt: string; assignee?: string; type?: AgentType }): Promise<AgentJobEntity> {
         const job = await this.prisma.agentJob.create({
             data: {
                 prompt: data.prompt,
                 assignee: data.assignee,
+                type: data.type ? PrismaAgentType[data.type] : PrismaAgentType.LANGGRAPH,
             },
             include: { logs: true, artifacts: true },
         });
@@ -87,6 +88,7 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
             prompt: dbJob.prompt,
             assignee: dbJob.assignee ?? undefined,
             status: dbJob.status as AgentJobStatus,
+            type: AgentType[dbJob.type],
             logs: dbJob.logs.map(l => ({
                 id: l.id,
                 message: l.message,

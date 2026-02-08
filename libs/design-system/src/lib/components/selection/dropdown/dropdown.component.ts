@@ -1,9 +1,9 @@
-import { Component, DestroyRef, inject, input, model, effect } from '@angular/core';
+import { Component, DestroyRef, inject, input, model, effect, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, FormControl, ReactiveFormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { DropdownConfig } from '../../../types/component.types';
 
@@ -30,8 +30,15 @@ class OrcaErrorStateMatcher implements ErrorStateMatcher {
     imports: [CommonModule, MatFormFieldModule, MatSelectModule, FormsModule, ReactiveFormsModule],
     templateUrl: './dropdown.component.html',
     styleUrl: './dropdown.component.scss',
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => DropdownComponent),
+            multi: true
+        }
+    ]
 })
-export class DropdownComponent {
+export class DropdownComponent implements ControlValueAccessor {
     private destroyRef = inject(DestroyRef);
     config = input<DropdownConfig<unknown>, Partial<DropdownConfig<unknown>> | undefined>(DEFAULT_CONFIG, {
         transform: (value) => ({ ...DEFAULT_CONFIG, ...value })
@@ -40,6 +47,9 @@ export class DropdownComponent {
     value = model<unknown>(null);
     control = new FormControl<unknown>(null);
     errorStateMatcher = new OrcaErrorStateMatcher(() => this.config());
+
+    onChange: (value: unknown) => void = () => { };
+    onTouched: () => void = () => { };
 
     constructor() {
         effect(() => {
@@ -70,11 +80,34 @@ export class DropdownComponent {
         ).subscribe(val => {
             if (val !== null) {
                 this.value.set(val);
+                this.onChange(val);
             }
         });
     }
 
     onSelectionChange(event: { value: unknown }) {
         this.value.set(event.value);
+        this.onChange(event.value);
+    }
+
+    writeValue(value: unknown): void {
+        this.value.set(value);
+        this.control.setValue(value, { emitEvent: false });
+    }
+
+    registerOnChange(fn: (value: unknown) => void): void {
+        this.onChange = fn;
+    }
+
+    registerOnTouched(fn: () => void): void {
+        this.onTouched = fn;
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        if (isDisabled) {
+            this.control.disable({ emitEvent: false });
+        } else {
+            this.control.enable({ emitEvent: false });
+        }
     }
 }

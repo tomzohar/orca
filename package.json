@@ -3,8 +3,8 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "start:client": "npx nx serve client",
-    "start:server": "npx nx serve server",
+    "start:client": "npx nx serve web",
+    "start:server": "npx nx serve api",
     "storybook": "npx nx storybook design-system"
   },
   "private": true,
@@ -52,7 +52,7 @@
     "postcss": "^8.4.5",
     "postcss-url": "~10.1.3",
     "prettier": "~3.6.2",
-    "prisma": "5.22.0",
+    "prisma": "^5.22.0",
     "storybook": "10.2.4",
     "ts-jest": "^29.4.6",
     "ts-node": "10.9.1",

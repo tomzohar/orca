@@ -1,6 +1,6 @@
 import { Injectable, Logger, NotFoundException, Inject } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AgentJobEntity } from './entities/agent-job.entity';
+import { AgentJobEntity, AgentType } from './entities/agent-job.entity';
 import { AGENT_JOBS_REPOSITORY, IAgentJobsRepository } from './repositories/agent-jobs.repository.interface';
 import { AGENT_RUNNER, IAgentRunner } from './interfaces/agent-runner.interface';
 import { JobCreatedEvent } from './events/agent-job-events';
@@ -13,20 +13,22 @@ export class AgentJobsService {
         @Inject(AGENT_JOBS_REPOSITORY)
         private readonly repository: IAgentJobsRepository,
         @Inject(AGENT_RUNNER)
-        private readonly runner: IAgentRunner,
+        private readonly runnerFactory: (type: AgentType) => IAgentRunner,
         private readonly eventEmitter: EventEmitter2,
     ) { }
 
-    async createJob(prompt: string, assignee?: string): Promise<AgentJobEntity> {
+    async createJob(prompt: string, assignee?: string, type: AgentType = AgentType.LANGGRAPH): Promise<AgentJobEntity> {
         const job = await this.repository.create({
             prompt,
             assignee,
+            type,
         });
 
         this.eventEmitter.emit('agent-job.created', new JobCreatedEvent(job));
 
         // Fire and forget async processing
-        this.runner.run(job).catch((err) =>
+        const runner = this.runnerFactory(job.type);
+        runner.run(job).catch((err) =>
             this.logger.error(`Error running job ${job.id}`, err)
         );
 

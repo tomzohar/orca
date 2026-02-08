@@ -1,4 +1,5 @@
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsEnum } from 'class-validator';
+import { AgentType } from '../entities/agent-job.entity';
 
 export class CreateAgentJobDto {
     @IsString()
@@ -8,4 +9,8 @@ export class CreateAgentJobDto {
     @IsString()
     @IsOptional()
     assignee?: string;
+
+    @IsOptional()
+    @IsEnum(AgentType)
+    type?: AgentType;
 }

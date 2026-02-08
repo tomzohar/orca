@@ -2,7 +2,7 @@ import { Controller, Post, Body, Get, Param, ParseIntPipe, Sse, MessageEvent, Qu
 import { OnEvent } from '@nestjs/event-emitter';
 import { AgentJobsService } from './agent-jobs.service';
 import { CreateAgentJobDto } from './dto/create-agent-job.dto';
-import { AgentJobEntity } from './entities/agent-job.entity';
+import { AgentType } from './entities/agent-job.entity';
 import { Observable, Subject, map, filter } from 'rxjs';
 import { JobArtifactAddedEvent, JobCreatedEvent, JobLogAddedEvent, JobStatusChangedEvent } from './events/agent-job-events';
 
@@ -36,7 +36,9 @@ export class AgentJobsController {
 
     @Post()
     createJob(@Body() dto: CreateAgentJobDto) {
-        return this.agentJobsService.createJob(dto.prompt, dto.assignee);
+        // Map simplified string/enum from DTO to strictly typed AgentType if needed
+        const type = dto.type ? AgentType[dto.type] : AgentType.LANGGRAPH;
+        return this.agentJobsService.createJob(dto.prompt, dto.assignee, type);
     }
 
     @Get()

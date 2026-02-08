@@ -5,6 +5,11 @@ export enum AgentJobStatus {
     FAILED = 'FAILED',
 }
 
+export enum AgentType {
+    CLAUDE_SDK = 'CLAUDE_SDK',
+    LANGGRAPH = 'LANGGRAPH',
+}
+
 export interface AgentJobLog {
     id: number;
     message: string;
@@ -23,6 +28,7 @@ export class AgentJobEntity {
     prompt: string;
     assignee?: string;
     status: AgentJobStatus;
+    type: AgentType;
     logs: AgentJobLog[];
     artifacts: AgentJobArtifact[];
     createdAt: Date;
