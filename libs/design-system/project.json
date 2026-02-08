@@ -35,7 +35,15 @@
     },
     "test": {
       "executor": "@nx/angular:unit-test",
-      "options": {}
+      "options": {
+        "watch": false
+      }
+    },
+    "test:watch": {
+      "executor": "@nx/angular:unit-test",
+      "options": {
+        "watch": true
+      }
     },
     "lint": {
       "executor": "@nx/eslint:lint"
