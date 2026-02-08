@@ -46,6 +46,8 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ Connects to backend via proxy.
   - ✅ Consumes SSE stream for live updates.
   - ✅ Displays logs and artifacts in real-time.
+  - ✅ **State Management:** TanStack Query (Experimental) integrated for server state.
+  - ✅ **DevTools:** Custom wrapper for Angular Query DevTools implemented.
   - ✅ Monorepo-safe test suite (non-watch mode by default).
 
 ## 3. Recent Accomplishments
@@ -55,6 +57,10 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 - **Unit Testing:** Implemented comprehensive test suites for `LocalAgentRunner`, `DockerAgentRunner`, and execution log matchers (`AskUserMatcher`, `ToolUseMatcher`).
 - **Test Optimization:** Resolved monorepo-wide test synchronization issues, ensuring all projects (`api`, `web`, `design-system`) can be tested in a single, non-blocking run.
 - **TypeScript Quality:** Resolved complex Jest typing issues in mock files through `tsconfig` improvements.
+- **Linting & Code Quality:**
+  - **Web:** Fixed selector prefixes and strict typing issues.
+  - **API:** Configured ESLint to ignore generated Prisma files, achieving a clean lint baseline.
+- **Architecture Refactor:** Moved App Layout state to `libs/core/layout` to establish a proper library structure for shared business logic.
 
 ## 4. Next Steps (Orchestration & UI)
 

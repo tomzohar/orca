@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@orca/design-system": ["libs/design-system/src/index.ts"]
+      "@orca/design-system": ["libs/design-system/src/index.ts"],
+      "@orca/core/layout": ["libs/core/layout/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

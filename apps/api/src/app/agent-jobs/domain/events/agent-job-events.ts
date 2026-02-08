@@ -1,29 +1,33 @@
-import { AgentJobEntity, AgentJobStatus, AgentJobLog } from '../entities/agent-job.entity';
+import {
+  AgentJobEntity,
+  AgentJobStatus,
+  AgentJobLog,
+} from '../entities/agent-job.entity';
 
 export class JobCreatedEvent {
-    constructor(public readonly job: AgentJobEntity) { }
+  constructor(public readonly job: AgentJobEntity) {}
 }
 
 export class JobStatusChangedEvent {
-    constructor(
-        public readonly jobId: number,
-        public readonly newStatus: AgentJobStatus,
-        public readonly job: AgentJobEntity
-    ) { }
+  constructor(
+    public readonly jobId: number,
+    public readonly newStatus: AgentJobStatus,
+    public readonly job: AgentJobEntity,
+  ) {}
 }
 
 export class JobLogAddedEvent {
-    constructor(
-        public readonly jobId: number,
-        public readonly log: AgentJobLog & { jobId: number }
-    ) { }
+  constructor(
+    public readonly jobId: number,
+    public readonly log: AgentJobLog & { jobId: number },
+  ) {}
 }
 
 export class JobArtifactAddedEvent {
-    constructor(
-        public readonly jobId: number,
-        public readonly artifactId: number,
-        public readonly filename: string,
-        public readonly path: string
-    ) { }
+  constructor(
+    public readonly jobId: number,
+    public readonly artifactId: number,
+    public readonly filename: string,
+    public readonly path: string,
+  ) {}
 }

@@ -14,36 +14,32 @@ import { LocalAgentRunner } from './execution/services/local-agent-runner';
 import { DbArtifactStorage } from './storage/services/db-artifact-storage';
 
 @Module({
-    imports: [
-        PrismaModule,
-        EventEmitterModule.forRoot(),
-        LlmModule,
-    ],
-    controllers: [AgentJobsController],
-    providers: [
-        AgentJobsService,
-        LocalAgentRunner,
-        DockerAgentRunner,
-        {
-            provide: AGENT_JOBS_REPOSITORY,
-            useClass: PrismaAgentJobsRepository,
-        },
-        {
-            provide: AGENT_RUNNER, // Provide AGENT_RUNNER token
-            useFactory: (local: LocalAgentRunner, docker: DockerAgentRunner) => {
-                return (type: AgentType) => {
-                    if (type === AgentType.CLAUDE_SDK) {
-                        return docker;
-                    }
-                    return local;
-                };
-            },
-            inject: [LocalAgentRunner, DockerAgentRunner],
-        },
-        {
-            provide: ARTIFACT_STORAGE,
-            useClass: DbArtifactStorage,
-        },
-    ],
+  imports: [PrismaModule, EventEmitterModule.forRoot(), LlmModule],
+  controllers: [AgentJobsController],
+  providers: [
+    AgentJobsService,
+    LocalAgentRunner,
+    DockerAgentRunner,
+    {
+      provide: AGENT_JOBS_REPOSITORY,
+      useClass: PrismaAgentJobsRepository,
+    },
+    {
+      provide: AGENT_RUNNER, // Provide AGENT_RUNNER token
+      useFactory: (local: LocalAgentRunner, docker: DockerAgentRunner) => {
+        return (type: AgentType) => {
+          if (type === AgentType.CLAUDE_SDK) {
+            return docker;
+          }
+          return local;
+        };
+      },
+      inject: [LocalAgentRunner, DockerAgentRunner],
+    },
+    {
+      provide: ARTIFACT_STORAGE,
+      useClass: DbArtifactStorage,
+    },
+  ],
 })
-export class AgentJobsModule { }
+export class AgentJobsModule {}

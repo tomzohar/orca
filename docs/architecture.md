@@ -99,6 +99,26 @@ To ensure long-term maintainability and prevent "Big Ball of Mud" anti-patterns,
 - **Strict Typing with `import type`**: When importing interfaces for type-checking only (e.g., in service constructors), use `import type` to minimize bundle size and avoid circular dependency runtime issues.
 - **Module READMEs**: Every sub-folder contains a `README.md` explaining its responsibility, maintaining high tribal knowledge within the codebase.
 
+### 1.7 Frontend Architecture
+
+To maintain scalability alongside the backend, the frontend follows a modular library-based architecture.
+
+#### State Management
+
+- **Server State:** Handled by **TanStack Query** (via `@tanstack/angular-query-experimental`). This eliminates boilerplate for data fetching, caching, and synchronization.
+- **Local State:** Uses Angular Signals for reactive, fine-grained UI updates.
+
+#### Library Strategy
+
+- **`apps/web`**: The application shell. Responsible for routing, layout, and page-level orchestration.
+- **`libs/core`**: Business logic and state management.
+  - Example: `libs/core/layout` manages the global sidebar/topbar configuration via TanStack Query.
+- **`libs/ui`**: Pure UI components (Design System). Stateless and reusable.
+
+#### Experimental Integration
+
+- **DevTools**: We utilize a custom wrapper for the experimental Angular Query DevTools to enable deep inspection of queries during development.
+
 ## 2. Control Dashboard
 
 The Human-in-the-Loop interface for monitoring and intervention.

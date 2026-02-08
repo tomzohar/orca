@@ -1,0 +1,10 @@
+[
+  {
+    "content": "Always use Nx generators when generating components, services, libs and anything else possible with nx",
+    "createdAt": "2026-02-08T19:25:43.586Z"
+  },
+  {
+    "content": "To generate a non-buildable Angular library in a specific directory with a custom import path using Nx, use: npx nx g @nx/angular:library --name=<lib-name> --directory=libs/<path> --importPath=@<scope>/<path> --standalone --skipModule --unitTestRunner=jest",
+    "createdAt": "2026-02-08T19:33:40.676Z"
+  }
+]

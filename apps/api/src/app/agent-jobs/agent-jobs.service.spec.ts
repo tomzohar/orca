@@ -1,95 +1,106 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AgentJobsService } from './agent-jobs.service';
 import { AGENT_JOBS_REPOSITORY } from './domain/interfaces/agent-jobs.repository.interface';
-import { AgentJobEntity, AgentJobStatus, AgentType } from './domain/entities/agent-job.entity';
+import {
+  AgentJobEntity,
+  AgentJobStatus,
+  AgentType,
+} from './domain/entities/agent-job.entity';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { AGENT_RUNNER } from './domain/interfaces/agent-runner.interface';
 import { JobCreatedEvent } from './domain/events/agent-job-events';
 
 describe('AgentJobsService', () => {
-    let service: AgentJobsService;
-    let repository: any;
-    let eventEmitter: EventEmitter2;
-    let runner: any;
+  let service: AgentJobsService;
+  let repository: any;
+  let eventEmitter: EventEmitter2;
+  let runner: any;
 
-    const mockRepository = {
-        create: jest.fn(),
-        findById: jest.fn(),
-        update: jest.fn(),
-        findAll: jest.fn(),
-        addLog: jest.fn().mockResolvedValue({}),
-        addArtifact: jest.fn().mockResolvedValue({}),
-    };
+  const mockRepository = {
+    create: jest.fn(),
+    findById: jest.fn(),
+    update: jest.fn(),
+    findAll: jest.fn(),
+    addLog: jest.fn().mockResolvedValue({}),
+    addArtifact: jest.fn().mockResolvedValue({}),
+  };
 
-    const mockEventEmitter = {
-        emit: jest.fn(),
-    };
+  const mockEventEmitter = {
+    emit: jest.fn(),
+  };
 
-    const mockRunner = {
-        run: jest.fn().mockResolvedValue(undefined),
-    };
+  const mockRunner = {
+    run: jest.fn().mockResolvedValue(undefined),
+  };
 
-    beforeEach(async () => {
-        const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                AgentJobsService,
-                { provide: AGENT_JOBS_REPOSITORY, useValue: mockRepository },
-                { provide: EventEmitter2, useValue: mockEventEmitter },
-                { provide: AGENT_RUNNER, useValue: () => mockRunner },
-            ],
-        }).compile();
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        AgentJobsService,
+        { provide: AGENT_JOBS_REPOSITORY, useValue: mockRepository },
+        { provide: EventEmitter2, useValue: mockEventEmitter },
+        { provide: AGENT_RUNNER, useValue: () => mockRunner },
+      ],
+    }).compile();
 
-        service = module.get<AgentJobsService>(AgentJobsService);
-        repository = module.get(AGENT_JOBS_REPOSITORY);
-        eventEmitter = module.get<EventEmitter2>(EventEmitter2);
-        runner = mockRunner;
+    service = module.get<AgentJobsService>(AgentJobsService);
+    repository = module.get(AGENT_JOBS_REPOSITORY);
+    eventEmitter = module.get<EventEmitter2>(EventEmitter2);
+    runner = mockRunner;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('should be defined', () => {
+    expect(service).toBeDefined();
+  });
+
+  describe('createJob', () => {
+    it('should create a job with PENDING status via repository', async () => {
+      const prompt = 'Test Prompt';
+      const mockJob = new AgentJobEntity({
+        id: 1,
+        prompt,
+        status: AgentJobStatus.PENDING,
+        logs: [],
+        artifacts: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      mockRepository.create.mockResolvedValue(mockJob);
+
+      const result = await service.createJob(prompt);
+
+      expect(repository.create).toHaveBeenCalledWith({
+        prompt,
+        assignee: undefined,
+        type: AgentType.LANGGRAPH,
+      });
+      expect(eventEmitter.emit).toHaveBeenCalledWith(
+        'agent-job.created',
+        new JobCreatedEvent(mockJob),
+      );
+      expect(runner.run).toHaveBeenCalledWith(mockJob);
+      expect(result).toEqual(mockJob);
     });
+  });
 
-    afterEach(() => {
-        jest.clearAllMocks();
+  describe('getJob', () => {
+    it('should return a job by id', async () => {
+      const mockJob = new AgentJobEntity({
+        id: 1,
+        prompt: 'foo',
+        status: AgentJobStatus.PENDING,
+      });
+      mockRepository.findById.mockResolvedValue(mockJob);
+
+      const result = await service.getJob(1);
+      expect(result).toEqual(mockJob);
+      expect(repository.findById).toHaveBeenCalledWith(1);
     });
-
-    it('should be defined', () => {
-        expect(service).toBeDefined();
-    });
-
-    describe('createJob', () => {
-        it('should create a job with PENDING status via repository', async () => {
-            const prompt = 'Test Prompt';
-            const mockJob = new AgentJobEntity({
-                id: 1,
-                prompt,
-                status: AgentJobStatus.PENDING,
-                logs: [],
-                artifacts: [],
-                createdAt: new Date(),
-                updatedAt: new Date()
-            });
-
-            mockRepository.create.mockResolvedValue(mockJob);
-
-            const result = await service.createJob(prompt);
-
-            expect(repository.create).toHaveBeenCalledWith({
-                prompt,
-                assignee: undefined,
-                type: AgentType.LANGGRAPH,
-            });
-            expect(eventEmitter.emit).toHaveBeenCalledWith('agent-job.created', new JobCreatedEvent(mockJob));
-            expect(runner.run).toHaveBeenCalledWith(mockJob);
-            expect(result).toEqual(mockJob);
-        });
-    });
-
-    describe('getJob', () => {
-        it('should return a job by id', async () => {
-            const mockJob = new AgentJobEntity({ id: 1, prompt: 'foo', status: AgentJobStatus.PENDING });
-            mockRepository.findById.mockResolvedValue(mockJob);
-
-            const result = await service.getJob(1);
-            expect(result).toEqual(mockJob);
-            expect(repository.findById).toHaveBeenCalledWith(1);
-        });
-    });
+  });
 });
