@@ -1,10 +1,10 @@
 # Project Status
 
-**Last Updated:** February 7, 2026
+**Last Updated:** February 8, 2026
 
 ## 1. Overview
 
-Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture**, enabling both fast local execution and isolated Docker-based execution for deep coding tasks.
+Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture**, enabling both fast local execution and isolated Docker-based execution for deep coding tasks. The platform is now backed by a robust testing infrastructure and strict domain isolation.
 
 ## 2. Current Architecture State
 
@@ -15,6 +15,9 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 - **Architecture:** **Pluggable Strategy Pattern**
   - `AgentRunnerFactory`: Dispatches jobs based on `AgentType`.
   - **Quick Mode (`LocalAgentRunner`)**: In-process LangGraph execution (Fast, Database-only artifacts).
+  - **Testing Infrastructure**:
+    - Centralized mocking system for LLMs, Runners, and Repositories.
+    - Automated test execution via Nx (monorepo-safe).
 - [x] **Deep Mode (Dockerized Agent)**:
   - [x] Create `apps/agent-scaffold` with Claude Agent SDK.
   - [x] Implement `DockerAgentRunner` in backend.
@@ -30,6 +33,8 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ "Blackboard" Schema implemented.
   - ✅ Docker Infrastructure verified (Image built, permissions configured).
   - ✅ Granular SSE event stream (`log_added`, `artifact_added`).
+  - ✅ Domain Isolation: Prisma models decoupled from domain events.
+  - ✅ Test Coverage: ~90% for execution services and log matchers.
 
 ### Frontend (`apps/web`)
 
@@ -41,13 +46,15 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ Connects to backend via proxy.
   - ✅ Consumes SSE stream for live updates.
   - ✅ Displays logs and artifacts in real-time.
+  - ✅ Monorepo-safe test suite (non-watch mode by default).
 
 ## 3. Recent Accomplishments
 
-- **Pluggable Agent Architecture:** Implemented Strategy Pattern to support multiple agent runners.
-- **Docker Integration:** Created `orca-agent` Docker image with Node.js/Python and confirmed container connectivity.
-- **Frontend UI:** Added "Agent Mode" selection and validated End-to-End flow.
-- **Bug Fixes:** Resolved Angular `ControlValueAccessor` issues in `DropdownComponent`.
+- **Domain Integrity:** Fixed Prisma model leakage into domain events, enforcing strict architectural boundaries.
+- **Mocking Infrastructure:** Established a dedicated mocking layer in `test-utils` with best practices documentation.
+- **Unit Testing:** Implemented comprehensive test suites for `LocalAgentRunner`, `DockerAgentRunner`, and execution log matchers (`AskUserMatcher`, `ToolUseMatcher`).
+- **Test Optimization:** Resolved monorepo-wide test synchronization issues, ensuring all projects (`api`, `web`, `design-system`) can be tested in a single, non-blocking run.
+- **TypeScript Quality:** Resolved complex Jest typing issues in mock files through `tsconfig` improvements.
 
 ## 4. Next Steps (Orchestration & UI)
 

@@ -70,6 +70,35 @@ The current "Spawning" & "Blackboard" flow functions as follows:
     - User watches real-time logs and sees file changes appear in the artifact list.
     - User can interrupt or amend instructions at any time.
 
+### 1.6 File Structure & Domain Isolation
+
+To ensure long-term maintainability and prevent "Big Ball of Mud" anti-patterns, the system follows a Layered Architecture with strict Domain Isolation.
+
+#### Folder Structure (`apps/api/src/app/agent-jobs/`)
+
+- **`api/` (Presentation Layer)**:
+  - Responsibility: Handling HTTP requests/responses, DTO validation, and SSE streaming.
+  - Key Files: `agent-jobs.controller.ts`, `dto/`.
+- **`domain/` (Core Logic Layer)**:
+  - Responsibility: Housing core business logic, entities, interfaces, and domain events. This layer **must not** depend on external frameworks or database clients (e.g., Prisma).
+  - Key Files: `entities/`, `interfaces/`, `events/`.
+- **`execution/` (Application Layer)**:
+  - Responsibility: Orchestrating the execution of agents. Translates domain intentions into runner-specific actions.
+  - Key Files: `services/` (`DockerAgentRunner`, `LocalAgentRunner`), `matchers/`.
+- **`data/` (Infrastructure Layer - Persistence)**:
+  - Responsibility: Implementing repository interfaces using specific providers (e.g., Prisma).
+  - Key Files: `repositories/` (`PrismaAgentJobsRepository`).
+- **`storage/` (Infrastructure Layer - Artifacts)**:
+  - Responsibility: Handling physical storage of artifacts produced by agents.
+  - Key Files: `services/` (`DbArtifactStorage`).
+
+#### Best Practices
+
+- **Dependency Inversion**: Application logic (`execution/`) and Presentation (`api/`) depend on interfaces defined in `domain/` rather than concrete implementations. This allows for easy swapping of runners or database providers.
+- **Domain Isolation**: Domain entities (`AgentJobEntity`) are pure TypeScript classes. Prisma models are mapped to entities in the repository layer to prevent ORM leak into the business logic.
+- **Strict Typing with `import type`**: When importing interfaces for type-checking only (e.g., in service constructors), use `import type` to minimize bundle size and avoid circular dependency runtime issues.
+- **Module READMEs**: Every sub-folder contains a `README.md` explaining its responsibility, maintaining high tribal knowledge within the codebase.
+
 ## 2. Control Dashboard
 
 The Human-in-the-Loop interface for monitoring and intervention.
