@@ -1,0 +1,45 @@
+@use 'component' as *;
+
+:host {
+    display: block;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+.orca-layout {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    background-color: $tokens-background-color;
+
+    .layout-sidebar {
+        flex-shrink: 0;
+        z-index: 10;
+
+        .sidebar-header {
+            width: 100%;
+            display: flex;
+
+            img {
+                display: block;
+                margin: $tokens-spacing-sm auto 0;
+            }
+        }
+    }
+
+    .layout-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0; // Prevent flex item from overflowing
+        position: relative;
+
+        .layout-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: $tokens-spacing-xl;
+            position: relative;
+        }
+    }
+}

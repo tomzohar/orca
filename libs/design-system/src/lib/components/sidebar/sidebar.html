@@ -13,7 +13,9 @@
       (keydown.enter)="onItemClick(item)"
       class="sidebar-item"
     >
+      @if (item.icon) {
       <orca-icon matListItemIcon [config]="item.icon"></orca-icon>
+      }
       <span matListItemTitle>{{ item.label }}</span>
     </a>
     }

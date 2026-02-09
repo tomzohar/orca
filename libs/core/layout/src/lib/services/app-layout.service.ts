@@ -7,11 +7,12 @@ export class AppLayoutService {
     async getLayoutConfig(): Promise<AppLayoutConfig> {
         return Promise.resolve({
             sidebar: {
-                routes: [{ path: '/dashboard', label: 'Dashboard', icon: 'dashboard' }]
+                routes: [
+                    { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
+                ]
             },
             topbar: {
                 title: 'Orca',
-                logoUrl: 'assets/logo.svg' // Verify actual path
             }
         });
     }

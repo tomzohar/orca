@@ -3,6 +3,7 @@
 :host {
   display: block;
   width: var(--sidebar-width, 239px);
+  height: 100%;
 }
 
 .orca-sidebar {
@@ -10,7 +11,7 @@
   flex-direction: column;
   height: 100%;
   background-color: tokens.$surface-sidebar;
-  border-right: 1px solid tokens.$border-accent-subtle;
+  border-right: 1px solid tokens.$border-color;
   width: 100%;
   color: tokens.$text-primary;
 
@@ -19,7 +20,7 @@
     padding: 0 16px;
     display: flex;
     align-items: center;
-    border-bottom: 1px solid tokens.$border-disabled;
+    border-bottom: 1px solid tokens.$border-color;
   }
 
   .sidebar-list {

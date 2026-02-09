@@ -3,7 +3,7 @@ import { IconConfig } from '../../types/component.types';
 export interface SidebarItem {
     id: string;
     label: string;
-    icon: IconConfig;
+    icon?: IconConfig;
     route?: string;
     isActive?: boolean;
 }

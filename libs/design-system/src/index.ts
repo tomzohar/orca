@@ -12,3 +12,7 @@ export * from './lib/components/feedback/progress-bar/progress-bar.component';
 export * from './lib/components/feedback/spinner/spinner.component';
 export * from './lib/components/feedback/dialog/dialog.component';
 export * from './lib/services/dialog.service';
+export * from './lib/components/sidebar/sidebar.types';
+export * from './lib/components/topbar/topbar.types';
+export * from './lib/components/sidebar/sidebar.component';
+export * from './lib/components/topbar/topbar.component';

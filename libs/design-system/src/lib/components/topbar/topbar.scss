@@ -6,14 +6,14 @@
 
 mat-toolbar.orca-topbar {
   display: flex;
-  // justify-content: space-between;
   align-items: center;
   padding: 0 24px;
   background-color: tokens.$surface-topbar;
   color: tokens.$text-primary;
-  border-bottom: 1px solid tokens.$border-accent-subtle;
+  border-bottom: 1px solid tokens.$border-color;
   height: var(--topbar-height, 64px);
   box-shadow: none;
+  box-sizing: unset;
 
   .topbar-left,
   .topbar-center,

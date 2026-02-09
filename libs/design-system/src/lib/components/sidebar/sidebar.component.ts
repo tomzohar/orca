@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
-import { MatListModule } from '@angular/material/list';
+import { MatListModule, MatNavList } from '@angular/material/list';
 import { IconComponent } from '../icon/icon.component';
 import { SidebarConfig, SidebarItem } from './sidebar.types';
 
 @Component({
   selector: 'orca-sidebar',
   standalone: true,
-  imports: [MatListModule, IconComponent],
+  imports: [MatListModule, IconComponent, MatNavList],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

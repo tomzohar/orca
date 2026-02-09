@@ -4,6 +4,5 @@ export interface AppLayoutConfig {
     };
     topbar: {
         title: string;
-        logoUrl: string;
     };
 }
