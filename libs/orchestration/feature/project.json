@@ -1,0 +1,21 @@
+{
+  "name": "orchestration-feature",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/orchestration/feature/src",
+  "prefix": "lib",
+  "projectType": "library",
+  "tags": ["type:feature", "scope:orchestration"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/orchestration/feature/jest.config.cts",
+        "tsConfig": "libs/orchestration/feature/tsconfig.spec.json"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

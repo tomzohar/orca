@@ -16,7 +16,13 @@
     "baseUrl": ".",
     "paths": {
       "@orca/design-system": ["libs/design-system/src/index.ts"],
-      "@orca/core/layout": ["libs/core/layout/src/index.ts"]
+      "@orca/core/layout": ["libs/core/layout/src/index.ts"],
+      "@orca/orchestration-data": ["libs/orchestration/data/src/index.ts"],
+      "@orca/orchestration-feature": [
+        "libs/orchestration/feature/src/index.ts"
+      ],
+      "@orca/orchestration-ui": ["libs/orchestration/ui/src/index.ts"],
+      "@orca/orchestration-types": ["libs/orchestration/types/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
