@@ -17,3 +17,6 @@ export * from './lib/components/sidebar/sidebar.types';
 export * from './lib/components/topbar/topbar.types';
 export * from './lib/components/sidebar/sidebar.component';
 export * from './lib/components/topbar/topbar.component';
+export * from './lib/components/kanban/kanban-view/kanban-view.component';
+export * from './lib/components/kanban/kanban-card/kanban-card.component';
+export * from './lib/types/kanban.types';
