@@ -6,6 +6,7 @@ export * from './lib/components/selection/radio/radio.component';
 export * from './lib/components/selection/switch/switch.component';
 export * from './lib/components/selection/dropdown/dropdown.component';
 export * from './lib/components/feedback/alert/alert.component';
+export * from './lib/components/feedback/empty-state/empty-state.component';
 export * from './lib/components/containers/card/card.component';
 export * from './lib/components/icon/icon.component';
 export * from './lib/components/feedback/progress-bar/progress-bar.component';
