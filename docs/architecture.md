@@ -35,17 +35,19 @@ The control plane manages the lifecycle of tasks and agents.
 The current "Spawning" & "Blackboard" flow functions as follows:
 
 1.  **Job Creation (The Trigger):**
-    - A user or system event triggers a `POST /agent-jobs` request.
-    - The `AgentJobsService` creates a new `AgentJob` record in the database (The Blackboard) with status `PENDING`.
+    - A user or system event triggers a `POST /agent-jobs` request, which now requires a `projectId`.
+    - The `AgentJobsService` creates a new `AgentJob` record in the database (The Blackboard) with status `PENDING`, linked to the specified `Project`.
 
 2.  **Dispatcher & Execution:**
     - The `AgentJobsService` uses a **Factory** to select the appropriate Runner based on `job.agentType`:
       - **`CLAUDE_SDK`**: Dispatches a Docker Container running the Claude Agent SDK.
       - **`LANGGRAPH`**: Dispatches the local LangGraph loop.
-    - The Runner initializes the environment (mounts volumes or configures context).
-    - **Tools as Actuators:** The agent is equipped with specific tools that wrap the "Blackboard" repository:
+    - The Runner initializes the environment and **injects project context**:
+      - Retrieves the `rootPath`, `includes`, and `excludes` from the associated `Project`.
+    - **Tools as Actuators:** The agent is equipped with specific tools that wrap the "Blackboard" and the localized Workspace:
       - `logTool`: Writes progress to `AgentJobLog`.
       - `saveArtifactTool`: Writes outputs to `AgentJobArtifact`.
+      - `fileSystemTool`: Provides the agent with safe, scoped access to the project's `rootPath`.
 
 3.  **Real-Time Feedback Loop:**
     - As the Agent thinks and acts, it calls these tools.
@@ -91,6 +93,26 @@ To ensure long-term maintainability and prevent "Big Ball of Mud" anti-patterns,
 - **`storage/` (Infrastructure Layer - Artifacts)**:
   - Responsibility: Handling physical storage of artifacts produced by agents.
   - Key Files: `services/` (`DbArtifactStorage`).
+
+#### Folder Structure (`apps/api/src/app/projects/`)
+
+- **`api/`**: Project CRUD and slug-based lookup.
+- **`domain/`**: `Project` entity and repository interface.
+- **`application/`**: Business logic for project generation and management.
+- **`data/`**: Prisma implementation of project persistence.
+
+### 1.7 Workspace Awareness (Projects)
+
+The `Projects` module provides the structural context for agent execution. A project is not just a folder; it's a domain boundary.
+
+- **Entity Attributes**:
+  - `rootPath`: Absolute path on the server filesystem.
+  - `slug`: Human-readable unique identifier.
+  - `includes`/`excludes`: Glob patterns to control agent visibility.
+- **Lifecycle Integration**:
+  - Every `AgentJob` must be associated with a `Project`.
+  - This ensures that when an agent is spawned, it "knows" where it is working and what files are relevant.
+  - Execution tools (like `fileSystemTool`) are automatically scoped to the project's `rootPath`.
 
 #### Best Practices
 

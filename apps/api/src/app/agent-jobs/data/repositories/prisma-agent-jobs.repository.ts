@@ -12,27 +12,29 @@ import {
 import type { IAgentJobsRepository } from '../../domain/interfaces/agent-jobs.repository.interface';
 
 type AgentJobWithRelations = Prisma.AgentJobGetPayload<{
-  include: { logs: true; artifacts: true };
+  include: { logs: true; artifacts: true; project: true };
 }>;
 
 @Injectable()
 export class PrismaAgentJobsRepository implements IAgentJobsRepository {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async create(data: {
     prompt: string;
     assignee?: string;
     type?: AgentType;
+    projectId?: number;
   }): Promise<AgentJobEntity> {
     const job = await this.prisma.agentJob.create({
       data: {
         prompt: data.prompt,
         assignee: data.assignee,
+        projectId: data.projectId,
         type: data.type
           ? PrismaAgentType[data.type]
           : PrismaAgentType.LANGGRAPH,
       },
-      include: { logs: true, artifacts: true },
+      include: { logs: true, artifacts: true, project: true },
     });
     return this.mapToEntity(job);
   }
@@ -40,7 +42,7 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
   async findById(id: number): Promise<AgentJobEntity | null> {
     const job = await this.prisma.agentJob.findUnique({
       where: { id },
-      include: { logs: true, artifacts: true },
+      include: { logs: true, artifacts: true, project: true },
     });
     return job ? this.mapToEntity(job) : null;
   }
@@ -59,7 +61,7 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
     const updated = await this.prisma.agentJob.update({
       where: { id },
       data: updateData,
-      include: { logs: true, artifacts: true },
+      include: { logs: true, artifacts: true, project: true },
     });
     return this.mapToEntity(updated);
   }
@@ -69,7 +71,7 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
       where: {
         assignee: filters?.assignee,
       },
-      include: { logs: true, artifacts: true },
+      include: { logs: true, artifacts: true, project: true },
       orderBy: { createdAt: 'desc' },
     });
     return jobs.map((j) => this.mapToEntity(j));
@@ -108,6 +110,12 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
       assignee: dbJob.assignee ?? undefined,
       status: dbJob.status as AgentJobStatus,
       type: AgentType[dbJob.type],
+      projectId: dbJob.projectId ?? undefined,
+      project: dbJob.project ? {
+        rootPath: dbJob.project.rootPath,
+        includes: dbJob.project.includes,
+        excludes: dbJob.project.excludes
+      } : undefined,
       logs: dbJob.logs.map((l) => ({
         id: l.id,
         message: l.message,

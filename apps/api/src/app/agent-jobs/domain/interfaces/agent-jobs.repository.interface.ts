@@ -7,6 +7,7 @@ export interface IAgentJobsRepository {
     prompt: string;
     assignee?: string;
     type?: AgentType;
+    projectId?: number;
   }): Promise<AgentJobEntity>;
   findById(id: number): Promise<AgentJobEntity | null>;
   update(id: number, data: Partial<AgentJobEntity>): Promise<AgentJobEntity>;

@@ -1,10 +1,12 @@
 import { HumanMessage } from '@langchain/core/messages';
+import { DynamicStructuredTool } from '@langchain/core/tools';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LlmService } from '../../../shared/llm/llm.service';
 import { createAgentGraph } from '../../agent/agent.graph';
 import { createLogTool } from '../../agent/tools/log-progress.tool';
 import { createSaveArtifactTool } from '../../agent/tools/save-artifact.tool';
+import { createFileSystemTool } from '../../agent/tools/file-system.tool';
 import {
   AgentJobEntity,
   AgentJobStatus,
@@ -35,7 +37,7 @@ export class LocalAgentRunner implements IAgentRunner {
     private readonly artifactStorage: IArtifactStorage,
     private readonly eventEmitter: EventEmitter2,
     private readonly llmService: LlmService,
-  ) {}
+  ) { }
 
   async run(job: AgentJobEntity): Promise<void> {
     this.logger.log(`Starting LangGraph job ${job.id}`);
@@ -81,7 +83,15 @@ export class LocalAgentRunner implements IAgentRunner {
         },
       );
 
-      const tools = [logTool, artifactTool];
+      const tools: DynamicStructuredTool[] = [logTool, artifactTool];
+
+      if (job.project) {
+        this.logger.log(`Adding file system tool for project root: ${job.project.rootPath}`);
+        const fsTool = createFileSystemTool(job.project.rootPath);
+        tools.push(fsTool);
+      } else {
+        this.logger.warn(`Job ${job.id} has no project context. File system tool disabled.`);
+      }
 
       // 3. Create Graph
       const graph = createAgentGraph(model, tools);

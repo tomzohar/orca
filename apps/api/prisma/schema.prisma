@@ -37,10 +37,27 @@ model AgentJob {
   prompt    String
   assignee  String?
   status    JobStatus @default(PENDING)
+  
+  projectId Int?
+  project   Project?  @relation(fields: [projectId], references: [id])
+
   logs      AgentJobLog[]
   artifacts AgentJobArtifact[]
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
+}
+
+model Project {
+  id          Int        @id @default(autoincrement())
+  name        String
+  slug        String     @unique
+  rootPath    String
+  description String?
+  includes    String[]   @default(["**/*"])
+  excludes    String[]   @default(["**/node_modules/**", "**/.git/**"])
+  jobs        AgentJob[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
 }
 
 model AgentJobLog {

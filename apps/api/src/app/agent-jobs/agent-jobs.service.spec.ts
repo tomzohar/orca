@@ -10,6 +10,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { AGENT_RUNNER } from './domain/interfaces/agent-runner.interface';
 import { JobCreatedEvent } from './domain/events/agent-job-events';
+import { ProjectsService } from '../projects/application/projects.service';
 
 describe('AgentJobsService', () => {
   let service: AgentJobsService;
@@ -34,6 +35,10 @@ describe('AgentJobsService', () => {
     run: jest.fn().mockResolvedValue(undefined),
   };
 
+  const mockProjectsService = {
+    findById: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -41,6 +46,7 @@ describe('AgentJobsService', () => {
         { provide: AGENT_JOBS_REPOSITORY, useValue: mockRepository },
         { provide: EventEmitter2, useValue: mockEventEmitter },
         { provide: AGENT_RUNNER, useValue: () => mockRunner },
+        { provide: ProjectsService, useValue: mockProjectsService },
       ],
     }).compile();
 
@@ -73,12 +79,13 @@ describe('AgentJobsService', () => {
 
       mockRepository.create.mockResolvedValue(mockJob);
 
-      const result = await service.createJob(prompt);
+      const result = await service.createJob(prompt, undefined, undefined, 1);
 
       expect(repository.create).toHaveBeenCalledWith({
         prompt,
         assignee: undefined,
         type: AgentType.LANGGRAPH,
+        projectId: 1,
       });
       expect(eventEmitter.emit).toHaveBeenCalledWith(
         'agent-job.created',

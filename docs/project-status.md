@@ -4,17 +4,19 @@
 
 ## 1. Overview
 
-Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture**, enabling both fast local execution and isolated Docker-based execution for deep coding tasks. The platform is now backed by a robust testing infrastructure, strict domain isolation, and a centralized layout system.
+Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture** and a specialized **Projects Module**, enabling agents to operate with full project awareness and localized file system access. The platform is now backed by a robust testing infrastructure, strict domain isolation, and a centralized layout system.
 
 ## 2. Current Architecture State
 
 ### Backend (`apps/api`)
 
 - **Framework:** NestJS + Prisma (PostgreSQL).
-- **Core Module:** `agent-jobs`
+- **Core Modules:**
+  - `agent-jobs`: Core execution engine.
+  - `projects`: Manages file system project metadata and access.
 - **Architecture:** **Pluggable Strategy Pattern**
   - `AgentRunnerFactory`: Dispatches jobs based on `AgentType`.
-  - **Quick Mode (`LocalAgentRunner`)**: In-process LangGraph execution (Fast, Database-only artifacts).
+  - **Quick Mode (`LocalAgentRunner`)**: In-process LangGraph execution (Fast, Project-aware).
   - **Testing Infrastructure**:
     - Centralized mocking system for LLMs, Runners, and Repositories.
     - Automated test execution via Nx (monorepo-safe).
@@ -23,18 +25,24 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - [x] Implement `DockerAgentRunner` in backend.
   - [x] Integrate with `AgentJobs` module.
   - [x] Verify tool use (File System, Bash).
+- [x] **Project Awareness**:
+  - [x] Implement `Projects` module (CRUD for project metadata).
+  - [x] Integrate `projectId` into `AgentJob` schema.
+  - [x] Inject project `rootPath` into agent tools (File System Tool).
 - [x] **Log Formatting**: Parse raw JSON logs into human-readable updates.
 - [x] **Artifact Capture**: Store agent file outputs (`Write` & `Edit` via `fs.watch`) in DB.
 - [x] **Feedback Loop**: Agent can request user input (`AskUserQuestion`), triggering `WAITING_FOR_USER` status.
 - **Data Model:**
-  - `AgentJob`: Includes `agentType` logic.
+  - `AgentJob`: Includes `agentType` and `projectId` logic.
+  - `Project`: Defines root paths, includes, and excludes for agent access.
   - `AgentJobLog` & `AgentJobArtifact`: Relational tables for streaming outputs.
 - **Status:**
   - ✅ "Blackboard" Schema implemented.
+  - ✅ Project management system integrated.
   - ✅ Docker Infrastructure verified (Image built, permissions configured).
   - ✅ Granular SSE event stream (`log_added`, `artifact_added`).
   - ✅ Domain Isolation: Prisma models decoupled from domain events.
-  - ✅ Test Coverage: ~90% for execution services and log matchers.
+  - ✅ Test Coverage: High coverage for execution services and project module.
 
 ### Frontend (`apps/web`)
 
@@ -56,17 +64,17 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 
 ## 3. Recent Accomplishments
 
+- **Projects Module Implementation:** Launched a dedicated `Projects` module to manage workspace metadata, enabling agents to have localized context and safe file system access.
+- **Agent-Project Integration:** Updated `AgentJobs` to be project-aware, ensuring `LocalAgentRunner` correctly initializes file system tools with the project's root path.
+- **Architecture Quality:** Refactored error handling in the API to use standard NestJS HTTP Exceptions and implemented comprehensive unit tests for the new `Projects` layer.
 - **Layout Architecture Refactor:** Migrated the `LayoutComponent` from `design-system` to `libs/core/layout` to separate architectural structure from atomic styling.
 - **State-Driven UI:** Integrated the layout with `AppLayoutQuery`, enabling central configuration of navigation and global UI elements.
 - **Design System Polish:** Refined `Sidebar` and `Topbar` components with consistent styling tokens, improved borders, and optimized spacing.
-- **Domain Integrity:** Fixed Prisma model leakage into domain events, enforcing strict architectural boundaries.
-- **Mocking Infrastructure:** Established a dedicated mocking layer in `test-utils` with best practices documentation.
-- **Unit Testing:** Implemented comprehensive test suites for `LocalAgentRunner`, `DockerAgentRunner`, and execution services.
-- **TypeScript Quality:** Resolved complex Jest typing issues in mock files through `tsconfig` improvements.
 
 ## 4. Next Steps (Orchestration & UI)
 
 1.  **Orchestration Logic:** Handle the `WAITING_FOR_USER` state in the frontend (display question, accept input).
-2.  **Resume Job:** Implement API to resume a job with user feedback.
-3.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.
-4.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.
+2.  **Project Management UI:** Create frontend views for managing projects.
+3.  **Resume Job:** Implement API to resume a job with user feedback.
+4.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.
+5.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.

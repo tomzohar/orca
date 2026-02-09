@@ -12,9 +12,10 @@ import { ARTIFACT_STORAGE } from './domain/interfaces/artifact-storage.interface
 import { DockerAgentRunner } from './execution/services/docker-agent-runner';
 import { LocalAgentRunner } from './execution/services/local-agent-runner';
 import { DbArtifactStorage } from './storage/services/db-artifact-storage';
+import { ProjectsModule } from '../projects/projects.module';
 
 @Module({
-  imports: [PrismaModule, EventEmitterModule.forRoot(), LlmModule],
+  imports: [PrismaModule, EventEmitterModule.forRoot(), LlmModule, ProjectsModule],
   controllers: [AgentJobsController],
   providers: [
     AgentJobsService,
@@ -42,4 +43,4 @@ import { DbArtifactStorage } from './storage/services/db-artifact-storage';
     },
   ],
 })
-export class AgentJobsModule {}
+export class AgentJobsModule { }
