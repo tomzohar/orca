@@ -1,10 +1,10 @@
 # Project Status
 
-**Last Updated:** February 8, 2026
+**Last Updated:** February 9, 2026
 
 ## 1. Overview
 
-Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture**, enabling both fast local execution and isolated Docker-based execution for deep coding tasks. The platform is now backed by a robust testing infrastructure and strict domain isolation.
+Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture**, enabling both fast local execution and isolated Docker-based execution for deep coding tasks. The platform is now backed by a robust testing infrastructure, strict domain isolation, and a centralized layout system.
 
 ## 2. Current Architecture State
 
@@ -39,6 +39,9 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 ### Frontend (`apps/web`)
 
 - **Framework:** Angular 18+ (Zoneless/Signals) + Angular Material.
+- **Core Libraries:**
+  - `libs/core/layout`: Centralized layout orchestration (`LayoutComponent`) driven by state.
+  - `libs/design-system`: Atomic UI components (Sidebar, Topbar, Card, etc.).
 - **Components:**
   - `AgentPocComponent`: Real-time agent interaction interface.
   - **Agent Mode Selector**: Dropdown to switch between "Quick" and "Deep" modes.
@@ -47,23 +50,23 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ Consumes SSE stream for live updates.
   - ✅ Displays logs and artifacts in real-time.
   - ✅ **State Management:** TanStack Query (Experimental) integrated for server state.
+  - ✅ **Layout Orchestration:** `LayoutComponent` migrated to `core` and integrated with `AppLayoutQuery`.
   - ✅ **DevTools:** Custom wrapper for Angular Query DevTools implemented.
   - ✅ Monorepo-safe test suite (non-watch mode by default).
 
 ## 3. Recent Accomplishments
 
+- **Layout Architecture Refactor:** Migrated the `LayoutComponent` from `design-system` to `libs/core/layout` to separate architectural structure from atomic styling.
+- **State-Driven UI:** Integrated the layout with `AppLayoutQuery`, enabling central configuration of navigation and global UI elements.
+- **Design System Polish:** Refined `Sidebar` and `Topbar` components with consistent styling tokens, improved borders, and optimized spacing.
 - **Domain Integrity:** Fixed Prisma model leakage into domain events, enforcing strict architectural boundaries.
 - **Mocking Infrastructure:** Established a dedicated mocking layer in `test-utils` with best practices documentation.
-- **Unit Testing:** Implemented comprehensive test suites for `LocalAgentRunner`, `DockerAgentRunner`, and execution log matchers (`AskUserMatcher`, `ToolUseMatcher`).
-- **Test Optimization:** Resolved monorepo-wide test synchronization issues, ensuring all projects (`api`, `web`, `design-system`) can be tested in a single, non-blocking run.
+- **Unit Testing:** Implemented comprehensive test suites for `LocalAgentRunner`, `DockerAgentRunner`, and execution services.
 - **TypeScript Quality:** Resolved complex Jest typing issues in mock files through `tsconfig` improvements.
-- **Linting & Code Quality:**
-  - **Web:** Fixed selector prefixes and strict typing issues.
-  - **API:** Configured ESLint to ignore generated Prisma files, achieving a clean lint baseline.
-- **Architecture Refactor:** Moved App Layout state to `libs/core/layout` to establish a proper library structure for shared business logic.
 
 ## 4. Next Steps (Orchestration & UI)
 
 1.  **Orchestration Logic:** Handle the `WAITING_FOR_USER` state in the frontend (display question, accept input).
 2.  **Resume Job:** Implement API to resume a job with user feedback.
 3.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.
+4.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.
