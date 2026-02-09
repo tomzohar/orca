@@ -2,6 +2,9 @@ import { ConflictException, Inject, Injectable, Logger, NotFoundException } from
 import { IProjectsRepository } from '../domain/projects.repository.interface';
 import { Project } from '../domain/project.entity';
 import { CreateProjectDto } from '../domain/dtos/create-project.dto';
+import type { ProjectDetectionResult, ProjectType } from '../domain/types';
+import { existsSync } from 'fs';
+import { join } from 'path';
 
 // Define a token for DI
 export const PROJECTS_REPOSITORY = 'PROJECTS_REPOSITORY';
@@ -64,5 +67,75 @@ export class ProjectsService {
             return projects[0];
         }
         throw new NotFoundException('No projects found. Please create a project first.');
+    }
+
+    /**
+     * Detects the current project based on working directory
+     * @returns ProjectDetectionResult with matched project (or null) and working directory info
+     */
+    async detectProject(): Promise<ProjectDetectionResult> {
+        const cwd = process.cwd();
+
+        try {
+            // Fetch all projects from repository
+            const projects = await this.projectsRepository.findAll();
+
+            // Find exact match: cwd === project.rootPath
+            const matchedProject = projects.find(project => project.rootPath === cwd) || null;
+
+            // Detect project type
+            const projectType = this.detectProjectType(cwd);
+
+            return {
+                project: matchedProject,
+                workingDirectory: {
+                    path: cwd,
+                    projectType
+                }
+            };
+        } catch (error) {
+            // Log error but don't throw - always return a valid response
+            this.logger.error(`Error detecting project: ${error.message}`, error.stack);
+
+            return {
+                project: null,
+                workingDirectory: {
+                    path: cwd,
+                    projectType: 'unknown'
+                }
+            };
+        }
+    }
+
+    /**
+     * Detects project type based on marker files in the given directory
+     * Priority: typescript > javascript > python > unknown
+     */
+    private detectProjectType(dirPath: string): ProjectType {
+        try {
+            // Check for TypeScript (highest priority)
+            if (existsSync(join(dirPath, 'tsconfig.json'))) {
+                return 'typescript';
+            }
+
+            // Check for JavaScript (must not have tsconfig.json)
+            if (existsSync(join(dirPath, 'package.json'))) {
+                return 'javascript';
+            }
+
+            // Check for Python
+            const pythonMarkers = ['requirements.txt', 'pyproject.toml', 'setup.py'];
+            for (const marker of pythonMarkers) {
+                if (existsSync(join(dirPath, marker))) {
+                    return 'python';
+                }
+            }
+
+            return 'unknown';
+        } catch (error) {
+            // If file system check fails, default to unknown
+            this.logger.warn(`Error detecting project type: ${error.message}`);
+            return 'unknown';
+        }
     }
 }

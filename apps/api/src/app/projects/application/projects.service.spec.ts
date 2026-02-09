@@ -133,4 +133,133 @@ describe('ProjectsService', () => {
             );
         });
     });
+
+    describe('detectProject', () => {
+        beforeEach(() => {
+            // Mock fs.existsSync for project type detection
+            jest.spyOn(require('fs'), 'existsSync');
+        });
+
+        afterEach(() => {
+            jest.restoreAllMocks();
+        });
+
+        it('should return matching project with typescript type when tsconfig.json exists', async () => {
+            const cwd = '/Users/tomzohar/projects/orca';
+            jest.spyOn(process, 'cwd').mockReturnValue(cwd);
+
+            const matchingProject = new Project(
+                1,
+                'Orca',
+                'orca',
+                cwd,
+                'Main project',
+                ['**/*'],
+                ['**/node_modules/**'],
+                new Date(),
+                new Date()
+            );
+
+            mockProjectsRepository.findAll.mockResolvedValue([matchingProject]);
+            require('fs').existsSync.mockImplementation((path: string) => {
+                if (path.includes('tsconfig.json')) return true;
+                return false;
+            });
+
+            const result = await service.detectProject();
+
+            expect(result.project).toEqual(matchingProject);
+            expect(result.workingDirectory.path).toBe(cwd);
+            expect(result.workingDirectory.projectType).toBe('typescript');
+        });
+
+        it('should return null project with javascript type when only package.json exists', async () => {
+            const cwd = '/Users/tomzohar/projects/some-js-project';
+            jest.spyOn(process, 'cwd').mockReturnValue(cwd);
+
+            mockProjectsRepository.findAll.mockResolvedValue([]);
+            require('fs').existsSync.mockImplementation((path: string) => {
+                if (path.includes('package.json')) return true;
+                return false;
+            });
+
+            const result = await service.detectProject();
+
+            expect(result.project).toBeNull();
+            expect(result.workingDirectory.path).toBe(cwd);
+            expect(result.workingDirectory.projectType).toBe('javascript');
+        });
+
+        it('should return null project with python type when requirements.txt exists', async () => {
+            const cwd = '/Users/tomzohar/projects/python-app';
+            jest.spyOn(process, 'cwd').mockReturnValue(cwd);
+
+            mockProjectsRepository.findAll.mockResolvedValue([]);
+            require('fs').existsSync.mockImplementation((path: string) => {
+                if (path.includes('requirements.txt')) return true;
+                return false;
+            });
+
+            const result = await service.detectProject();
+
+            expect(result.project).toBeNull();
+            expect(result.workingDirectory.path).toBe(cwd);
+            expect(result.workingDirectory.projectType).toBe('python');
+        });
+
+        it('should return unknown type when no marker files exist', async () => {
+            const cwd = '/Users/tomzohar/projects/unknown';
+            jest.spyOn(process, 'cwd').mockReturnValue(cwd);
+
+            mockProjectsRepository.findAll.mockResolvedValue([]);
+            require('fs').existsSync.mockReturnValue(false);
+
+            const result = await service.detectProject();
+
+            expect(result.project).toBeNull();
+            expect(result.workingDirectory.path).toBe(cwd);
+            expect(result.workingDirectory.projectType).toBe('unknown');
+        });
+
+        it('should not match project when path does not equal exactly', async () => {
+            const cwd = '/Users/tomzohar/projects/orca/apps/api';
+            jest.spyOn(process, 'cwd').mockReturnValue(cwd);
+
+            const project = new Project(
+                1,
+                'Orca',
+                'orca',
+                '/Users/tomzohar/projects/orca',
+                'Main project',
+                ['**/*'],
+                ['**/node_modules/**'],
+                new Date(),
+                new Date()
+            );
+
+            mockProjectsRepository.findAll.mockResolvedValue([project]);
+            require('fs').existsSync.mockReturnValue(false);
+
+            const result = await service.detectProject();
+
+            expect(result.project).toBeNull();
+            expect(result.workingDirectory.path).toBe(cwd);
+        });
+
+        it('should handle file system errors gracefully', async () => {
+            const cwd = '/Users/tomzohar/projects/test';
+            jest.spyOn(process, 'cwd').mockReturnValue(cwd);
+
+            mockProjectsRepository.findAll.mockResolvedValue([]);
+            require('fs').existsSync.mockImplementation(() => {
+                throw new Error('File system error');
+            });
+
+            const result = await service.detectProject();
+
+            expect(result.project).toBeNull();
+            expect(result.workingDirectory.path).toBe(cwd);
+            expect(result.workingDirectory.projectType).toBe('unknown');
+        });
+    });
 });

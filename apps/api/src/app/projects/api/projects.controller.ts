@@ -2,6 +2,7 @@ import { Body, Controller, Get, NotFoundException, Param, Post, UsePipes, Valida
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProjectsService } from '../application/projects.service';
 import { CreateProjectDto } from '../domain/dtos/create-project.dto';
+import { DetectProjectResponseDto } from '../domain/dtos/detect-project-response.dto';
 
 @ApiTags('projects')
 @Controller('projects')
@@ -20,6 +21,17 @@ export class ProjectsController {
     @ApiOperation({ summary: 'Get all projects' })
     async findAll() {
         return this.projectsService.findAll();
+    }
+
+    @Get('detect')
+    @ApiOperation({ summary: 'Detect current project from working directory' })
+    @ApiResponse({
+        status: 200,
+        description: 'Returns the detected project (or null) and working directory information',
+        type: DetectProjectResponseDto
+    })
+    async detectCurrentProject(): Promise<DetectProjectResponseDto> {
+        return this.projectsService.detectProject();
     }
 
     @Get(':slug')

@@ -1,6 +1,6 @@
 # Project Status
 
-**Last Updated:** February 9, 2026
+**Last Updated:** February 9, 2026 (13:54)
 
 ## 1. Overview
 
@@ -27,6 +27,7 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - [x] Verify tool use (File System, Bash).
 - [x] **Project Awareness**:
   - [x] Implement `Projects` module (CRUD for project metadata).
+  - [x] Project Detection Endpoint: `GET /projects/detect` automatically detects current project and identifies project type (TypeScript/JavaScript/Python).
   - [x] Integrate `projectId` into `AgentJob` schema.
   - [x] Inject project `rootPath` into agent tools (File System Tool).
 - [x] **Log Formatting**: Parse raw JSON logs into human-readable updates.
@@ -65,6 +66,7 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 ## 3. Recent Accomplishments
 
 - **Projects Module Implementation:** Launched a dedicated `Projects` module to manage workspace metadata, enabling agents to have localized context and safe file system access.
+- **Project Detection Endpoint:** Implemented automatic project detection that matches the current working directory to registered projects and identifies project type (TypeScript, JavaScript, Python, or unknown) based on marker files. Includes comprehensive test coverage with 7 test cases covering all success and failure paths.
 - **Agent-Project Integration:** Updated `AgentJobs` to be project-aware, ensuring `LocalAgentRunner` correctly initializes file system tools with the project's root path.
 - **Architecture Quality:** Refactored error handling in the API to use standard NestJS HTTP Exceptions and implemented comprehensive unit tests for the new `Projects` layer.
 - **Layout Architecture Refactor:** Migrated the `LayoutComponent` from `design-system` to `libs/core/layout` to separate architectural structure from atomic styling.
@@ -73,8 +75,9 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 
 ## 4. Next Steps (Orchestration & UI)
 
-1.  **Orchestration Logic:** Handle the `WAITING_FOR_USER` state in the frontend (display question, accept input).
-2.  **Project Management UI:** Create frontend views for managing projects.
-3.  **Resume Job:** Implement API to resume a job with user feedback.
-4.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.
-5.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.
+1.  **Frontend Project Detection:** Implement logic to call `/projects/detect` on app start and handle project state (show CTA if no project detected).
+2.  **Orchestration Logic:** Handle the `WAITING_FOR_USER` state in the frontend (display question, accept input).
+3.  **Project Management UI:** Create frontend views for managing projects.
+4.  **Resume Job:** Implement API to resume a job with user feedback.
+5.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.
+6.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.
