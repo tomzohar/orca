@@ -37,7 +37,10 @@ class OrcaErrorStateMatcher implements ErrorStateMatcher {
             useExisting: forwardRef(() => InputComponent),
             multi: true
         }
-    ]
+    ],
+    host: {
+        '[attr.type]': 'config().type || "text"'
+    }
 })
 export class InputComponent implements ControlValueAccessor {
     private destroyRef = inject(DestroyRef)

@@ -22,7 +22,8 @@
         "libs/orchestration/feature/src/index.ts"
       ],
       "@orca/orchestration-ui": ["libs/orchestration/ui/src/index.ts"],
-      "@orca/orchestration-types": ["libs/orchestration/types/src/index.ts"]
+      "@orca/orchestration-types": ["libs/orchestration/types/src/index.ts"],
+      "@orca/core/projects": ["libs/core/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,0 +1,30 @@
+@use 'component' as *;
+
+.loading-container,
+.empty-state-container,
+.error-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+}
+
+.empty-state-container {
+    background: radial-gradient(circle at 50% 8%, #0a233c 0%, #001121 57%);
+
+    ::ng-deep img {
+        border-radius: $tokens-spacing-md;
+    }
+}
+
+.error-container {
+    color: $tokens-error-color;
+}
+
+.toggle-devtools-button {
+    position: fixed;
+    bottom: $tokens-spacing-lg;
+    right: $tokens-spacing-lg;
+    z-index: 1000;
+}

@@ -17,7 +17,7 @@
 
   @if (config().action; as action) {
     <div class="empty-state-cta">
-      <orca-button [config]="action">
+      <orca-button [config]="action" (clicked)="actionClicked.emit()">
         {{ action.label }}
       </orca-button>
     </div>

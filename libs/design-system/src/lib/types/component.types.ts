@@ -2,6 +2,7 @@ export type DesignSystemColor = 'primary' | 'accent' | 'warn';
 
 export interface ButtonConfig {
     variant?: 'primary' | 'secondary' | 'ghost';
+    size?: 'sm' | 'md';
     disabled?: boolean;
     type?: 'button' | 'submit' | 'reset';
     icon?: IconConfig;

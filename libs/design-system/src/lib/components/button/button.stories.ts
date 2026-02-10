@@ -70,3 +70,34 @@ export const IconButtonWithText: Story = {
         template: `<orca-button [config]="config">Add Item</orca-button>`,
     }),
 };
+
+export const Small: Story = {
+    args: {
+        config: { variant: 'primary', size: 'sm' },
+    },
+    render: (args) => ({
+        props: args,
+        template: `<orca-button [config]="config">Small Button</orca-button>`,
+    }),
+};
+
+export const Medium: Story = {
+    args: {
+        config: { variant: 'primary', size: 'md' },
+    },
+    render: (args) => ({
+        props: args,
+        template: `<orca-button [config]="config">Medium Button</orca-button>`,
+    }),
+};
+
+export const SmallWithIcon: Story = {
+    args: {
+        config: { variant: 'primary', size: 'sm', icon: { name: 'add' } },
+    },
+    render: (args) => ({
+        props: args,
+        template: `<orca-button [config]="config">Small with Icon</orca-button>`,
+    }),
+};
+

@@ -1,6 +1,7 @@
 export * from './lib/types/component.types';
 export * from './lib/components/button/button.component';
 export * from './lib/components/input/input.component';
+export * from './lib/components/input/tag-input.component';
 export * from './lib/components/selection/checkbox/checkbox.component';
 export * from './lib/components/selection/radio/radio.component';
 export * from './lib/components/selection/switch/switch.component';

@@ -13,10 +13,10 @@ describe('App', () => {
     }).compileComponents();
   });
 
-  it('should render router-outlet', async () => {
+  it('should create the app component', () => {
     const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('router-outlet')).toBeTruthy();
+    const component = fixture.componentInstance;
+
+    expect(component).toBeTruthy();
   });
 });

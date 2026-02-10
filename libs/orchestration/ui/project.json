@@ -2,7 +2,7 @@
   "name": "orchestration-ui",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/orchestration/ui/src",
-  "prefix": "lib",
+  "prefix": "orca",
   "projectType": "library",
   "tags": ["type:ui", "scope:orchestration"],
   "targets": {

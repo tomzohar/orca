@@ -2,7 +2,7 @@
   "name": "orchestration-feature",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/orchestration/feature/src",
-  "prefix": "lib",
+  "prefix": "orca",
   "projectType": "library",
   "tags": ["type:feature", "scope:orchestration"],
   "targets": {

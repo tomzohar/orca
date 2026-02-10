@@ -1,10 +1,10 @@
 # Project Status
 
-**Last Updated:** February 9, 2026 (13:54)
+**Last Updated:** February 10, 2026 (15:24)
 
 ## 1. Overview
 
-Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture** and a specialized **Projects Module**, enabling agents to operate with full project awareness and localized file system access. The platform is now backed by a robust testing infrastructure, strict domain isolation, and a centralized layout system.
+Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture** and a specialized **Projects Module**, enabling agents to operate with full project awareness and localized file system access. The platform now features **fully automatic project initialization** - projects are detected and created without any user intervention, providing a seamless zero-friction onboarding experience.
 
 ## 2. Current Architecture State
 
@@ -17,7 +17,7 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 - **Architecture:** **Pluggable Strategy Pattern**
   - `AgentRunnerFactory`: Dispatches jobs based on `AgentType`.
   - **Quick Mode (`LocalAgentRunner`)**: In-process LangGraph execution (Fast, Project-aware).
-  - **Testing Infrastructure**:
+  - **Testing Infrastructure:**
     - Centralized mocking system for LLMs, Runners, and Repositories.
     - Automated test execution via Nx (monorepo-safe).
 - [x] **Deep Mode (Dockerized Agent)**:
@@ -27,7 +27,8 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - [x] Verify tool use (File System, Bash).
 - [x] **Project Awareness**:
   - [x] Implement `Projects` module (CRUD for project metadata).
-  - [x] Project Detection Endpoint: `GET /projects/detect` automatically detects current project and identifies project type (TypeScript/JavaScript/Python).
+  - [x] **Auto-Initialization**: `GET /projects/detect` automatically detects AND creates projects (idempotent).
+  - [x] **Smart Slug Generation**: Uses parent directory + basename for unique project slugs.
   - [x] Integrate `projectId` into `AgentJob` schema.
   - [x] Inject project `rootPath` into agent tools (File System Tool).
 - [x] **Log Formatting**: Parse raw JSON logs into human-readable updates.
@@ -50,8 +51,10 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 - **Framework:** Angular 18+ (Zoneless/Signals) + Angular Material.
 - **Core Libraries:**
   - `libs/core/layout`: Centralized layout orchestration (`LayoutComponent`) driven by state.
-  - `libs/design-system`: Atomic UI components (Sidebar, Topbar, Card, etc.).
+  - `libs/core/projects`: Project detection services and TanStack Query integration.
+  - `libs/design-system`: Atomic UI components (Sidebar, Topbar, Card, Spinner, etc.).
 - **Components:**
+  - `App`: Main application component managing global project detection and layout state.
   - `AgentPocComponent`: Real-time agent interaction interface.
   - **Agent Mode Selector**: Dropdown to switch between "Quick" and "Deep" modes.
 - **Status:**
@@ -60,24 +63,26 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ Displays logs and artifacts in real-time.
   - ✅ **State Management:** TanStack Query (Experimental) integrated for server state.
   - ✅ **Layout Orchestration:** `LayoutComponent` migrated to `core` and integrated with `AppLayoutQuery`.
-  - ✅ **DevTools:** Custom wrapper for Angular Query DevTools implemented.
+  - ✅ **DevTools:** Custom wrapper for Angular Query DevTools integrated with toggle.
+  - ✅ **Auto-Initialization:** App automatically initializes projects on detection. Simplified to 3 states: loading, error (with retry), loaded.
   - ✅ Monorepo-safe test suite (non-watch mode by default).
 
 ## 3. Recent Accomplishments
 
+- **Automatic Project Initialization (Feb 10, 2026):** Refactored project initialization to be fully automatic:
+  - Backend auto-creates projects when detected (idempotent - no duplicates)
+  - Smart slug generation using parent directory for uniqueness
+  - Removed manual `LoadProjectDialog` component and workflow
+  - Frontend simplified to 3 states with error recovery via retry button
+  - Zero user intervention required - seamless onboarding experience
+- **DevTools Integration:** Added a toggleable DevTools button in the main application for improved debugging of TanStack Query state.
 - **Projects Module Implementation:** Launched a dedicated `Projects` module to manage workspace metadata, enabling agents to have localized context and safe file system access.
-- **Project Detection Endpoint:** Implemented automatic project detection that matches the current working directory to registered projects and identifies project type (TypeScript, JavaScript, Python, or unknown) based on marker files. Includes comprehensive test coverage with 7 test cases covering all success and failure paths.
 - **Agent-Project Integration:** Updated `AgentJobs` to be project-aware, ensuring `LocalAgentRunner` correctly initializes file system tools with the project's root path.
-- **Architecture Quality:** Refactored error handling in the API to use standard NestJS HTTP Exceptions and implemented comprehensive unit tests for the new `Projects` layer.
-- **Layout Architecture Refactor:** Migrated the `LayoutComponent` from `design-system` to `libs/core/layout` to separate architectural structure from atomic styling.
-- **State-Driven UI:** Integrated the layout with `AppLayoutQuery`, enabling central configuration of navigation and global UI elements.
-- **Design System Polish:** Refined `Sidebar` and `Topbar` components with consistent styling tokens, improved borders, and optimized spacing.
 
 ## 4. Next Steps (Orchestration & UI)
 
-1.  **Frontend Project Detection:** Implement logic to call `/projects/detect` on app start and handle project state (show CTA if no project detected).
-2.  **Orchestration Logic:** Handle the `WAITING_FOR_USER` state in the frontend (display question, accept input).
-3.  **Project Management UI:** Create frontend views for managing projects.
-4.  **Resume Job:** Implement API to resume a job with user feedback.
-5.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.
-6.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.
+1.  **Orchestration Logic:** Handle the `WAITING_FOR_USER` state in the frontend (display question, accept input).
+2.  **Project Management UI:** Create frontend views for managing/editing existing projects (rename, update excludes, etc.).
+3.  **Resume Job:** Implement API to resume a job with user feedback.
+4.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.
+5.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.

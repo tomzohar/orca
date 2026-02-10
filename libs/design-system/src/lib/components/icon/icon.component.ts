@@ -20,15 +20,14 @@ const DEFAULT_CONFIG: IconConfig = {
             [class.orca-icon-lg]="config().size === 'lg'"
             [class.orca-icon-xl]="config().size === 'xl'"
             [style.color]="config().color"
-        >
-            {{ config().name }}
-        </mat-icon>
+        >{{ config().name }}</mat-icon>
     `,
     styles: [`
         .orca-icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            line-height: 1;
         }
         .orca-icon-xs { font-size: 12px; width: 12px; height: 12px; }
         .orca-icon-sm { font-size: 16px; width: 16px; height: 16px; }

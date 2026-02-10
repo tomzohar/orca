@@ -54,11 +54,39 @@ export class ProjectsService {
     }
 
     // Helper methods
-    private generateSlug(name: string): string {
-        return name
+    private generateSlug(text: string): string {
+        return text
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/(^-|-$)/g, '');
+    }
+
+    /**
+     * Generates a human-readable project name from the directory path
+     * Uses the basename of the path (last segment)
+     */
+    private generateProjectNameFromPath(path: string): string {
+        const segments = path.split('/').filter(s => s.length > 0);
+        return segments[segments.length - 1] || 'project';
+    }
+
+    /**
+     * Generates a unique slug using parent directory + basename
+     * Example: /Users/tom/projects/orca => 'projects-orca'
+     */
+    private generateUniqueSlug(path: string): string {
+        const segments = path.split('/').filter(s => s.length > 0);
+
+        if (segments.length < 2) {
+            // Fallback: use only basename if path is too shallow
+            return this.generateSlug(segments[segments.length - 1] || 'project');
+        }
+
+        // Use last 2 segments for uniqueness: parent-basename
+        const parent = segments[segments.length - 2];
+        const basename = segments[segments.length - 1];
+
+        return this.generateSlug(`${parent}-${basename}`);
     }
 
     async getDefaultProject(): Promise<Project> {
@@ -81,10 +109,31 @@ export class ProjectsService {
             const projects = await this.projectsRepository.findAll();
 
             // Find exact match: cwd === project.rootPath
-            const matchedProject = projects.find(project => project.rootPath === cwd) || null;
+            let matchedProject = projects.find(project => project.rootPath === cwd) || null;
 
             // Detect project type
             const projectType = this.detectProjectType(cwd);
+
+            // Auto-create project if detected but not in DB
+            if (!matchedProject && projectType !== 'unknown') {
+                this.logger.log(`Auto-creating project for detected ${projectType} project at ${cwd}`);
+
+                const name = this.generateProjectNameFromPath(cwd);
+                const slug = this.generateUniqueSlug(cwd);
+
+                const project = Project.create(
+                    name,
+                    slug,
+                    cwd
+                );
+
+                // Set default includes and excludes
+                project.includes = ['**/*'];
+                project.excludes = ['**/node_modules/**', '**/.git/**'];
+
+                matchedProject = await this.projectsRepository.create(project);
+                this.logger.log(`Auto-created project: ${matchedProject.name} (${matchedProject.slug})`);
+            }
 
             return {
                 project: matchedProject,

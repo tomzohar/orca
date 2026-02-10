@@ -2,7 +2,7 @@ import { Component, ElementRef, inject, input } from '@angular/core';
 import { injectDevtoolsPanel } from '@tanstack/angular-query-devtools-experimental';
 
 @Component({
-    selector: 'app-angular-query-devtools',
+    selector: 'orca-angular-query-devtools',
     standalone: true,
     template: '',
     host: {

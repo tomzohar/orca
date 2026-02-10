@@ -1,4 +1,27 @@
+@if (isLoading()) {
+<div class="loading-container">
+  <orca-spinner [config]="{ size: 'lg' }" />
+</div>
+} @else if (isError()) {
+<div class="error-container">
+  <orca-empty-state
+    [config]="errorStateConfig()"
+    (actionClicked)="retryDetection()"
+  />
+</div>
+} @else {
 <orca-layout>
-  <router-outlet></router-outlet>
+  <router-outlet />
 </orca-layout>
-<app-angular-query-devtools [initialIsOpen]="false" />
+}
+
+<div class="toggle-devtools-button">
+  <orca-button
+    [config]="toggleDevtoolsButtonConfig"
+    (clicked)="showDevTools.set(!showDevTools())"
+  ></orca-button>
+</div>
+
+@if (showDevTools()) {
+<orca-angular-query-devtools [initialIsOpen]="false" />
+}

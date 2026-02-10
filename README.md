@@ -110,8 +110,17 @@ To ensure the TypeScript server and local builds have the latest types, you must
 npx nx prisma-generate api
 ```
 
-> [!NOTE]
 > The generated client is stored locally in `apps/api/prisma/client` and is ignored by git. This ensures maximum stability for IDE synchronization.
+
+### 3. Interact with Data (Prisma Studio)
+
+To interact with the database using a GUI, you can run Prisma Studio:
+
+```bash
+npm run db:studio
+```
+
+This will open a web interface at `http://localhost:5555` where you can view and edit your data.
 
 ## Running Tasks
 

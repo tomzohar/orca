@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ButtonComponent } from '../../button/button.component';
 import { ButtonConfig } from '../../../types/component.types';
@@ -22,4 +22,6 @@ export class EmptyStateComponent {
      * Configuration for the empty state
      */
     config = input<EmptyStateConfig>({});
+
+    actionClicked = output();
 }

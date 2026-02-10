@@ -3,6 +3,7 @@
 :host {
     display: block;
     width: 100%;
+    --input-height: 48px;
 }
 
 
@@ -14,7 +15,14 @@
         .mdc-text-field--outlined {
             background-color: $surface-color;
             border-radius: $radius-md;
-            min-height: 56px;
+
+            // Centering for non-textarea inputs
+            :host:not([type="textarea"]) & {
+                height: var(--input-height) !important;
+                min-height: var(--input-height) !important;
+                display: flex;
+                align-items: center;
+            }
 
             // Focused border
             &.mdc-text-field--focused:not(.mdc-text-field--invalid) {
@@ -53,6 +61,20 @@
 
     // Label color
     ::ng-deep {
+        :host:not([type="textarea"]) & {
+
+            .mat-mdc-text-field-wrapper,
+            .mdc-text-field--outlined,
+            .mat-mdc-form-field-infix,
+            .mat-mdc-form-field-flex {
+                height: var(--input-height) !important;
+                min-height: var(--input-height) !important;
+            }
+        }
+
+        .mat-mdc-form-field-flex .mat-mdc-floating-label {
+            top: 24px;
+        }
 
         .mdc-floating-label {
             background-color: $surface-color;
@@ -85,12 +107,6 @@
     // Placeholder
     input.mat-mdc-input-element::placeholder {
         color: rgba($text-primary, 0.4);
-    }
-
-    .mat-mdc-form-field-infix,
-    .mat-mdc-form-field-flex {
-        border: none;
-        outline: none;
     }
 
     // Ensure error message and hint are visible and styled
@@ -138,6 +154,7 @@
             display: flex;
             align-items: center;
             position: relative;
+            padding-left: $spacing-md;
         }
 
         ::ng-deep .mat-mdc-form-field-subscript-wrapper,

@@ -173,11 +173,24 @@ describe('ProjectsService', () => {
             expect(result.workingDirectory.projectType).toBe('typescript');
         });
 
-        it('should return null project with javascript type when only package.json exists', async () => {
+        it('should auto-create project with javascript type when only package.json exists', async () => {
             const cwd = '/Users/tomzohar/projects/some-js-project';
             jest.spyOn(process, 'cwd').mockReturnValue(cwd);
 
+            const autoCreatedProject = new Project(
+                1,
+                'some-js-project',
+                'projects-some-js-project',
+                cwd,
+                undefined,
+                ['**/*'],
+                ['**/node_modules/**', '**/.git/**'],
+                new Date(),
+                new Date()
+            );
+
             mockProjectsRepository.findAll.mockResolvedValue([]);
+            mockProjectsRepository.create.mockResolvedValue(autoCreatedProject);
             require('fs').existsSync.mockImplementation((path: string) => {
                 if (path.includes('package.json')) return true;
                 return false;
@@ -185,16 +198,30 @@ describe('ProjectsService', () => {
 
             const result = await service.detectProject();
 
-            expect(result.project).toBeNull();
+            expect(repository.create).toHaveBeenCalled();
+            expect(result.project).toEqual(autoCreatedProject);
             expect(result.workingDirectory.path).toBe(cwd);
             expect(result.workingDirectory.projectType).toBe('javascript');
         });
 
-        it('should return null project with python type when requirements.txt exists', async () => {
+        it('should auto-create project with python type when requirements.txt exists', async () => {
             const cwd = '/Users/tomzohar/projects/python-app';
             jest.spyOn(process, 'cwd').mockReturnValue(cwd);
 
+            const autoCreatedProject = new Project(
+                1,
+                'python-app',
+                'projects-python-app',
+                cwd,
+                undefined,
+                ['**/*'],
+                ['**/node_modules/**', '**/.git/**'],
+                new Date(),
+                new Date()
+            );
+
             mockProjectsRepository.findAll.mockResolvedValue([]);
+            mockProjectsRepository.create.mockResolvedValue(autoCreatedProject);
             require('fs').existsSync.mockImplementation((path: string) => {
                 if (path.includes('requirements.txt')) return true;
                 return false;
@@ -202,7 +229,8 @@ describe('ProjectsService', () => {
 
             const result = await service.detectProject();
 
-            expect(result.project).toBeNull();
+            expect(repository.create).toHaveBeenCalled();
+            expect(result.project).toEqual(autoCreatedProject);
             expect(result.workingDirectory.path).toBe(cwd);
             expect(result.workingDirectory.projectType).toBe('python');
         });

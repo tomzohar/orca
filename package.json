@@ -5,7 +5,8 @@
   "scripts": {
     "start:client": "npx nx serve web",
     "start:server": "npx nx serve api",
-    "storybook": "npx nx storybook design-system"
+    "storybook": "npx nx storybook design-system",
+    "db:studio": "npx prisma studio --schema apps/api/prisma/schema.prisma"
   },
   "private": true,
   "devDependencies": {

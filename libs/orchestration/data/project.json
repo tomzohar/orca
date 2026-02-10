@@ -2,7 +2,7 @@
   "name": "orchestration-data",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/orchestration/data/src",
-  "prefix": "lib",
+  "prefix": "orca",
   "projectType": "library",
   "tags": ["type:data", "scope:orchestration"],
   "targets": {
