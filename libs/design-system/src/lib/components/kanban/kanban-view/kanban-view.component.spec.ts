@@ -5,6 +5,11 @@ import { Component, TemplateRef, ViewChild } from '@angular/core';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 
+interface TestItem {
+    id: number;
+    title: string;
+}
+
 @Component({
     template: `
     <orca-kanban-view [lists]="lists" [itemTemplate]="itemTemplate"></orca-kanban-view>
@@ -14,11 +19,11 @@ import { CommonModule } from '@angular/common';
     imports: [KanbanViewComponent, CommonModule]
 })
 class TestHostComponent {
-    lists: KanbanList<any>[] = [
+    lists: KanbanList<TestItem>[] = [
         { id: '1', title: 'List 1', items: [{ id: 1, title: 'Item 1' }] },
         { id: '2', title: 'List 2', items: [] }
     ];
-    @ViewChild('itemTemplate') itemTemplate!: TemplateRef<any>;
+    @ViewChild('itemTemplate') itemTemplate!: TemplateRef<TestItem>;
 }
 
 describe('KanbanViewComponent', () => {

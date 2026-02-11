@@ -3,12 +3,13 @@ import { OrchestrationComponent } from './orchestration.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { QueryClient, provideAngularQuery } from '@tanstack/angular-query-experimental';
 import { JobStatus } from '@orca/orchestration-types';
-import { JobEventsService } from '@orca/orchestration-data';
-import { DialogService } from '@orca/design-system';
+import { JobEventsService, JobsService } from '@orca/orchestration-data';
+import { DialogService, SidePanelService } from '@orca/design-system';
 import { CreateJobDialogComponent } from './components/create-job-dialog/create-job-dialog.component';
 import { signal } from '@angular/core';
 import { of } from 'rxjs';
 import { DialogRef } from '@angular/cdk/dialog';
+import { ActivatedRoute, NavigationEnd, Router, convertToParamMap } from '@angular/router';
 
 // Mock EventSource
 class MockEventSource {
@@ -38,6 +39,39 @@ describe('OrchestrationComponent', () => {
                     },
                 })),
                 JobEventsService,
+                JobsService,
+                {
+                    provide: DialogService,
+                    useValue: {
+                        open: jest.fn()
+                    }
+                },
+                {
+                    provide: SidePanelService,
+                    useValue: {
+                        open: jest.fn().mockReturnValue({
+                            detachments: () => of(null)
+                        }),
+                        close: jest.fn()
+                    }
+                },
+                {
+                    provide: Router,
+                    useValue: {
+                        navigate: jest.fn(),
+                        events: of(new NavigationEnd(0, '', ''))
+                    }
+                },
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        snapshot: {
+                            paramMap: convertToParamMap({})
+                        },
+                        paramMap: of(convertToParamMap({})),
+                        params: of({})
+                    }
+                }
             ],
         }).compileComponents();
 
@@ -75,7 +109,14 @@ describe('OrchestrationComponent', () => {
 
     it('should handle job drop event', () => {
         const consoleSpy = jest.spyOn(console, 'log');
-        const mockEvent = { type: 'drop', data: {} };
+        const mockEvent = {
+            item: { id: 1 } as any,
+            sourceListId: 'PENDING',
+            targetListId: 'RUNNING',
+            currentIndex: 0,
+            previousIndex: 0,
+            container: {} as any
+        };
 
         component.onJobDrop(mockEvent);
 

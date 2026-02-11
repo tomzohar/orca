@@ -3,7 +3,6 @@ import { MenuComponent } from './menu.component';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 import { By } from '@angular/platform-browser';
-import { MenuConfig } from '../../types/component.types';
 
 describe('MenuComponent', () => {
   let component: MenuComponent;

@@ -11,10 +11,9 @@ import { Job, JobUIModel } from '@orca/orchestration-types';
  * @returns JobUIModel with formatted display fields
  */
 export function mapJobToUIModel(job: Job): JobUIModel {
-
     return {
         ...job,
-        formattedCreatedAt: formatDate(job.createdAt),
+        formattedCreatedAt: formatDate(job.createdAt)
     };
 }
 

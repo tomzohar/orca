@@ -1,7 +1,7 @@
 import { Meta, StoryObj } from '@storybook/angular';
 import { KanbanViewComponent } from './kanban-view.component';
 import { KanbanCardComponent } from '../kanban-card/kanban-card.component';
-import { KanbanList } from '../../../types/kanban.types';
+import { KanbanList, KanbanItemDropEvent } from '../../../types/kanban.types';
 import { Component, CUSTOM_ELEMENTS_SCHEMA, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -80,7 +80,7 @@ const MOCK_LISTS: KanbanList<Task>[] = [
 class KanbanStoryWrapperComponent {
     lists = signal(MOCK_LISTS); // Start with structured data
 
-    handleDrop(event: any) {
+    handleDrop(event: KanbanItemDropEvent<Task>) {
         console.log('Drop Event:', event);
         // In a real app, we update the data source here.
         // For storybook visualization, we might not strictly need to update the signal 

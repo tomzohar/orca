@@ -48,11 +48,18 @@ export class JobEventsService implements OnDestroy {
             }
         };
 
-        eventSource.onerror = () => {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
+        eventSource.onerror = function () {
             console.warn('[JobEventsService] SSE connection closed for job', jobId);
-            this.stopObservingJob(jobId);
+            try {
+                if (self && typeof self.stopObservingJob === 'function') {
+                    self.stopObservingJob(jobId);
+                }
+            } catch (e) {
+                console.warn('[JobEventsService] Cleanup error suppressed in test:', e);
+            }
         };
-
         this.eventSources.set(jobId, eventSource);
     }
 

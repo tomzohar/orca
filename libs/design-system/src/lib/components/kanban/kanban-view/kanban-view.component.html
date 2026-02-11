@@ -30,28 +30,32 @@
               <ng-container
                 *ngTemplateOutlet="itemTemplate(); context: { $implicit: item }"
               ></ng-container>
-
-              <!-- Drag Preview (Follows Cursor) -->
-              <div *cdkDragPreview class="kanban-preview">
-                <ng-container
-                  *ngTemplateOutlet="
-                    itemTemplate();
-                    context: { $implicit: item }
-                  "
-                ></ng-container>
-              </div>
-
-              <!-- Placeholder (Gap in List) -->
-              <div *cdkDragPlaceholder class="kanban-placeholder">
-                <!-- We render the item again but it will be styled with opacity via CSS -->
-                <ng-container
-                  *ngTemplateOutlet="
-                    itemTemplate();
-                    context: { $implicit: item }
-                  "
-                ></ng-container>
-              </div>
             </orca-kanban-card>
+
+            <!-- Drag Preview (Follows Cursor) -->
+            <div *cdkDragPreview class="kanban-preview">
+              <orca-kanban-card>
+                <ng-container
+                  *ngTemplateOutlet="
+                    itemTemplate();
+                    context: { $implicit: item }
+                  "
+                ></ng-container>
+              </orca-kanban-card>
+            </div>
+
+            <!-- Placeholder (Gap in List) -->
+            <div *cdkDragPlaceholder class="kanban-placeholder">
+              <!-- We render the item again but it will be styled with opacity via CSS -->
+              <orca-kanban-card>
+                <ng-container
+                  *ngTemplateOutlet="
+                    itemTemplate();
+                    context: { $implicit: item }
+                  "
+                ></ng-container>
+              </orca-kanban-card>
+            </div>
           </div>
         }
       </div>

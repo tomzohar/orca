@@ -1,11 +1,13 @@
 @use 'component' as *;
 
 .job-details-container {
-    padding: $tokens-spacing-md;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
 
-    pre {
-        padding: $tokens-spacing-sm;
-        border-radius: $tokens-radius-md;
-        overflow-x: auto;
-    }
+.tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: $tokens-spacing-md;
 }

@@ -64,6 +64,8 @@ export function injectCreateJobMutation() {
                 status: JobStatus.PENDING,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
+                logs: [],
+                artifacts: [],
             };
 
             queryClient.setQueryData<Job[]>(queryKey, (old) => {

@@ -1,0 +1,36 @@
+@if (job(); as currentJob) {
+  <div class="overview-tab">
+    <div class="detail-section">
+      <h4 class="section-title">Prompt</h4>
+      <p class="prompt-text">{{ currentJob.prompt }}</p>
+    </div>
+
+    <div class="detail-section">
+      <h4 class="section-title">Status</h4>
+      <span class="status-badge" [attr.data-status]="currentJob.status">
+        {{ currentJob.status }}
+      </span>
+    </div>
+
+    <div class="detail-section">
+      <h4 class="section-title">Timestamps</h4>
+      <div class="timestamp-group">
+        <div class="timestamp-item">
+          <span class="timestamp-label">Created:</span>
+          <span class="timestamp-value">{{ currentJob.createdAt | date:'medium' }}</span>
+        </div>
+        <div class="timestamp-item">
+          <span class="timestamp-label">Updated:</span>
+          <span class="timestamp-value">{{ currentJob.updatedAt | date:'medium' }}</span>
+        </div>
+      </div>
+    </div>
+
+    @if (currentJob.assignee) {
+      <div class="detail-section">
+        <h4 class="section-title">Assignee</h4>
+        <p>{{ currentJob.assignee }}</p>
+      </div>
+    }
+  </div>
+}

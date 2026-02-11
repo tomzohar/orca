@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TabsComponent } from './tabs.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { TabsConfig } from '../../types/component.types';
-import { take } from 'rxjs';
+import { MatTabChangeEvent } from '@angular/material/tabs';
 
 describe('TabsComponent', () => {
     let component: TabsComponent;
@@ -80,7 +80,7 @@ describe('TabsComponent', () => {
                 emittedIndex = index;
             });
 
-            component.onTabChanged({ index: 1 } as any);
+            component.onTabChanged({ index: 1 } as MatTabChangeEvent);
             expect(emittedIndex).toBe(1);
         });
     });

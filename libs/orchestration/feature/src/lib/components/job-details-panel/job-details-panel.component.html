@@ -1,6 +1,17 @@
-@if (job()) {
-  <div class="job-details-container">
-    <h3>Job Details</h3>
-    <pre>{{ job() | json }}</pre>
+<div class="job-details-container">
+  <orca-tabs [config]="tabsConfig()" (tabChanged)="onTabChanged($event)" />
+
+  <div class="tab-content">
+    @switch (selectedTabIndex()) {
+      @case (0) {
+        <orca-job-overview [job]="job()" />
+      }
+      @case (1) {
+        <orca-job-logs [job]="job()" />
+      }
+      @case (2) {
+        <orca-job-artifacts [job]="job()" />
+      }
+    }
   </div>
-}
+</div>

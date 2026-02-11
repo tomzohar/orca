@@ -8,11 +8,15 @@ export const appRoutes: Route[] = [
     },
     {
         path: 'orchestration',
-        loadComponent: () => import('@orca/orchestration-feature').then(m => m.OrchestrationComponent)
+        children: [
+            {
+                path: '',
+                loadComponent: () => import('@orca/orchestration-feature').then(m => m.OrchestrationComponent),
+            },
+            {
+                path: ':jobId',
+                loadComponent: () => import('@orca/orchestration-feature').then(m => m.OrchestrationComponent),
+            }
+        ]
     },
-    {
-        path: 'orchestration/:jobId',
-        loadComponent: () => import('@orca/orchestration-feature').then(m => m.OrchestrationComponent),
-        data: { hideInSidebar: true }
-    }
 ];

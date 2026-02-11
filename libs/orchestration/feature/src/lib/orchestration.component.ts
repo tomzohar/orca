@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { injectProjectDetection } from '@orca/core/projects';
 import { ButtonComponent, DialogService, EmptyStateComponent, EmptyStateConfig, KanbanItemDropEvent, KanbanList, KanbanViewComponent, PageHeaderComponent, SidePanelService, SpinnerComponent } from '@orca/design-system';
 import { injectJobsQuery, JobEventsService, mapJobsToUIModels } from '@orca/orchestration-data';
-import { JobStatus, JobUIModel } from '@orca/orchestration-types';
+import { Job, JobStatus, JobUIModel } from '@orca/orchestration-types';
 import { CreateJobDialogComponent } from './components/create-job-dialog/create-job-dialog.component';
 import { JobDetailsPanelComponent } from './components/job-details-panel/job-details-panel.component';
 
@@ -31,8 +31,8 @@ export class OrchestrationComponent {
   private readonly sidePanelService = inject(SidePanelService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  private readonly injector = inject(Injector);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly injector = inject(Injector);
 
   // Inject project detection to get the current project context
   private readonly projectDetection = injectProjectDetection();
@@ -90,6 +90,11 @@ export class OrchestrationComponent {
         items: jobsByStatus[JobStatus.RUNNING] || [],
       },
       {
+        id: JobStatus.WAITING_FOR_USER,
+        title: 'Waiting for user',
+        items: jobsByStatus[JobStatus.WAITING_FOR_USER] || [],
+      },
+      {
         id: JobStatus.COMPLETED,
         title: 'Completed',
         items: jobsByStatus[JobStatus.COMPLETED] || [],
@@ -129,44 +134,43 @@ export class OrchestrationComponent {
     if (!projectIdStr) return;
 
     // Start observing all PENDING, RUNNING, and WAITING_FOR_USER jobs
-    jobs.forEach((job) => {
-      // Skip jobs with temporary string IDs (e.g., from optimistic updates)
-      if (job.id.toString().startsWith('temp-')) {
-        return;
-      }
+    this.listenToActiveJobsEvents(jobs, projectIdStr)
 
-      const jobId = Number(job.id);
-      if (isNaN(jobId)) {
-        return;
-      }
-
-      if (
-        job.status === JobStatus.PENDING ||
-        job.status === JobStatus.RUNNING ||
-        job.status === JobStatus.WAITING_FOR_USER
-      ) {
-        this.jobEventsService.observeJob(jobId, projectIdStr);
-      }
-    });
   });
 
   constructor() {
-    // Listen to route params
-    this.route.paramMap
-      .pipe(
-        takeUntilDestroyed(this.destroyRef)
-      )
-      .subscribe(params => {
-        const jobIdStr = params.get('jobId');
-        if (jobIdStr) {
-          const jobId = Number(jobIdStr);
-          if (!isNaN(jobId)) {
-            this.openJobDetails(jobId);
-          }
-        } else {
-          this.sidePanelService.closeAll();
-        }
-      });
+    this.route.params.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe((params) => {
+      const jobId = params['jobId'];
+      this.handleJobIdChange(jobId);
+    });
+  }
+
+  private currentPanelJobId: number | null = null;
+
+  private openSidePanelForJob(jobId: number): void {
+    // Don't reopen if already showing this job
+    if (this.currentPanelJobId === jobId) {
+      return;
+    }
+
+    this.currentPanelJobId = jobId;
+
+    // Open side panel with job details component
+    // The component will use router-outlet to render child tab components
+    const overlayRef = this.sidePanelService.open(JobDetailsPanelComponent, {
+      data: { jobId },
+      title: 'Job Details',
+      size: 'xl',
+      injector: this.injector,
+    });
+
+    // When panel closes, navigate back and reset state
+    overlayRef.detachments().subscribe(() => {
+      this.currentPanelJobId = null;
+      this.router.navigate(['/orchestration']);
+    });
   }
 
   /**
@@ -200,6 +204,7 @@ export class OrchestrationComponent {
     if (projectIdStr) {
       this.jobEventsService.observeJob(jobId, projectIdStr);
     }
+    this.handleJobIdChange(jobId.toString());
   }
 
   /**
@@ -207,7 +212,7 @@ export class OrchestrationComponent {
    * Navigates to the job details route
    */
   onJobClick(job: JobUIModel): void {
-    this.router.navigate(['.', job.id], { relativeTo: this.route });
+    this.router.navigate(['/orchestration', job.id]);
   }
 
   /**
@@ -220,23 +225,6 @@ export class OrchestrationComponent {
     }
   }
 
-  private openJobDetails(jobId: number): void {
-    const overlayRef = this.sidePanelService.open(JobDetailsPanelComponent, {
-      data: { jobId },
-      title: 'Job Details',
-      size: 'xl',
-      injector: this.injector
-    });
-
-    // Handle close to navigate back
-    overlayRef.detachments().subscribe(() => {
-      // Only navigate back if we are still on the job route
-      const currentJobId = this.route.snapshot.paramMap.get('jobId');
-      if (currentJobId && Number(currentJobId) === jobId) {
-        this.router.navigate(['..'], { relativeTo: this.route });
-      }
-    });
-  }
 
   /**
    * Handles drag-and-drop events from kanban
@@ -245,5 +233,35 @@ export class OrchestrationComponent {
   onJobDrop(event: KanbanItemDropEvent<JobUIModel>): void {
     console.log('Job dropped:', event);
     // TODO: Update job status via targetListId
+  }
+
+  private handleJobIdChange(jobId: string | null | undefined): void {
+    if (jobId && !isNaN(Number(jobId))) {
+      this.openSidePanelForJob(Number(jobId));
+    } else {
+      this.sidePanelService.closeAll();
+    }
+  }
+
+  private listenToActiveJobsEvents(jobs: Job[], projectIdStr: string) {
+    jobs.forEach((job) => {
+      // Skip jobs with temporary string IDs (e.g., from optimistic updates)
+      if (job.id.toString().startsWith('temp-')) {
+        return;
+      }
+
+      const jobId = Number(job.id);
+      if (isNaN(jobId)) {
+        return;
+      }
+
+      if (
+        job.status === JobStatus.PENDING ||
+        job.status === JobStatus.RUNNING ||
+        job.status === JobStatus.WAITING_FOR_USER
+      ) {
+        this.jobEventsService.observeJob(jobId, projectIdStr);
+      }
+    });
   }
 }

@@ -2,6 +2,16 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Required Documentation
+
+Before working on any task, read these documentation files to understand the project context:
+
+- `docs/vision.md` - Project vision and goals
+- `docs/architecture.md` - System architecture and design decisions
+- `docs/stack.md` - Technology stack details
+- `docs/memories.md` - Agent memory system
+- `docs/project-status.md` - Current project status and roadmap
+
 ## Project Overview
 
 Orca is an autonomous software orchestration platform for managing teams of AI agents. The system uses a **Centralized State ("Blackboard")** architecture where agents collaborate on shared state, with a Human-in-the-Loop dashboard for monitoring and intervention.

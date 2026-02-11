@@ -19,7 +19,8 @@ export class DialogService {
             backdropClass: config.backdropClass || 'orca-dialog-backdrop',
         };
 
-        return this.cdkDialog.open<R, D>(componentOrTemplate as any, cdkConfig as any);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        return this.cdkDialog.open<R, D>(componentOrTemplate as unknown as any, cdkConfig as unknown as any);
     }
 
     closeAll(): void {

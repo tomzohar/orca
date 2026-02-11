@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTabsModule, MatTabChangeEvent } from '@angular/material/tabs';
 import { TabsConfig } from '../../types/component.types';

@@ -143,7 +143,9 @@ export interface MenuItem {
     icon?: string;
     action?: (item: MenuItem) => void;
     disabled?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     route?: string | any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     queryParams?: Record<string, any>;
     divider?: boolean; // useful for separators
     danger?: boolean; // red color for delete etc
