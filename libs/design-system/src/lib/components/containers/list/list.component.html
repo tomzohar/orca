@@ -6,12 +6,16 @@
         (opened)="onExpanded(item)"
         (closed)="onCollapsed(item)"
         [class.has-content]="item.content"
-        [class.disabled]="item.disabled">
+        [class.disabled]="item.disabled"
+      >
         <mat-expansion-panel-header>
           <mat-panel-title>
             <div class="list-item-header">
               @if (config().showIcons && item.icon) {
-                <orca-icon [config]="{ name: item.icon, size: 'sm' }" class="item-icon"></orca-icon>
+                <orca-icon
+                  [config]="{ name: item.icon, size: 'lg' }"
+                  class="item-icon"
+                ></orca-icon>
               }
               <span class="item-title">{{ item.title }}</span>
               @if (item.badge) {
@@ -44,9 +48,13 @@
         [class.clickable]="!item.disabled"
         (click)="onItemClick(item)"
         (keydown.enter)="onItemClick(item)"
-        (keydown.space)="onItemClick(item)">
+        (keydown.space)="onItemClick(item)"
+      >
         @if (config().showIcons && item.icon) {
-          <orca-icon [config]="{ name: item.icon, size: 'sm' }" class="item-icon"></orca-icon>
+          <orca-icon
+            [config]="{ name: item.icon, size: 'sm' }"
+            class="item-icon"
+          ></orca-icon>
         }
         <div class="item-content">
           <div class="item-title">{{ item.title }}</div>

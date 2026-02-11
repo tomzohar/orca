@@ -3,12 +3,12 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterLink } from '@angular/router';
 import { IconComponent } from '../icon/icon.component';
-import { MenuConfig, MenuItem } from '../../types/component.types';
+import { IconName, MenuConfig, MenuItem } from '../../types/component.types';
 import { MatDividerModule } from '@angular/material/divider';
 import { CommonModule } from '@angular/common';
 
 const DEFAULT_CONFIG: MenuConfig = {
-  triggerIcon: 'more_vert',
+  triggerIcon: IconName.more_vert,
   triggerVariant: 'icon',
   items: [],
   xPosition: 'after',

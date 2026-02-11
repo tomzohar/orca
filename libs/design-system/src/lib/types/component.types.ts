@@ -57,7 +57,7 @@ export interface CardConfig {
 export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface IconConfig {
-    name: string;
+    name: IconName;
     size?: IconSize;
     color?: string;
 }
@@ -101,7 +101,14 @@ export enum IconName {
     expand_less = 'expand_less',
     view_kanban = 'view_kanban',
     dashboard = 'dashboard',
-    link = 'link'
+    link = 'link',
+    javascript = 'javascript',
+    css = 'css',
+    html = 'html',
+    article = 'article',
+    construction = 'construction',
+    more_vert = 'more_vert',
+    cancel = 'cancel'
 }
 
 export type DialogSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
@@ -140,7 +147,7 @@ export interface DropdownConfig<T> {
 export interface MenuItem {
     id?: string;
     label: string;
-    icon?: string;
+    icon?: IconName;
     action?: (item: MenuItem) => void;
     disabled?: boolean;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -152,7 +159,7 @@ export interface MenuItem {
 }
 
 export interface MenuConfig {
-    triggerIcon?: string;
+    triggerIcon?: IconName;
     triggerLabel?: string;
     triggerVariant?: 'icon' | 'button' | 'ghost'; // defaults to icon
     items: MenuItem[];
@@ -162,7 +169,7 @@ export interface MenuConfig {
 
 export interface TabConfig {
     label: string;
-    icon?: string;
+    icon?: IconName;
     disabled?: boolean;
 }
 
@@ -194,7 +201,7 @@ export interface ListItem {
     id?: string;
     title: string;
     description?: string;
-    icon?: string;
+    icon?: IconName;
     badge?: string;
     content?: string;
     disabled?: boolean;

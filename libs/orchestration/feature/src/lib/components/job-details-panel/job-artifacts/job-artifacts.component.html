@@ -6,23 +6,9 @@
         <p>Waiting for artifacts...</p>
       </div>
     } @else if (currentJob.artifacts.length === 0) {
-      <div class="empty-state">
-        <p>No artifacts yet</p>
-      </div>
+      <orca-empty-state [config]="emptyStateConfig()" />
     } @else {
-      <div class="artifacts-list">
-        @for (artifact of currentJob.artifacts; track artifact.id) {
-          <details class="artifact-item">
-            <summary class="artifact-header">
-              <span class="artifact-filename">{{ artifact.filename }}</span>
-              <span class="artifact-timestamp">{{ artifact.createdAt | date:'short' }}</span>
-            </summary>
-            <div class="artifact-content">
-              <pre><code>{{ artifact.content }}</code></pre>
-            </div>
-          </details>
-        }
-      </div>
+      <orca-list [config]="artifactsListConfig()" />
     }
   </div>
 }

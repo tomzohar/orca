@@ -6,9 +6,7 @@
     (menuClosed)="onMenuClosed()"
     [attr.aria-label]="config().triggerLabel || 'Open menu'"
   >
-    <orca-icon
-      [config]="{ name: config().triggerIcon || 'more_vert' }"
-    ></orca-icon>
+    <orca-icon [config]="{ name: config().triggerIcon! }"></orca-icon>
   </button>
 } @else {
   <button
@@ -42,7 +40,7 @@
           [class.danger-item]="item.danger"
         >
           @if (item.icon) {
-            <orca-icon [config]="{ name: item.icon }"></orca-icon>
+            <orca-icon [config]="{ name: item.icon! }"></orca-icon>
           }
           <span>{{ item.label }}</span>
         </a>
@@ -54,7 +52,7 @@
           [class.danger-item]="item.danger"
         >
           @if (item.icon) {
-            <orca-icon [config]="{ name: item.icon }"></orca-icon>
+            <orca-icon [config]="{ name: item.icon! }"></orca-icon>
           }
           <span>{{ item.label }}</span>
         </button>

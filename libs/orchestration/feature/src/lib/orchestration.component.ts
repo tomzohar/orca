@@ -3,7 +3,7 @@ import { Component, computed, DestroyRef, effect, inject, Injector, TemplateRef,
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { injectProjectDetection } from '@orca/core/projects';
-import { ButtonComponent, DialogService, EmptyStateComponent, EmptyStateConfig, KanbanItemDropEvent, KanbanList, KanbanViewComponent, PageHeaderComponent, SidePanelService, SpinnerComponent } from '@orca/design-system';
+import { ButtonComponent, DialogService, EmptyStateComponent, EmptyStateConfig, IconName, KanbanItemDropEvent, KanbanList, KanbanViewComponent, PageHeaderComponent, SidePanelService, SpinnerComponent } from '@orca/design-system';
 import { injectJobsQuery, JobEventsService, mapJobsToUIModels } from '@orca/orchestration-data';
 import { Job, JobStatus, JobUIModel } from '@orca/orchestration-types';
 import { CreateJobDialogComponent } from './components/create-job-dialog/create-job-dialog.component';
@@ -33,6 +33,8 @@ export class OrchestrationComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly injector = inject(Injector);
+
+  readonly icons = IconName;
 
   // Inject project detection to get the current project context
   private readonly projectDetection = injectProjectDetection();

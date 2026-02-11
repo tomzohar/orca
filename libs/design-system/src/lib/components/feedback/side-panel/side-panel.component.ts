@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { ButtonComponent } from '../../button/button.component';
-import { SidePanelConfig } from '../../../types/component.types';
+import { IconName, SidePanelConfig } from '../../../types/component.types';
 
 const DEFAULT_CONFIG: SidePanelConfig = {
     position: 'right',
@@ -28,7 +28,7 @@ const DEFAULT_CONFIG: SidePanelConfig = {
                     </div>
                     @if (config().showCloseButton) {
                         <orca-button 
-                            [config]="{ variant: 'ghost', icon: { name: 'close' } }" 
+                            [config]="{ variant: 'ghost', icon: { name: icons.close } }" 
                             (clicked)="closed.emit()"
                         ></orca-button>
                     }
@@ -43,6 +43,7 @@ const DEFAULT_CONFIG: SidePanelConfig = {
     styleUrl: './side-panel.component.scss'
 })
 export class SidePanelComponent {
+    readonly icons = IconName;
     config = input<SidePanelConfig, Partial<SidePanelConfig> | undefined>(DEFAULT_CONFIG, {
         transform: (value) => ({ ...DEFAULT_CONFIG, ...value })
     });

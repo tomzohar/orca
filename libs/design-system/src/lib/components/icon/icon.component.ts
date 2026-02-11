@@ -1,9 +1,9 @@
 import { Component, input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { IconConfig } from '../../types/component.types';
+import { IconConfig, IconName } from '../../types/component.types';
 
 const DEFAULT_CONFIG: IconConfig = {
-    name: '',
+    name: IconName.add,
     size: 'md',
 };
 

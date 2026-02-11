@@ -5,61 +5,6 @@
     flex-direction: column;
 }
 
-.artifacts-list {
-    display: flex;
-    flex-direction: column;
-    gap: $tokens-spacing-md;
-}
-
-.artifact-item {
-    border: 1px solid $tokens-border-color;
-    border-radius: $tokens-radius-md;
-    overflow: hidden;
-
-    .artifact-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: $tokens-spacing-sm $tokens-spacing-md;
-        background-color: $tokens-background-color;
-        cursor: pointer;
-        user-select: none;
-
-        &:hover {
-            background-color: $tokens-surface-accent-muted;
-        }
-
-        .artifact-filename {
-            font-weight: $typography-font-weight-semibold;
-            font-family: monospace;
-        }
-
-        .artifact-timestamp {
-            font-size: $tokens-font-size-sm;
-            color: $tokens-text-secondary;
-        }
-    }
-
-    .artifact-content {
-        padding: $tokens-spacing-md;
-        background-color: $tokens-surface-color;
-        max-height: 500px;
-        overflow-y: auto;
-
-        pre {
-            margin: 0;
-            white-space: pre-wrap;
-            word-break: break-word;
-
-            code {
-                font-family: monospace;
-                font-size: $tokens-font-size-sm;
-                line-height: 1.5;
-            }
-        }
-    }
-}
-
 .empty-state {
     display: flex;
     flex-direction: column;
@@ -73,5 +18,27 @@
     p {
         margin: 0;
         font-size: $tokens-font-size-md;
+    }
+}
+
+// Styles for artifact content displayed within the list component
+::ng-deep .artifact-content-container {
+    padding: $tokens-spacing-md;
+    background-color: $tokens-surface-color;
+    max-height: 500px;
+    overflow-y: auto;
+    border-top: 1px solid $tokens-border-color;
+
+    pre {
+        margin: 0;
+        white-space: pre-wrap;
+        word-break: break-word;
+
+        code {
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+            font-size: $tokens-font-size-sm;
+            line-height: 1.5;
+            color: $tokens-text-primary;
+        }
     }
 }

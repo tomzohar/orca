@@ -1,7 +1,7 @@
 import { Component, input, output } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { IconComponent } from '../../icon/icon.component';
-import { ListConfig, ListItem } from '../../../types/component.types';
+import { IconName, ListConfig, ListItem } from '../../../types/component.types';
 
 const DEFAULT_CONFIG: ListConfig = {
   items: [],
@@ -28,6 +28,7 @@ export class ListComponent {
   itemExpanded = output<ListItem>();
   itemCollapsed = output<ListItem>();
   itemClicked = output<ListItem>();
+  readonly icons = IconName;
 
   onExpanded(item: ListItem): void {
     this.itemExpanded.emit(item);

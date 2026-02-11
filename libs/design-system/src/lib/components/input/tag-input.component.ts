@@ -3,6 +3,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { InputComponent } from './input.component';
 import { IconComponent } from '../icon/icon.component';
+import { IconName } from '../../types/component.types';
 
 @Component({
     selector: 'orca-tag-input',
@@ -28,7 +29,7 @@ import { IconComponent } from '../icon/icon.component';
                         <mat-chip>
                             {{ tag }}
                             <button matChipRemove (click)="removeTag(tag)" [disabled]="disabled()">
-                                <orca-icon [config]="{ name: 'cancel' }" />
+                                <orca-icon [config]="{ name: icons.cancel }" />
                             </button>
                         </mat-chip>
                     }
@@ -39,6 +40,8 @@ import { IconComponent } from '../icon/icon.component';
     styleUrl: './tag-input.component.scss'
 })
 export class TagInputComponent {
+
+    readonly icons = IconName;
     // Inputs
     label = input<string>('');
     placeholder = input<string>('Add item and press Enter');

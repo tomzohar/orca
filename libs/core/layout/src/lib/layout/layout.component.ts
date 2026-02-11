@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, output } from '@a
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { SidebarComponent, TopbarComponent, SidebarItem, TopbarAction } from '@orca/design-system';
+import { SidebarComponent, TopbarComponent, SidebarItem, TopbarAction, IconName, SidebarConfig } from '@orca/design-system';
 import { injectAppLayoutConfig } from '../queries/app-layout.query';
 import { injectProjectDetection } from '@orca/core/projects';
 import { map } from 'rxjs';
@@ -19,6 +19,7 @@ export class LayoutComponent {
     private layoutQuery = injectAppLayoutConfig();
     private projectQuery = injectProjectDetection();
     private router = inject(Router);
+    readonly icons = IconName;
 
     // Convert router events to a signal that tracks the current URL
     private currentUrl = toSignal(
@@ -28,7 +29,7 @@ export class LayoutComponent {
         { initialValue: this.router.url }
     );
 
-    sidebarConfig = computed(() => {
+    sidebarConfig = computed((): SidebarConfig => {
         const data = this.layoutQuery.data();
         if (!data) return { items: [] };
 
@@ -39,7 +40,7 @@ export class LayoutComponent {
                 id: route.path,
                 label: route.label,
                 route: route.path,
-                icon: route.icon ? { name: route.icon } : undefined,
+                icon: route.icon ? { name: route.icon as IconName } : undefined,
                 isActive: currentUrl === route.path || currentUrl.startsWith(route.path + '/'),
             })),
         };
