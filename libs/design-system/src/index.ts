@@ -25,3 +25,5 @@ export * from './lib/components/kanban/kanban-view/kanban-view.component';
 export * from './lib/components/kanban/kanban-card/kanban-card.component';
 export * from './lib/types/kanban.types';
 export * from './lib/components/page-header/page-header.component';
+export * from './lib/components/menu/menu.component';
+export * from './lib/components/tabs/tabs.component';

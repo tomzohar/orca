@@ -1,0 +1,17 @@
+@use '../../styles/tokens' as *;
+
+.orca-tabs-container {
+    ::ng-deep {
+        .orca-tab-label-content {
+            display: flex;
+            align-items: center;
+
+            .tab-icon {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: $spacing-md;
+            }
+        }
+    }
+}

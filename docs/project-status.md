@@ -1,10 +1,10 @@
 # Project Status
 
-**Last Updated:** February 10, 2026 (15:24)
+**Last Updated:** February 11, 2026
 
 ## 1. Overview
 
-Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture** and a specialized **Projects Module**, enabling agents to operate with full project awareness and localized file system access. The platform now features **fully automatic project initialization** - projects are detected and created without any user intervention, providing a seamless zero-friction onboarding experience.
+Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture** and a specialized **Projects Module**, enabling agents to operate with full project awareness and localized file system access. The platform now features **fully automatic project initialization** and a comprehensive **Orchestration Dashboard** with real-time job monitoring and management.
 
 ## 2. Current Architecture State
 
@@ -25,6 +25,7 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - [x] Implement `DockerAgentRunner` in backend.
   - [x] Integrate with `AgentJobs` module.
   - [x] Verify tool use (File System, Bash).
+  - [x] Robust error handling and configuration validation.
 - [x] **Project Awareness**:
   - [x] Implement `Projects` module (CRUD for project metadata).
   - [x] **Auto-Initialization**: `GET /projects/detect` automatically detects AND creates projects (idempotent).
@@ -65,13 +66,24 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ **Layout Orchestration:** `LayoutComponent` migrated to `core` and integrated with `AppLayoutQuery`.
   - ✅ **DevTools:** Custom wrapper for Angular Query DevTools integrated with toggle.
   - ✅ **Auto-Initialization:** App automatically initializes projects on detection. Simplified to 3 states: loading, error (with retry), loaded.
-  - ✅ **Orchestration:** Implemented Kanban board for visualizing Agent Jobs (`Pending`, `Running`, `Paused`, `Completed`, `Failed`).
+  - ✅ **Orchestration Dashboard:**
+    - ✅ **Kanban Board:** Full visualization of job lifecycle (`Pending`, `Running`, `Completed`, `Failed`, `Waiting for User`).
+    - ✅ **Job Creation:** Integrated dialog with agent type selection (Docker/Local).
+    - ✅ **Real-time Monitoring:** SSE-driven updates for status changes, logs, and artifacts.
+    - ✅ **Job Details Panel:** High-performance side panel for deep inspection of running/finished jobs.
+    - ✅ **Project Context:** Automatic filtering of jobs based on the active project.
   - ✅ Monorepo-safe test suite (non-watch mode by default).
 
 ## 3. Recent Accomplishments
 
-- **Kanban Orchestration (Feb 10, 2026):**
-  - Implemented a Kanban board to visualize and manage agent jobs.
+- **Real-Time Orchestration (Feb 11, 2026):**
+  - Completed the full Job Management lifecycle with backend repository decoupling.
+  - Implemented SSE (Server-Sent Events) for real-time status, log, and artifact updates.
+  - Launched the Job Creation dialog and the Detail Panel infrastructure.
+  - Achieved high accessibility standards (WCAG-compliant keyboard navigation) and strict typing across the orchestration stack.
+
+- **Kanban Foundation (Feb 10, 2026):**
+  - Initial implementation of the Kanban board to visualize and manage agent jobs.
 
 - **Automatic Project Initialization (Feb 10, 2026):** Refactored project initialization to be fully automatic:
   - Backend auto-creates projects when detected (idempotent - no duplicates)
@@ -85,9 +97,8 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 
 ## 4. Next Steps (Orchestration & UI)
 
-1.  **Orchestration Logic:** Handle the `WAITING_FOR_USER` state in the frontend (display question, accept input).
+1.  **Resume & Feedback UI:** Implement the `WAITING_FOR_USER` state in the frontend (display question, accept input, and API to resume).
 2.  **Job Interaction:** Implement drag-and-drop actions to update job status/priority via API.
 3.  **Project Management UI:** Create frontend views for managing/editing existing projects (rename, update excludes, etc.).
-4.  **Resume Job:** Implement API to resume a job with user feedback.
-5.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.
-6.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.
+4.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling (themes, code highlighting).
+5.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.

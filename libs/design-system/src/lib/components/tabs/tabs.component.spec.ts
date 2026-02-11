@@ -75,13 +75,13 @@ describe('TabsComponent', () => {
         });
 
         it('should emit tabChanged event when tab is selected', () => {
-            component.tabChanged
-                .pipe(take(1))
-                .subscribe((index: number) => {
-                    expect(index).toBe(1);
-                });
+            let emittedIndex = -1;
+            component.tabChanged.subscribe((index: number) => {
+                emittedIndex = index;
+            });
 
             component.onTabChanged({ index: 1 } as any);
+            expect(emittedIndex).toBe(1);
         });
     });
 

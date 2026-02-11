@@ -1,4 +1,3 @@
-import { TemplateRef } from '@angular/core';
 import { CdkDropList } from '@angular/cdk/drag-drop';
 
 /**

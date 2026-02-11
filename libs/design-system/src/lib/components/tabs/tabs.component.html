@@ -1,0 +1,31 @@
+<div
+  class="orca-tabs-container"
+  [class.alignment-center]="config().alignment === 'center'"
+  [class.header-below]="config().headerPosition === 'below'"
+>
+  <mat-tab-group
+    [selectedIndex]="config().selectedIndex"
+    [animationDuration]="config().animationDuration || '300ms'"
+    [disableRipple]="config().disableRipple"
+    [headerPosition]="config().headerPosition || 'above'"
+    (selectedTabChange)="onTabChanged($event)"
+    [class.mat-tab-group-center]="config().alignment === 'center'"
+    [class.mat-tab-group-start]="config().alignment === 'start'"
+  >
+    @for (tab of config().tabs; track tab.label) {
+      <mat-tab [label]="tab.label" [disabled]="tab.disabled">
+        <ng-template mat-tab-label>
+          <div class="orca-tab-label-content">
+            @if (tab.icon) {
+              <orca-icon
+                [config]="{ name: tab.icon, size: 'md' }"
+                class="tab-icon"
+              ></orca-icon>
+            }
+            <span class="tab-text">{{ tab.label }}</span>
+          </div>
+        </ng-template>
+      </mat-tab>
+    }
+  </mat-tab-group>
+</div>
