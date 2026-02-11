@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { PrismaModule } from '../prisma/prisma.module';
 import { LlmModule } from '../shared/llm/llm.module';
@@ -15,7 +15,7 @@ import { DbArtifactStorage } from './storage/services/db-artifact-storage';
 import { ProjectsModule } from '../projects/projects.module';
 
 @Module({
-  imports: [PrismaModule, EventEmitterModule.forRoot(), LlmModule, ProjectsModule],
+  imports: [PrismaModule, EventEmitterModule.forRoot(), LlmModule, forwardRef(() => ProjectsModule)],
   controllers: [AgentJobsController],
   providers: [
     AgentJobsService,
@@ -42,5 +42,6 @@ import { ProjectsModule } from '../projects/projects.module';
       useClass: DbArtifactStorage,
     },
   ],
+  exports: [AgentJobsService],
 })
 export class AgentJobsModule { }

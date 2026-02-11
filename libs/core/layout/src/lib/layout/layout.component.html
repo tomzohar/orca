@@ -11,6 +11,9 @@
           width="56"
           height="56"
         />
+        @if (projectName()) {
+          <span class="project-name">{{ projectName() }}</span>
+        }
       </div>
       <ng-content select="[sidebar-footer]" footer></ng-content>
     </orca-sidebar>

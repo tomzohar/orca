@@ -66,10 +66,11 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
     return this.mapToEntity(updated);
   }
 
-  async findAll(filters?: { assignee?: string }): Promise<AgentJobEntity[]> {
+  async findAll(filters?: { assignee?: string; projectId?: number }): Promise<AgentJobEntity[]> {
     const jobs = await this.prisma.agentJob.findMany({
       where: {
         assignee: filters?.assignee,
+        projectId: filters?.projectId,
       },
       include: { logs: true, artifacts: true, project: true },
       orderBy: { createdAt: 'desc' },

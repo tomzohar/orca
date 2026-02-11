@@ -1,8 +1,10 @@
 import { Component, input, output, signal } from '@angular/core';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { SidebarComponent, SidebarItem, TopbarAction, TopbarComponent, TopbarConfig } from '@orca/design-system';
 import * as AppLayoutQuery from '../queries/app-layout.query';
 import { LayoutComponent } from './layout.component';
+import { ProjectsService } from '@orca/core/projects';
+import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 
 @Component({
     selector: 'orca-sidebar',
@@ -27,17 +29,27 @@ class MockTopbarComponent {
 describe('LayoutComponent', () => {
     let component: LayoutComponent;
     let fixture: ComponentFixture<LayoutComponent>;
+    let mockProjectsService: any;
 
     beforeEach(async () => {
+        mockProjectsService = {
+            detectProject: jest.fn().mockReturnValue(Promise.resolve({
+                project: { name: 'Test Project' }
+            }))
+        };
+
         jest.spyOn(AppLayoutQuery, 'injectAppLayoutConfig').mockReturnValue({
             data: signal({
                 sidebar: { routes: [] },
-                topbar: { title: 'Test App' }
             })
         } as any);
 
         await TestBed.configureTestingModule({
             imports: [LayoutComponent],
+            providers: [
+                provideTanStackQuery(new QueryClient()),
+                { provide: ProjectsService, useValue: mockProjectsService }
+            ]
         })
             .overrideComponent(LayoutComponent, {
                 remove: { imports: [SidebarComponent, TopbarComponent] },
@@ -47,6 +59,9 @@ describe('LayoutComponent', () => {
 
         fixture = TestBed.createComponent(LayoutComponent);
         component = fixture.componentInstance;
+        fixture.detectChanges();
+        // Wait for query to resolve
+        await fixture.whenStable();
         fixture.detectChanges();
     });
 
@@ -70,5 +85,11 @@ describe('LayoutComponent', () => {
         component.onTopbarActionClick(mockAction);
 
         expect(spy).toHaveBeenCalledWith(mockAction);
+    });
+
+    it('should display project name', async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        fixture.detectChanges();
+        expect(component.projectName()).toBe('Test Project');
     });
 });

@@ -1,0 +1,53 @@
+@use '../../styles/tokens' as *;
+
+button[mat-menu-item],
+a[mat-menu-item] {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+
+    ::ng-deep {
+        .mat-mdc-menu-item-text {
+            display: flex;
+            align-items: center;
+            gap: $spacing-sm;
+        }
+
+        .mdc-button__label {
+            display: flex;
+            gap: $spacing-sm;
+        }
+    }
+
+    orca-icon {
+        display: block;
+    }
+}
+
+:host {
+    ::ng-deep {
+        button[mat-button].mdc-button {
+            .mdc-button__label {
+                display: flex;
+                gap: $spacing-sm;
+            }
+        }
+    }
+}
+
+
+.danger-item {
+    ::ng-deep {
+        .mat-icon {
+            color: $error-color; // Verify variable name in global styles
+        }
+
+        span {
+            color: $error-color;
+        }
+    }
+
+    &:hover:not([disabled]) {
+        background-color: rgba(var(--color-error-rgb), 0.1);
+    }
+}

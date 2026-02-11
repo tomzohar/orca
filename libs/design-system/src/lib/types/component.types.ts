@@ -1,3 +1,5 @@
+import { Injector } from '@angular/core';
+
 export type DesignSystemColor = 'primary' | 'accent' | 'warn';
 
 export interface ButtonConfig {
@@ -79,11 +81,28 @@ export interface SpinnerConfig {
     diameter?: number;
 }
 
-export type IconName =
-    | 'search' | 'home' | 'settings' | 'menu' | 'close'
-    | 'check' | 'error' | 'warning' | 'info' | 'add'
-    | 'remove' | 'edit' | 'delete' | 'arrow_forward'
-    | 'arrow_back' | 'expand_more' | 'expand_less';
+export enum IconName {
+    search = 'search',
+    home = 'home',
+    settings = 'settings',
+    menu = 'menu',
+    close = 'close',
+    check = 'check',
+    error = 'error',
+    warning = 'warning',
+    info = 'info',
+    add = 'add',
+    remove = 'remove',
+    edit = 'edit',
+    delete = 'delete',
+    arrow_forward = 'arrow_forward',
+    arrow_back = 'arrow_back',
+    expand_more = 'expand_more',
+    expand_less = 'expand_less',
+    view_kanban = 'view_kanban',
+    dashboard = 'dashboard',
+    link = 'link'
+}
 
 export type DialogSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
@@ -116,4 +135,55 @@ export interface DropdownConfig<T> {
     error?: string;
     hint?: string;
     options: DropdownOption<T>[];
+}
+
+export interface MenuItem {
+    id?: string;
+    label: string;
+    icon?: string;
+    action?: (item: MenuItem) => void;
+    disabled?: boolean;
+    route?: string | any[];
+    queryParams?: Record<string, any>;
+    divider?: boolean; // useful for separators
+    danger?: boolean; // red color for delete etc
+}
+
+export interface MenuConfig {
+    triggerIcon?: string;
+    triggerLabel?: string;
+    triggerVariant?: 'icon' | 'button' | 'ghost'; // defaults to icon
+    items: MenuItem[];
+    xPosition?: 'before' | 'after';
+    yPosition?: 'above' | 'below';
+}
+
+export interface TabConfig {
+    label: string;
+    icon?: string;
+    disabled?: boolean;
+}
+
+export interface TabsConfig {
+    tabs: TabConfig[];
+    selectedIndex?: number;
+    alignment?: 'start' | 'center';
+    animationDuration?: string;
+    disableRipple?: boolean;
+    headerPosition?: 'above' | 'below';
+}
+
+export type SidePanelPosition = 'left' | 'right';
+export type SidePanelSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+
+export interface SidePanelConfig {
+    title?: string;
+    subtitle?: string;
+    position?: SidePanelPosition;
+    size?: SidePanelSize;
+    showCloseButton?: boolean;
+    disableClose?: boolean;
+    hasBackdrop?: boolean;
+    backdropClass?: string;
+    injector?: Injector;
 }

@@ -21,21 +21,17 @@ import {
 } from '../domain/events/agent-job-events';
 import { CreateAgentJobDto } from './dto/create-agent-job.dto';
 
-type AgentJobEvent =
-  | JobCreatedEvent
-  | JobStatusChangedEvent
-  | JobLogAddedEvent
-  | JobArtifactAddedEvent;
+type AgentJobEventPayload =
+  | { type: 'job_created'; payload: any; jobId: number }
+  | { type: 'status_changed'; payload: { status: string; job: any }; jobId: number }
+  | { type: 'log_added'; payload: any; jobId: number }
+  | { type: 'artifact_added'; payload: { artifactId: number; filename: string; path: string }; jobId: number };
 
 @Controller('agent-jobs')
 export class AgentJobsController {
-  private readonly updates$ = new Subject<{
-    type: string;
-    payload: any;
-    jobId: number;
-  }>();
+  private readonly updates$ = new Subject<AgentJobEventPayload>();
 
-  constructor(private readonly agentJobsService: AgentJobsService) {}
+  constructor(private readonly agentJobsService: AgentJobsService) { }
 
   @OnEvent('agent-job.created')
   handleJobCreated(event: JobCreatedEvent) {
@@ -81,12 +77,12 @@ export class AgentJobsController {
   createJob(@Body() dto: CreateAgentJobDto) {
     // Map simplified string/enum from DTO to strictly typed AgentType if needed
     const type = dto.type ? AgentType[dto.type] : AgentType.LANGGRAPH;
-    return this.agentJobsService.createJob(dto.prompt, dto.assignee, type);
+    return this.agentJobsService.createJob(dto.prompt, dto.assignee, type, dto.projectId);
   }
 
   @Get()
-  getJobs(@Query('assignee') assignee?: string) {
-    return this.agentJobsService.getJobs(assignee);
+  getJobs(@Query('assignee') assignee?: string, @Query('projectId', new ParseIntPipe({ optional: true })) projectId?: number) {
+    return this.agentJobsService.getJobs(assignee, projectId);
   }
 
   @Get(':id')

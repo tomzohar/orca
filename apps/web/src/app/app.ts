@@ -1,10 +1,12 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { injectProjectDetection } from '@orca/core/projects';
 import { EmptyStateComponent, EmptyStateConfig, SpinnerComponent, ButtonComponent, ButtonConfig } from '@orca/design-system';
-import { LayoutComponent } from '@orca/core/layout';
+import { AppLayoutService, LayoutComponent } from '@orca/core/layout';
 import { AngularQueryDevtoolsComponent } from "./utils/angular-query-devtools.component";
+import { appRoutes } from './app.routes';
+import { getSidebarRoutes } from './utils/route.utils';
 
 @Component({
   selector: 'orca-root',
@@ -22,6 +24,7 @@ import { AngularQueryDevtoolsComponent } from "./utils/angular-query-devtools.co
   styleUrl: './app.scss',
 })
 export class App {
+  private layoutService = inject(AppLayoutService);
   showDevTools = signal(false);
 
   readonly toggleDevtoolsButtonConfig: ButtonConfig = {
@@ -30,6 +33,12 @@ export class App {
       name: 'construction'
     }
   };
+
+  constructor() {
+    effect(() => {
+      this.initializeLayout();
+    })
+  }
 
   // TanStack Query - returns Signal<CreateQueryResult<ProjectDetectionResult>>
   projectDetectionQuery = injectProjectDetection();
@@ -54,4 +63,11 @@ export class App {
     this.projectDetectionQuery.refetch();
   }
 
+  private initializeLayout(): void {
+    this.layoutService.updateLayoutConfig({
+      sidebar: {
+        routes: getSidebarRoutes(appRoutes)
+      }
+    });
+  }
 }

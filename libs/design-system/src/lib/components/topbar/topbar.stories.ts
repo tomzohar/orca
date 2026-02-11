@@ -22,7 +22,6 @@ type Story = StoryObj<TopbarComponent>;
 export const Default: Story = {
   args: {
     config: {
-      title: 'ORCA DASHBOARD',
       showSearch: true,
       actions: [
         { id: 'notifications', icon: { name: 'notifications', size: 'sm' }, tooltip: 'Notifications' },
@@ -47,7 +46,6 @@ export const Default: Story = {
 export const Simple: Story = {
   args: {
     config: {
-      title: 'Settings',
       showSearch: false,
       actions: [],
     },

@@ -11,18 +11,20 @@ import {
     CdkDragPlaceholder
 } from '@angular/cdk/drag-drop';
 import { KanbanList, KanbanItemDropEvent } from '../../../types/kanban.types';
+import { KanbanCardComponent } from "../kanban-card/kanban-card.component";
 
 @Component({
     selector: 'orca-kanban-view',
     standalone: true,
     imports: [
-        CommonModule,
-        CdkDropListGroup,
-        CdkDropList,
-        CdkDrag,
-        CdkDragPreview,
-        CdkDragPlaceholder
-    ],
+    CommonModule,
+    CdkDropListGroup,
+    CdkDropList,
+    CdkDrag,
+    CdkDragPreview,
+    CdkDragPlaceholder,
+    KanbanCardComponent
+],
     templateUrl: './kanban-view.component.html',
     styleUrls: ['./kanban-view.component.scss'],
     changeDetection: ChangeDetectionStrategy.OnPush,

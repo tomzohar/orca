@@ -1,0 +1,55 @@
+@use '../../styles/typography' as *;
+@use '../../styles/tokens' as *;
+
+:host {
+    display: block;
+    width: 100%;
+}
+
+.page-header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md 0;
+    gap: $spacing-md;
+    flex-wrap: wrap; // Allow wrapping on small screens
+}
+
+.header-start {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+}
+
+.title-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+}
+
+.header-title {
+    @include typography-h5;
+    margin: 0;
+    color: $text-primary;
+}
+
+.header-subtitle {
+    @include typography-body-2;
+    color: $text-secondary;
+}
+
+.header-icon {
+    color: $primary-color;
+    margin-top: $spacing-sm;
+    // Size might need adjustment depending on icon component defaults
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+
+    &:empty {
+        display: none;
+    }
+}

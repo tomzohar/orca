@@ -1,0 +1,105 @@
+@use '../../../styles/tokens' as *;
+@use '../../../styles/typography' as *;
+
+
+.orca-side-panel-container {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    height: 100vh;
+    background: $surface-color;
+    border: 1px solid $border-color;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: $text-primary;
+    z-index: 1000;
+}
+
+// Position variants
+.position-left {
+    left: 0;
+    border-left: none;
+    animation: slideInLeft 0.3s ease-out;
+}
+
+.position-right {
+    right: 0;
+    border-right: none;
+    animation: slideInRight 0.3s ease-out;
+}
+
+// Size variants
+.size-sm {
+    width: 320px;
+}
+
+.size-md {
+    width: 480px;
+}
+
+.size-lg {
+    width: 640px;
+}
+
+.size-xl {
+    width: 800px;
+}
+
+.size-full {
+    width: 90vw;
+}
+
+// Header
+.orca-side-panel-header {
+    padding: $spacing-md $spacing-md;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 1px solid $border-color;
+    flex-shrink: 0;
+}
+
+.header-text {
+    flex: 1;
+}
+
+.header-text h4 {
+    margin: 0;
+    @include typography-h4;
+}
+
+.subtitle {
+    margin: 4px 0 0;
+    @include typography-body-2;
+    color: $text-secondary;
+}
+
+// Content
+.orca-side-panel-content {
+    padding: $spacing-xl;
+    overflow-y: auto;
+    flex: 1;
+}
+
+// Animations
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+    }
+
+    to {
+        transform: translateX(0);
+    }
+}

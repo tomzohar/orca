@@ -23,7 +23,6 @@ describe('TopbarComponent', () => {
     fixture = TestBed.createComponent(TopbarComponent);
     component = fixture.componentInstance;
     fixture.componentRef.setInput('config', {
-      title: 'Test Title',
       actions: [],
     });
     fixture.detectChanges();
@@ -31,10 +30,5 @@ describe('TopbarComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
-  });
-
-  it('should render title', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.topbar-title')?.textContent).toContain('Test Title');
   });
 });

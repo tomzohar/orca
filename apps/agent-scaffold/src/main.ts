@@ -9,12 +9,16 @@ async function main() {
     instruction += `\n\nIMPORTANT: If you need clarification from the user, or if you are stuck and need human assistance, USE THE tool named "AskUserQuestion".\nSchema: { questions: [{ question: string, options?: { label: string, description?: string }[] }] }.\nDo not just ask in text, USE THE TOOL.`;
 
     if (!apiKey) {
-        console.error('Missing ANTHROPIC_API_KEY');
+        console.error('[System] Missing ANTHROPIC_API_KEY environment variable.');
         process.exit(1);
     }
 
+    const model = process.env.CLAUDE_MODEL || 'claude-sonnet-4-20250514';
+
+    console.log(`[System] API Key present: ${apiKey.substring(0, 7)}...${apiKey.substring(apiKey.length - 4)}`);
+
     if (!instruction) {
-        console.error('Missing AGENT_INSTRUCTION');
+        console.error('[System] Missing AGENT_INSTRUCTION environment variable.');
         process.exit(1);
     }
 
@@ -22,7 +26,8 @@ async function main() {
 
     try {
         const session = unstable_v2_createSession({
-            model: 'claude-sonnet-4-5-20250929',
+            apiKey, // Pass API key explicitly
+            model,
             allowedTools: ['Write', 'Read', 'Bash', 'Glob', 'Grep', 'Ls', 'Edit', 'AskUserQuestion']
         });
 

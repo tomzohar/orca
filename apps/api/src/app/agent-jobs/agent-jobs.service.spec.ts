@@ -110,4 +110,43 @@ describe('AgentJobsService', () => {
       expect(repository.findById).toHaveBeenCalledWith(1);
     });
   });
+
+  describe('getJobs', () => {
+    it('should return all jobs when no filters provided', async () => {
+      const mockJobs = [
+        new AgentJobEntity({ id: 1, prompt: 'job1', status: AgentJobStatus.PENDING }),
+        new AgentJobEntity({ id: 2, prompt: 'job2', status: AgentJobStatus.COMPLETED }),
+      ];
+      mockRepository.findAll.mockResolvedValue(mockJobs);
+
+      const result = await service.getJobs();
+
+      expect(repository.findAll).toHaveBeenCalledWith({});
+      expect(result).toEqual(mockJobs);
+    });
+
+    it('should filter jobs by projectId', async () => {
+      const mockJobs = [
+        new AgentJobEntity({ id: 1, prompt: 'job1', status: AgentJobStatus.PENDING, projectId: 5 }),
+      ];
+      mockRepository.findAll.mockResolvedValue(mockJobs);
+
+      const result = await service.getJobs(undefined, 5);
+
+      expect(repository.findAll).toHaveBeenCalledWith({ assignee: undefined, projectId: 5 });
+      expect(result).toEqual(mockJobs);
+    });
+
+    it('should filter jobs by assignee and projectId', async () => {
+      const mockJobs = [
+        new AgentJobEntity({ id: 1, prompt: 'job1', status: AgentJobStatus.PENDING, projectId: 5, assignee: 'alice' }),
+      ];
+      mockRepository.findAll.mockResolvedValue(mockJobs);
+
+      const result = await service.getJobs('alice', 5);
+
+      expect(repository.findAll).toHaveBeenCalledWith({ assignee: 'alice', projectId: 5 });
+      expect(result).toEqual(mockJobs);
+    });
+  });
 });

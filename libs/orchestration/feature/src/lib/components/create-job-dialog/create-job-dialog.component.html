@@ -1,0 +1,47 @@
+<orca-dialog-container
+  [config]="{
+    title: 'Create New Job',
+    subtitle: 'project: ' + projectName,
+    size: 'lg',
+    showCloseButton: true,
+    actions: [
+      {
+        id: 'cancel',
+        label: 'Cancel',
+        variant: 'secondary',
+        disabled: isSubmitting(),
+      },
+      {
+        id: 'create',
+        label: 'Create',
+        variant: 'primary',
+        disabled: !canSubmit(),
+      },
+    ],
+  }"
+  (closed)="onClose()"
+  (actionClick)="$event === 'create' ? onSubmit() : onCancel()"
+>
+  <div class="create-job-form">
+    <orca-input
+      [config]="{
+        label: 'What would you like to do?',
+        placeholder: 'Describe the task for the agent...',
+        type: 'textarea',
+        rows: 6,
+        hint: 'Provide clear instructions for what you want the agent to accomplish',
+        error: errorMessage(),
+      }"
+      [(value)]="prompt"
+    ></orca-input>
+
+    <orca-dropdown
+      [config]="{
+        label: 'Agent Type',
+        hint: 'Local runs in-process (fast), Docker runs in isolated container (safe)',
+        options: agentTypeOptions,
+      }"
+      [(value)]="agentType"
+    ></orca-dropdown>
+  </div>
+</orca-dialog-container>

@@ -39,7 +39,7 @@ model AgentJob {
   status    JobStatus @default(PENDING)
   
   projectId Int?
-  project   Project?  @relation(fields: [projectId], references: [id])
+  project   Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   logs      AgentJobLog[]
   artifacts AgentJobArtifact[]
@@ -63,7 +63,7 @@ model Project {
 model AgentJobLog {
   id        Int      @id @default(autoincrement())
   jobId     Int
-  job       AgentJob @relation(fields: [jobId], references: [id])
+  job       AgentJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   message   String
   timestamp DateTime @default(now())
 }
@@ -71,7 +71,7 @@ model AgentJobLog {
 model AgentJobArtifact {
   id        Int      @id @default(autoincrement())
   jobId     Int
-  job       AgentJob @relation(fields: [jobId], references: [id])
+  job       AgentJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   filename  String
   content   String
   createdAt DateTime @default(now())

@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { spawn } from 'child_process';
 import * as path from 'path';
@@ -31,7 +32,8 @@ export class DockerAgentRunner implements IAgentRunner {
     @Inject(AGENT_JOBS_REPOSITORY)
     private readonly repository: IAgentJobsRepository,
     private readonly eventEmitter: EventEmitter2,
-  ) {}
+    private readonly configService: ConfigService,
+  ) { }
 
   private readonly matchers: LogMatcher[] = [
     new AskUserMatcher(),
@@ -40,34 +42,34 @@ export class DockerAgentRunner implements IAgentRunner {
 
   async run(job: AgentJobEntity): Promise<void> {
     this.logger.log(`Starting Docker job ${job.id}`);
+
+    // Fail fast if the API key is missing or clearly invalid
+    const apiKey = this.configService.get<string>('ANTHROPIC_API_KEY')?.trim();
+    if (!apiKey || !apiKey.startsWith('sk-ant-')) {
+      const msg =
+        'Missing or invalid ANTHROPIC_API_KEY. Ensure a valid Anthropic API key is set in your .env file.';
+      this.logger.error(msg);
+      await this.addLog(job.id, `Configuration Error: ${msg}`);
+      await this.updateStatus(job.id, AgentJobStatus.FAILED);
+      return;
+    }
+
     await this.updateStatus(job.id, AgentJobStatus.RUNNING);
 
     let isWaitingForUser = false;
-
     try {
-      // Project Root (where the monorepo lives)
-      // Assuming this service runs in /app/apps/api/src/...
-      // We need to resolve the root of the repo.
-      const projectRoot = path.resolve(process.cwd()); // This should be the repo root if run via nx
+      const projectRoot = job.project?.rootPath ?? process.cwd();
+      this.logger.log(`Project root: ${projectRoot}`);
 
-      this.logger.log(`Mounting project root: ${projectRoot}`);
-
-      // Prepare Environment Variables for the container
-
-      // Spawn Docker Process
-      // -v: Bind mount project root to /app
-      // -e: Pass Agent config
-      // orca-agent:latest: The image we built
       const dockerProcess = spawn('docker', [
         'run',
-        '--rm', // Remove container after exit
+        '--rm',
         '-v',
         `${projectRoot}:/app`,
         '-w',
         '/app',
         '-e',
-        `ANTHROPIC_API_KEY=${process.env.ANTHROPIC_API_KEY}`,
-        // Pass instruction as ENV for now, or CMD
+        `ANTHROPIC_API_KEY=${apiKey}`,
         '-e',
         `AGENT_INSTRUCTION=${job.prompt}`,
         'orca-agent:latest',
@@ -114,8 +116,6 @@ export class DockerAgentRunner implements IAgentRunner {
 
                 const content = fs.readFileSync(fullPath, 'utf-8');
                 // Create artifact
-                // Note: This might create many artifacts for one file if multiple writes happen.
-                // The frontend shows a list, so latest is last.
                 this.logger.debug(
                   `[File Watcher] Detected change in ${filename}`,
                 );
@@ -157,7 +157,13 @@ export class DockerAgentRunner implements IAgentRunner {
         }
       });
 
-      // ... (stderr handler) ...
+      dockerProcess.stderr.on('data', async (data) => {
+        const message = data.toString().trim();
+        if (message) {
+          this.logger.error(`[Docker Error] ${message}`);
+          await this.addLog(job.id, `ERROR: ${message}`);
+        }
+      });
 
       // Wait for exit
       const exitCode = await new Promise<number>((resolve) => {

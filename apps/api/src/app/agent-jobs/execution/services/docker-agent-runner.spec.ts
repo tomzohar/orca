@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Test, TestingModule } from '@nestjs/testing';
 import * as child_process from 'child_process';
@@ -47,6 +48,13 @@ describe('DockerAgentRunner', () => {
         DockerAgentRunner,
         { provide: AGENT_JOBS_REPOSITORY, useValue: mockRepo },
         { provide: EventEmitter2, useValue: { emit: jest.fn() } },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockReturnValue('sk-ant-test-key'),
+            getOrThrow: jest.fn().mockReturnValue('sk-ant-test-key'),
+          },
+        },
       ],
     }).compile();
 
@@ -100,6 +108,54 @@ describe('DockerAgentRunner', () => {
 
     await runner.run(mockJob);
 
+    expect(repository.update).toHaveBeenCalledWith(1, {
+      status: AgentJobStatus.FAILED,
+    });
+  });
+
+  it('should fail job when ANTHROPIC_API_KEY is missing', async () => {
+    const configService = { get: jest.fn().mockReturnValue(undefined) };
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        DockerAgentRunner,
+        { provide: AGENT_JOBS_REPOSITORY, useValue: repository },
+        { provide: EventEmitter2, useValue: eventEmitter },
+        { provide: ConfigService, useValue: configService },
+      ],
+    }).compile();
+
+    const runnerWithNoKey = module.get<DockerAgentRunner>(DockerAgentRunner);
+    await runnerWithNoKey.run(mockJob);
+
+    expect(child_process.spawn).not.toHaveBeenCalled();
+    expect(repository.addLog).toHaveBeenCalledWith(
+      1,
+      expect.stringContaining('Missing or invalid ANTHROPIC_API_KEY'),
+    );
+    expect(repository.update).toHaveBeenCalledWith(1, {
+      status: AgentJobStatus.FAILED,
+    });
+  });
+
+  it('should fail job when ANTHROPIC_API_KEY has invalid format', async () => {
+    const configService = { get: jest.fn().mockReturnValue('not-a-valid-key') };
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        DockerAgentRunner,
+        { provide: AGENT_JOBS_REPOSITORY, useValue: repository },
+        { provide: EventEmitter2, useValue: eventEmitter },
+        { provide: ConfigService, useValue: configService },
+      ],
+    }).compile();
+
+    const runnerWithBadKey = module.get<DockerAgentRunner>(DockerAgentRunner);
+    await runnerWithBadKey.run(mockJob);
+
+    expect(child_process.spawn).not.toHaveBeenCalled();
+    expect(repository.addLog).toHaveBeenCalledWith(
+      1,
+      expect.stringContaining('Missing or invalid ANTHROPIC_API_KEY'),
+    );
     expect(repository.update).toHaveBeenCalledWith(1, {
       status: AgentJobStatus.FAILED,
     });

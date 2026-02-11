@@ -2,6 +2,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProjectsController } from './projects.controller';
 import { ProjectsService } from '../application/projects.service';
+import { AgentJobsService } from '../../agent-jobs/agent-jobs.service';
 import { CreateProjectDto } from '../domain/dtos/create-project.dto';
 import { Project } from '../domain/project.entity';
 import { NotFoundException } from '@nestjs/common';
@@ -26,6 +27,7 @@ describe('ProjectsController', () => {
         create: jest.fn(),
         findAll: jest.fn(),
         findBySlug: jest.fn(),
+        findOne: jest.fn(),
     };
 
     beforeEach(async () => {
@@ -35,6 +37,10 @@ describe('ProjectsController', () => {
                 {
                     provide: ProjectsService,
                     useValue: mockProjectsService,
+                },
+                {
+                    provide: AgentJobsService,
+                    useValue: { getJobs: jest.fn() },
                 },
             ],
         }).compile();
@@ -96,4 +102,6 @@ describe('ProjectsController', () => {
             );
         });
     });
+
+
 });

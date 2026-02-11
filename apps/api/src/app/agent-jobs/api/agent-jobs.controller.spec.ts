@@ -53,6 +53,7 @@ describe('AgentJobsController', () => {
         prompt,
         undefined,
         AgentType.LANGGRAPH,
+        undefined,
       );
       expect(result).toEqual(mockJob);
     });
@@ -71,6 +72,20 @@ describe('AgentJobsController', () => {
 
       expect(service.getJob).toHaveBeenCalledWith(1);
       expect(result).toEqual(mockJob);
+    });
+  });
+
+  describe('getJobs', () => {
+    it('should return jobs filtered by projectId', async () => {
+      const mockJobs = [
+        new AgentJobEntity({ id: 1, prompt: 'job1', status: AgentJobStatus.PENDING, projectId: 5 }),
+      ];
+      mockService.getJobs.mockResolvedValue(mockJobs);
+
+      const result = await controller.getJobs(undefined, 5);
+
+      expect(service.getJobs).toHaveBeenCalledWith(undefined, 5);
+      expect(result).toEqual(mockJobs);
     });
   });
 });

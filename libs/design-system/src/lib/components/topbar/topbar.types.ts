@@ -9,7 +9,6 @@ export interface TopbarAction {
 }
 
 export interface TopbarConfig {
-    title?: string;
     logo?: string;
     showSearch?: boolean;
     actions?: TopbarAction[];

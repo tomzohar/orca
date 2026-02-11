@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException, forwardRef } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AgentJobEntity, AgentType } from './domain/entities/agent-job.entity';
 import { JobCreatedEvent } from './domain/events/agent-job-events';
@@ -22,6 +22,7 @@ export class AgentJobsService {
     @Inject(AGENT_RUNNER)
     private readonly runnerFactory: (type: AgentType) => IAgentRunner,
     private readonly eventEmitter: EventEmitter2,
+    @Inject(forwardRef(() => ProjectsService))
     private readonly projectsService: ProjectsService,
   ) { }
 
@@ -68,8 +69,8 @@ export class AgentJobsService {
     return job;
   }
 
-  async getJobs(assignee?: string): Promise<AgentJobEntity[]> {
-    return this.repository.findAll({ assignee });
+  async getJobs(assignee?: string, projectId?: number): Promise<AgentJobEntity[]> {
+    return this.repository.findAll({ assignee, projectId });
   }
 
   async getJob(id: number): Promise<AgentJobEntity> {

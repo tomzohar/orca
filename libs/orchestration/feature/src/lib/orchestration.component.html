@@ -1,4 +1,65 @@
 <div class="orchestration-container">
-  <h1>Orchestration</h1>
-  <p>Orchestration feature works!</p>
+  <orca-page-header [title]="projectName()">
+    <div actions>
+      <orca-button
+        [config]="{
+          variant: 'primary',
+          icon: { name: 'add' },
+        }"
+        (clicked)="onCreateJob()"
+      >
+        Create job
+      </orca-button>
+    </div>
+  </orca-page-header>
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="loading-container">
+      <orca-spinner [config]="{ size: 'lg' }" />
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (showEmpty()) {
+    <div class="empty-container">
+      <orca-empty-state [config]="emptyStateConfig" />
+    </div>
+  }
+
+  <!-- Kanban Board -->
+  @if (showKanban()) {
+    <orca-kanban-view
+      [lists]="kanbanLists()"
+      [itemTemplate]="jobCardTemplate()"
+      (itemDrop)="onJobDrop($event)"
+    ></orca-kanban-view>
+  }
 </div>
+
+<!-- Job Card Template -->
+<ng-template #jobCard let-job>
+  <div
+    class="job-card"
+    role="button"
+    tabindex="0"
+    (click)="onJobClick(job)"
+    (keydown)="onJobKeyDown($event, job)"
+  >
+    @if (job.prompt) {
+      <p class="job-description">
+        @if (job.prompt.length > 30) {
+          {{ job.prompt | slice: 0 : 30 }}...
+        } @else {
+          {{ job.prompt }}
+        }
+      </p>
+    }
+
+    <div class="job-footer">
+      @if (job.assignee) {
+        <span class="job-assignee">{{ job.assignee }}</span>
+      }
+      <span class="job-date">{{ job.formattedCreatedAt }}</span>
+    </div>
+  </div>
+</ng-template>

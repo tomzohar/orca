@@ -1,13 +1,18 @@
-import { Body, Controller, Get, NotFoundException, Param, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, UsePipes, ValidationPipe, Inject, forwardRef } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProjectsService } from '../application/projects.service';
 import { CreateProjectDto } from '../domain/dtos/create-project.dto';
 import { DetectProjectResponseDto } from '../domain/dtos/detect-project-response.dto';
+import { AgentJobsService } from '../../agent-jobs/agent-jobs.service';
 
 @ApiTags('projects')
 @Controller('projects')
 export class ProjectsController {
-    constructor(private readonly projectsService: ProjectsService) { }
+    constructor(
+        private readonly projectsService: ProjectsService,
+        @Inject(forwardRef(() => AgentJobsService))
+        private readonly agentJobsService: AgentJobsService
+    ) { }
 
     @Post()
     @ApiOperation({ summary: 'Create a new project' })

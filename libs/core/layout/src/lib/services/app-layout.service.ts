@@ -3,17 +3,27 @@ import { AppLayoutConfig } from '../types/app-layout.types';
 
 @Injectable({ providedIn: 'root' })
 export class AppLayoutService {
+    private layoutConfig: AppLayoutConfig = {
+        sidebar: {
+            routes: [
+                { path: '/orchestration', label: 'Orchestration', icon: 'view_kanban' },
+            ]
+        },
+    };
+
     // Service returns a Promise for TanStack Query to consume.
     async getLayoutConfig(): Promise<AppLayoutConfig> {
-        return Promise.resolve({
+        return Promise.resolve(this.layoutConfig);
+    }
+
+    updateLayoutConfig(config: Partial<AppLayoutConfig>): void {
+        this.layoutConfig = {
+            ...this.layoutConfig,
+            ...config,
             sidebar: {
-                routes: [
-                    { path: '/dashboard', label: 'Dashboard', icon: 'dashboard' },
-                ]
+                ...this.layoutConfig.sidebar,
+                ...config.sidebar,
             },
-            topbar: {
-                title: 'Orca',
-            }
-        });
+        };
     }
 }

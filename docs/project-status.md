@@ -65,9 +65,13 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ **Layout Orchestration:** `LayoutComponent` migrated to `core` and integrated with `AppLayoutQuery`.
   - ✅ **DevTools:** Custom wrapper for Angular Query DevTools integrated with toggle.
   - ✅ **Auto-Initialization:** App automatically initializes projects on detection. Simplified to 3 states: loading, error (with retry), loaded.
+  - ✅ **Orchestration:** Implemented Kanban board for visualizing Agent Jobs (`Pending`, `Running`, `Paused`, `Completed`, `Failed`).
   - ✅ Monorepo-safe test suite (non-watch mode by default).
 
 ## 3. Recent Accomplishments
+
+- **Kanban Orchestration (Feb 10, 2026):**
+  - Implemented a Kanban board to visualize and manage agent jobs.
 
 - **Automatic Project Initialization (Feb 10, 2026):** Refactored project initialization to be fully automatic:
   - Backend auto-creates projects when detected (idempotent - no duplicates)
@@ -82,7 +86,8 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 ## 4. Next Steps (Orchestration & UI)
 
 1.  **Orchestration Logic:** Handle the `WAITING_FOR_USER` state in the frontend (display question, accept input).
-2.  **Project Management UI:** Create frontend views for managing/editing existing projects (rename, update excludes, etc.).
-3.  **Resume Job:** Implement API to resume a job with user feedback.
-4.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.
-5.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.
+2.  **Job Interaction:** Implement drag-and-drop actions to update job status/priority via API.
+3.  **Project Management UI:** Create frontend views for managing/editing existing projects (rename, update excludes, etc.).
+4.  **Resume Job:** Implement API to resume a job with user feedback.
+5.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling.
+6.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.

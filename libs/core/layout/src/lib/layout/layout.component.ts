@@ -1,7 +1,11 @@
-import { ChangeDetectionStrategy, Component, computed, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { SidebarComponent, TopbarComponent, SidebarItem, TopbarAction } from '@orca/design-system';
 import { injectAppLayoutConfig } from '../queries/app-layout.query';
+import { injectProjectDetection } from '@orca/core/projects';
+import { map } from 'rxjs';
 
 @Component({
     selector: 'orca-layout',
@@ -13,10 +17,22 @@ import { injectAppLayoutConfig } from '../queries/app-layout.query';
 })
 export class LayoutComponent {
     private layoutQuery = injectAppLayoutConfig();
+    private projectQuery = injectProjectDetection();
+    private router = inject(Router);
+
+    // Convert router events to a signal that tracks the current URL
+    private currentUrl = toSignal(
+        this.router.events.pipe(
+            map(() => this.router.url)
+        ),
+        { initialValue: this.router.url }
+    );
 
     sidebarConfig = computed(() => {
         const data = this.layoutQuery.data();
         if (!data) return { items: [] };
+
+        const currentUrl = this.currentUrl();
 
         return {
             items: data.sidebar.routes.map((route) => ({
@@ -24,17 +40,20 @@ export class LayoutComponent {
                 label: route.label,
                 route: route.path,
                 icon: route.icon ? { name: route.icon } : undefined,
+                isActive: currentUrl === route.path || currentUrl.startsWith(route.path + '/'),
             })),
         };
     });
 
     topbarConfig = computed(() => {
         const data = this.layoutQuery.data();
-        if (!data) return { title: '' };
+        if (!data) return {};
 
-        return {
-            title: data.topbar.title,
-        };
+        return {};
+    });
+
+    projectName = computed(() => {
+        return this.projectQuery.data()?.project?.name;
     });
 
     sidebarItemClick = output<SidebarItem>();

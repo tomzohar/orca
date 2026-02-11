@@ -13,4 +13,7 @@ export class CreateAgentJobDto {
   @IsOptional()
   @IsEnum(AgentType)
   type?: AgentType;
+
+  @IsOptional()
+  projectId?: number;
 }

@@ -1,0 +1,11 @@
+@use 'component' as *;
+
+.job-details-container {
+    padding: $tokens-spacing-md;
+
+    pre {
+        padding: $tokens-spacing-sm;
+        border-radius: $tokens-radius-md;
+        overflow-x: auto;
+    }
+}

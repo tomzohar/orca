@@ -1,0 +1,64 @@
+@if (config().triggerVariant === 'icon') {
+  <button
+    mat-icon-button
+    [matMenuTriggerFor]="menu"
+    (menuOpened)="onMenuOpened()"
+    (menuClosed)="onMenuClosed()"
+    [attr.aria-label]="config().triggerLabel || 'Open menu'"
+  >
+    <orca-icon
+      [config]="{ name: config().triggerIcon || 'more_vert' }"
+    ></orca-icon>
+  </button>
+} @else {
+  <button
+    mat-button
+    [matMenuTriggerFor]="menu"
+    (menuOpened)="onMenuOpened()"
+    (menuClosed)="onMenuClosed()"
+  >
+    @if (config().triggerIcon) {
+      <orca-icon [config]="{ name: config().triggerIcon! }"></orca-icon>
+    }
+    {{ config().triggerLabel }}
+  </button>
+}
+
+<mat-menu
+  #menu="matMenu"
+  [xPosition]="config().xPosition || 'after'"
+  [yPosition]="config().yPosition || 'below'"
+>
+  @for (item of config().items; track item.label) {
+    @if (item.divider) {
+      <mat-divider></mat-divider>
+    } @else {
+      @if (item.route) {
+        <a
+          mat-menu-item
+          [routerLink]="item.route"
+          [queryParams]="item.queryParams"
+          [disabled]="item.disabled"
+          [class.danger-item]="item.danger"
+        >
+          @if (item.icon) {
+            <orca-icon [config]="{ name: item.icon }"></orca-icon>
+          }
+          <span>{{ item.label }}</span>
+        </a>
+      } @else {
+        <button
+          mat-menu-item
+          (click)="handleAction(item)"
+          [disabled]="item.disabled"
+          [class.danger-item]="item.danger"
+        >
+          @if (item.icon) {
+            <orca-icon [config]="{ name: item.icon }"></orca-icon>
+          }
+          <span>{{ item.label }}</span>
+        </button>
+      }
+    }
+  }
+</mat-menu>
