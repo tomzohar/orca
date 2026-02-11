@@ -1,0 +1,7 @@
+@use "component" as *;
+
+.create-job-form {
+    display: flex;
+    flex-direction: column;
+    gap: $tokens-spacing-lg;
+}

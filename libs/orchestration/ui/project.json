@@ -1,0 +1,22 @@
+{
+  "name": "orchestration-ui",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/orchestration/ui/src",
+  "prefix": "orca",
+  "projectType": "library",
+  "tags": ["type:ui", "scope:orchestration"],
+  "targets": {
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/orchestration/ui/jest.config.cts",
+        "tsConfig": "libs/orchestration/ui/tsconfig.spec.json",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}

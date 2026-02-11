@@ -1,0 +1,2 @@
+-- AlterEnum
+ALTER TYPE "JobStatus" ADD VALUE 'WAITING_FOR_USER';

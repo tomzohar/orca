@@ -1,2 +1,27 @@
-<app-nx-welcome></app-nx-welcome>
-<router-outlet></router-outlet>
+@if (isLoading()) {
+<div class="loading-container">
+  <orca-spinner [config]="{ size: 'lg' }" />
+</div>
+} @else if (isError()) {
+<div class="error-container">
+  <orca-empty-state
+    [config]="errorStateConfig()"
+    (actionClicked)="retryDetection()"
+  />
+</div>
+} @else {
+<orca-layout>
+  <router-outlet />
+</orca-layout>
+}
+
+<div class="toggle-devtools-button">
+  <orca-button
+    [config]="toggleDevtoolsButtonConfig"
+    (clicked)="showDevTools.set(!showDevTools())"
+  ></orca-button>
+</div>
+
+@if (showDevTools()) {
+<orca-angular-query-devtools [initialIsOpen]="false" />
+}

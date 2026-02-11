@@ -2,18 +2,40 @@
   appearance="outline"
   class="orca-input-field"
   [class.has-error]="config().error"
+  [class.sm]="config().size === 'sm'"
 >
   @if (config().label) {
     <mat-label>{{ config().label }}</mat-label>
   }
-  <input
-    matInput
-    [type]="config().type!"
-    [placeholder]="config().placeholder!"
-    [formControl]="control"
-    [errorStateMatcher]="errorStateMatcher"
-    (input)="onInput($event)"
-  />
+
+  @if (config().prefixIcon; as icon) {
+    <orca-icon
+      matIconPrefix
+      [config]="icon"
+      class="orca-input-icon"
+    ></orca-icon>
+  }
+
+  @if (config().type === 'textarea') {
+    <textarea
+      matInput
+      [rows]="config().rows || 3"
+      [placeholder]="config().placeholder!"
+      [formControl]="control"
+      [errorStateMatcher]="errorStateMatcher"
+      (input)="onInput($event)"
+    ></textarea>
+  } @else {
+    <input
+      matInput
+      [type]="config().type!"
+      [placeholder]="config().placeholder!"
+      [formControl]="control"
+      [errorStateMatcher]="errorStateMatcher"
+      (input)="onInput($event)"
+    />
+  }
+
   @if (config().hint) {
     <mat-hint>{{ config().hint }}</mat-hint>
   }

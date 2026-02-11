@@ -1,0 +1,33 @@
+<mat-toolbar color="primary" class="orca-topbar">
+  <div class="topbar-left">
+    <ng-content select="[left]"></ng-content>
+
+    @if (config().logo) {
+    <img [src]="config().logo" alt="Logo" class="topbar-logo" />
+    }
+  </div>
+
+  <div class="topbar-center">
+    <ng-content select="[center]"></ng-content>
+    @if (config().showSearch) {
+    <orca-input
+      class="topbar-search-input"
+      [config]="{ placeholder: 'Search...', prefixIcon: { name: icon.search, size: 'sm' }, size: 'sm' }"
+    ></orca-input>
+    }
+  </div>
+
+  <div class="topbar-right">
+    <ng-content select="[right]"></ng-content>
+    @for (action of config().actions; track action.id) {
+    <orca-button
+      [config]="{ variant: action.variant || 'ghost', icon: action.icon, size: 'sm' }"
+      [title]="action.tooltip || ''"
+      (clicked)="onActionClick(action)"
+    >
+      {{ action.icon ? '' : action.label }}
+    </orca-button>
+    }
+    <ng-content></ng-content>
+  </div>
+</mat-toolbar>

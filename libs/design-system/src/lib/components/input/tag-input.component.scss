@@ -1,0 +1,27 @@
+.orca-tag-input {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    width: 100%;
+
+    .tag-input-field {
+        width: 100%;
+    }
+
+    .tag-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--spacing-sm);
+        padding: var(--spacing-sm) 0;
+
+        mat-chip {
+            button[matChipRemove] {
+                mat-icon {
+                    font-size: var(--font-size-sm);
+                    width: var(--spacing-md);
+                    height: var(--spacing-md);
+                }
+            }
+        }
+    }
+}

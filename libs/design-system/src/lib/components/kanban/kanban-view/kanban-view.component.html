@@ -1,0 +1,64 @@
+<div class="kanban-board" cdkDropListGroup>
+  @for (list of lists(); track list.id) {
+    <div
+      class="kanban-list"
+      cdkDropList
+      [id]="'' + list.id"
+      [cdkDropListData]="list.items"
+      (cdkDropListDropped)="drop($event)"
+    >
+      <!-- List Header -->
+      <ng-container
+        *ngTemplateOutlet="
+          listHeaderTemplate() || defaultHeader;
+          context: { $implicit: list }
+        "
+      ></ng-container>
+
+      <ng-template #defaultHeader let-list>
+        <div class="list-header">
+          <h5>{{ list.title }}</h5>
+          <span class="count">{{ list.items.length }}</span>
+        </div>
+      </ng-template>
+
+      <div class="list-items">
+        @for (item of list.items; track item) {
+          <div class="kanban-item-wrapper" cdkDrag [cdkDragData]="item">
+            <orca-kanban-card>
+              <!-- Actual Item -->
+              <ng-container
+                *ngTemplateOutlet="itemTemplate(); context: { $implicit: item }"
+              ></ng-container>
+            </orca-kanban-card>
+
+            <!-- Drag Preview (Follows Cursor) -->
+            <div *cdkDragPreview class="kanban-preview">
+              <orca-kanban-card>
+                <ng-container
+                  *ngTemplateOutlet="
+                    itemTemplate();
+                    context: { $implicit: item }
+                  "
+                ></ng-container>
+              </orca-kanban-card>
+            </div>
+
+            <!-- Placeholder (Gap in List) -->
+            <div *cdkDragPlaceholder class="kanban-placeholder">
+              <!-- We render the item again but it will be styled with opacity via CSS -->
+              <orca-kanban-card>
+                <ng-container
+                  *ngTemplateOutlet="
+                    itemTemplate();
+                    context: { $implicit: item }
+                  "
+                ></ng-container>
+              </orca-kanban-card>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

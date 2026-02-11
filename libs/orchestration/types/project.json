@@ -1,0 +1,27 @@
+{
+  "name": "orchestration-types",
+  "$schema": "../../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/orchestration/types/src",
+  "projectType": "library",
+  "tags": ["type:types", "scope:orchestration"],
+  "targets": {
+    "build": {
+      "executor": "@nx/js:tsc",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/libs/orchestration/types",
+        "main": "libs/orchestration/types/src/index.ts",
+        "tsConfig": "libs/orchestration/types/tsconfig.lib.json",
+        "assets": ["libs/orchestration/types/*.md"]
+      }
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "libs/orchestration/types/jest.config.cts",
+        "passWithNoTests": true
+      }
+    }
+  }
+}

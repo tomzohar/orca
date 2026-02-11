@@ -1,0 +1,23 @@
+@if (job(); as currentJob) {
+  <div class="logs-tab">
+    @if (currentJob.status === 'RUNNING' && currentJob.logs.length === 0) {
+      <div class="empty-state">
+        <orca-spinner [config]="{ size: 'md' }" />
+        <p>Waiting for logs...</p>
+      </div>
+    } @else if (currentJob.logs.length === 0) {
+      <div class="empty-state">
+        <p>No logs yet</p>
+      </div>
+    } @else {
+      <div class="logs-list">
+        @for (log of currentJob.logs; track log.id) {
+          <div class="log-entry">
+            <span class="log-timestamp">{{ log.timestamp | date:'short' }}</span>
+            <span class="log-message">{{ log.message }}</span>
+          </div>
+        }
+      </div>
+    }
+  </div>
+}

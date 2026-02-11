@@ -1,9 +1,11 @@
-import { Component, DestroyRef, inject, input, model, effect } from '@angular/core';
+import { Component, DestroyRef, inject, input, model, effect, forwardRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
+import { IconComponent } from '../icon/icon.component';
 import { ErrorStateMatcher } from '@angular/material/core';
-import { FormsModule, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, FormControl, ReactiveFormsModule, NG_VALUE_ACCESSOR, ControlValueAccessor } from '@angular/forms';
 import { InputConfig } from '../../types/component.types';
 
 const DEFAULT_CONFIG: InputConfig = {
@@ -26,11 +28,21 @@ class OrcaErrorStateMatcher implements ErrorStateMatcher {
 @Component({
     selector: 'orca-input',
     standalone: true,
-    imports: [MatFormFieldModule, MatInputModule, FormsModule, ReactiveFormsModule],
+    imports: [MatFormFieldModule, MatInputModule, MatIconModule, IconComponent, FormsModule, ReactiveFormsModule],
     templateUrl: './input.component.html',
     styleUrl: './input.component.scss',
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => InputComponent),
+            multi: true
+        }
+    ],
+    host: {
+        '[attr.type]': 'config().type || "text"'
+    }
 })
-export class InputComponent {
+export class InputComponent implements ControlValueAccessor {
     private destroyRef = inject(DestroyRef)
     config = input<InputConfig, Partial<InputConfig> | undefined>(DEFAULT_CONFIG, {
         transform: (value) => ({ ...DEFAULT_CONFIG, ...value })
@@ -39,6 +51,9 @@ export class InputComponent {
     value = model<string>('');
     control = new FormControl<string>('');
     errorStateMatcher = new OrcaErrorStateMatcher(() => this.config());
+
+    onChange: (value: string) => void = () => { /* Intended empty */ };
+    onTouched: () => void = () => { /* Intended empty */ };
 
     constructor() {
         effect(() => {
@@ -69,6 +84,7 @@ export class InputComponent {
         ).subscribe(val => {
             if (val !== null) {
                 this.value.set(val);
+                this.onChange(val);
             }
         });
     }
@@ -76,5 +92,27 @@ export class InputComponent {
     onInput(event: Event) {
         const target = event.target as HTMLInputElement;
         this.value.set(target.value);
+        this.onChange(target.value);
+    }
+
+    writeValue(value: string): void {
+        this.value.set(value || '');
+        this.control.setValue(value || '', { emitEvent: false });
+    }
+
+    registerOnChange(fn: (value: string) => void): void {
+        this.onChange = fn;
+    }
+
+    registerOnTouched(fn: () => void): void {
+        this.onTouched = fn;
+    }
+
+    setDisabledState(isDisabled: boolean): void {
+        if (isDisabled) {
+            this.control.disable({ emitEvent: false });
+        } else {
+            this.control.enable({ emitEvent: false });
+        }
     }
 }

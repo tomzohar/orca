@@ -19,13 +19,15 @@
     background: none;
     min-height: $button-min-height;
     outline: none;
+    box-sizing: border-box;
 
     &.primary {
-        background-color: $primary-color;
-        color: $text-primary;
+        background-color: $primary-color !important;
+        color: white !important;
 
         &:disabled {
-            background-color: $color-disabled;
+            background-color: $color-disabled !important;
+            color: $text-disabled !important;
         }
 
         &:hover:not(:disabled) {
@@ -34,44 +36,66 @@
     }
 
     &.secondary {
-        border: 1px solid;
-        border-color: $primary-color;
-        color: $primary-color;
+        background-color: transparent !important;
+        border: 1px solid $primary-color !important;
+        color: $primary-color !important;
 
         &:hover:not(:disabled) {
-            background-color: rgba($primary-color, 0.08);
+            background-color: rgba($primary-color, 0.08) !important;
+        }
+
+        &:disabled {
+            background-color: transparent !important;
+            border-color: $border-disabled !important;
+            color: $text-disabled !important;
         }
     }
 
     &.ghost {
-        color: $primary-color;
-    }
-
-    &.icon-button {
-        padding: $spacing-xs;
-        min-width: $button-min-height;
-        border-radius: 50%;
-        color: $primary-color;
+        background-color: transparent !important;
+        color: $primary-color !important;
 
         &:hover:not(:disabled) {
-            background-color: rgba($primary-color, 0.08);
+            background-color: rgba($primary-color, 0.08) !important;
+        }
+
+        &:disabled {
+            color: $text-disabled !important;
         }
     }
 
-    .button-icon {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+    &.sm {
+        min-height: 36px;
+        height: 36px;
+        padding: 0 $spacing-md;
+        font-size: $font-size-sm;
 
-        &:has(+ ng-content) {
-            margin-right: 8px;
+        .button-icon {
+
+            svg,
+            mat-icon {
+                width: 18px;
+                height: 18px;
+                font-size: 18px;
+            }
         }
+    }
+
+    &.md {
+        min-height: 48px;
+        height: 48px;
+        padding: 0 $spacing-lg;
+    }
+
+
+    .button-icon {
+        line-height: 1;
+        vertical-align: middle;
     }
 
     &:disabled {
         cursor: not-allowed;
         border-color: $border-disabled;
         color: $text-disabled;
-        // background-color: transparent;
     }
 }

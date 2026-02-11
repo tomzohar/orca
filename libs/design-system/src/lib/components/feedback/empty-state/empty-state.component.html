@@ -1,0 +1,25 @@
+<div class="empty-state-container">
+  @if (config().imgSrc; as imgSrc) {
+    <img
+      [src]="imgSrc"
+      [alt]="config().title || 'Empty state'"
+      class="empty-state-image"
+    />
+  }
+
+  @if (config().title; as title) {
+    <h3 class="empty-state-title">{{ title }}</h3>
+  }
+
+  @if (config().description; as description) {
+    <p class="empty-state-description">{{ description }}</p>
+  }
+
+  @if (config().action; as action) {
+    <div class="empty-state-cta">
+      <orca-button [config]="action" (clicked)="actionClicked.emit()">
+        {{ action.label }}
+      </orca-button>
+    </div>
+  }
+</div>

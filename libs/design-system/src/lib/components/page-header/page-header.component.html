@@ -1,0 +1,21 @@
+<div class="page-header-container">
+  <div class="header-start">
+    <ng-content select="[start]"></ng-content>
+    @if (icon()) {
+      <orca-icon
+        [config]="{ name: icon()!, size: 'lg' }"
+        class="header-icon"
+      ></orca-icon>
+    }
+    <div class="title-wrapper">
+      <h1 class="header-title">{{ title() }}</h1>
+      @if (subTitle()) {
+        <span class="header-subtitle">{{ subTitle() }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="header-actions">
+    <ng-content select="[actions]"></ng-content>
+  </div>
+</div>

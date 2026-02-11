@@ -23,6 +23,33 @@ export const Default: Story = {
     }),
 };
 
+export const Search: Story = {
+    args: {
+        config: {
+            placeholder: 'Search...',
+            prefixIcon: { name: 'search', size: 'md' },
+        },
+    },
+    render: (args) => ({
+        props: args,
+        template: `<div style="max-width: 300px;"><orca-input [config]="config"></orca-input></div>`,
+    }),
+};
+
+export const Small: Story = {
+    args: {
+        config: {
+            placeholder: 'Small Input...',
+            size: 'sm',
+            prefixIcon: { name: 'search', size: 'sm' },
+        },
+    },
+    render: (args) => ({
+        props: args,
+        template: `<div style="max-width: 300px;"><orca-input [config]="config"></orca-input></div>`,
+    }),
+};
+
 export const WithHint: Story = {
     args: {
         config: {

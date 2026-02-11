@@ -1,6 +1,6 @@
 import { Component, input, output } from '@angular/core';
 import { ButtonComponent } from '../../button/button.component';
-import { DialogConfig } from '../../../types/component.types';
+import { DialogConfig, IconName } from '../../../types/component.types';
 
 const DEFAULT_CONFIG: DialogConfig = {
     size: 'md',
@@ -26,7 +26,7 @@ const DEFAULT_CONFIG: DialogConfig = {
                     </div>
                     @if (config().showCloseButton) {
                         <orca-button 
-                            [config]="{ variant: 'icon-button', icon: { name: 'close' } }" 
+                            [config]="{ variant: 'primary', icon: { name: icons.close } }" 
                             (clicked)="closed.emit()"
                         ></orca-button>
                     }
@@ -57,6 +57,7 @@ const DEFAULT_CONFIG: DialogConfig = {
     styleUrl: './dialog.component.scss'
 })
 export class DialogComponent {
+    readonly icons = IconName;
     config = input<DialogConfig, Partial<DialogConfig> | undefined>(DEFAULT_CONFIG, {
         transform: (value) => ({ ...DEFAULT_CONFIG, ...value })
     });

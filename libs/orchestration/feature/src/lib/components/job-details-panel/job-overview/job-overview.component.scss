@@ -1,0 +1,84 @@
+@use 'component' as *;
+
+.overview-tab {
+    display: flex;
+    flex-direction: column;
+    gap: $tokens-spacing-lg;
+}
+
+.detail-section {
+    display: flex;
+    flex-direction: column;
+    gap: $tokens-spacing-xs;
+
+    .section-title {
+        margin: 0;
+        font-size: $tokens-font-size-sm;
+        font-weight: $typography-font-weight-semibold;
+        color: $tokens-text-secondary;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .prompt-text {
+        margin: 0;
+        padding: $tokens-spacing-sm;
+        background-color: $tokens-background-color;
+        border-radius: $tokens-radius-md;
+        line-height: 1.6;
+    }
+
+    .status-badge {
+        display: inline-block;
+        padding: $tokens-spacing-xs $tokens-spacing-sm;
+        border-radius: 50px;
+        font-size: $tokens-font-size-sm;
+        font-weight: $typography-font-weight-semibold;
+        text-transform: uppercase;
+
+        &[data-status="PENDING"] {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #f57c00;
+        }
+
+        &[data-status="RUNNING"] {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: #1976d2;
+        }
+
+        &[data-status="COMPLETED"] {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #388e3c;
+        }
+
+        &[data-status="FAILED"] {
+            background-color: rgba(244, 67, 54, 0.1);
+            color: #d32f2f;
+        }
+
+        &[data-status="WAITING_FOR_USER"] {
+            background-color: rgba(156, 39, 176, 0.1);
+            color: #7b1fa2;
+        }
+    }
+
+    .timestamp-group {
+        display: flex;
+        flex-direction: column;
+        gap: $tokens-spacing-xs;
+    }
+
+    .timestamp-item {
+        display: flex;
+        gap: $tokens-spacing-sm;
+
+        .timestamp-label {
+            font-weight: $typography-font-weight-semibold;
+            color: $tokens-text-secondary;
+        }
+
+        .timestamp-value {
+            color: $tokens-text-primary;
+        }
+    }
+}

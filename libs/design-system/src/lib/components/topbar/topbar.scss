@@ -1,0 +1,109 @@
+@use '../../styles/tokens' as tokens;
+
+:host {
+  display: block;
+}
+
+mat-toolbar.orca-topbar {
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background-color: tokens.$surface-topbar;
+  color: tokens.$text-primary;
+  border-bottom: 1px solid tokens.$border-color;
+  height: var(--topbar-height, 64px);
+  box-shadow: none;
+  box-sizing: unset;
+
+  .topbar-left,
+  .topbar-center,
+  .topbar-right {
+    display: flex;
+    align-items: center;
+    gap: tokens.$spacing-md;
+  }
+
+  .topbar-center {
+    margin-left: tokens.$spacing-xl;
+  }
+
+  .topbar-right {
+    margin-left: auto;
+  }
+
+  .topbar-logo {
+    height: 32px;
+    width: auto;
+  }
+
+  .topbar-title {
+    font-family: 'Inter', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    line-height: 32px;
+  }
+
+  .topbar-search-input {
+    width: 258px;
+
+    ::ng-deep {
+      .mat-mdc-form-field-flex {
+        min-height: 40px !important;
+        background-color: tokens.$surface-search !important;
+        border-radius: tokens.$radius-md !important;
+      }
+
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border: none !important;
+      }
+
+      .mat-mdc-form-field-infix {
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+      }
+    }
+  }
+
+  .topbar-right {
+    gap: 16px;
+    margin-left: auto;
+
+    button {
+      color: white;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+}
+
+// Status Chip inside Topbar
+.status-chip {
+  border: 1px solid tokens.$status-online;
+  color: tokens.$status-online;
+  background: transparent;
+  border-radius: 16px;
+  padding: 2px 12px;
+  font-family: 'Menlo', monospace;
+  font-size: 13px;
+  font-weight: bold;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  &::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background-color: tokens.$status-online;
+    border-radius: 50%;
+  }
+}

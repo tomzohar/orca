@@ -1,0 +1,14 @@
+@if (job(); as currentJob) {
+  <div class="artifacts-tab">
+    @if (currentJob.status === 'RUNNING' && currentJob.artifacts.length === 0) {
+      <div class="empty-state">
+        <orca-spinner [config]="{ size: 'md' }" />
+        <p>Waiting for artifacts...</p>
+      </div>
+    } @else if (currentJob.artifacts.length === 0) {
+      <orca-empty-state [config]="emptyStateConfig()" />
+    } @else {
+      <orca-list [config]="artifactsListConfig()" />
+    }
+  </div>
+}

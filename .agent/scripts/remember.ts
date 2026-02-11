@@ -9,12 +9,19 @@ interface Memory {
 async function main() {
     const fact = process.argv[2];
     if (!fact) {
-        console.error('Usage: npx ts-node scripts/remember.ts "the fact to remember"');
+        console.error('Usage: npx ts-node .agent/scripts/remember.ts "the fact to remember"');
         process.exit(1);
     }
 
-    // Target directory: root .agent folder
-    const memoryDir = path.resolve(__dirname, '../../.agent');
+    // Ensure we are in the project root
+    const rootDir = process.cwd();
+    if (!fs.existsSync(path.join(rootDir, 'package.json'))) {
+        console.error('❌ Please run this script from the project root.');
+        process.exit(1);
+    }
+
+    // Target directory: root docs folder
+    const memoryDir = path.join(rootDir, 'docs');
     const memoryFile = path.join(memoryDir, 'memories.json');
 
     try {

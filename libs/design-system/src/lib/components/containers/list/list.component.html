@@ -1,0 +1,71 @@
+@if (config().expandable) {
+  <mat-accordion [multi]="config().multipleExpanded" class="orca-list">
+    @for (item of config().items; track item.id || $index) {
+      <mat-expansion-panel
+        [disabled]="item.disabled"
+        (opened)="onExpanded(item)"
+        (closed)="onCollapsed(item)"
+        [class.has-content]="item.content"
+        [class.disabled]="item.disabled"
+      >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="list-item-header">
+              @if (config().showIcons && item.icon) {
+                <orca-icon
+                  [config]="{ name: item.icon, size: 'lg' }"
+                  class="item-icon"
+                ></orca-icon>
+              }
+              <span class="item-title">{{ item.title }}</span>
+              @if (item.badge) {
+                <span class="item-badge">{{ item.badge }}</span>
+              }
+            </div>
+          </mat-panel-title>
+          @if (item.description) {
+            <mat-panel-description>
+              {{ item.description }}
+            </mat-panel-description>
+          }
+        </mat-expansion-panel-header>
+        @if (item.content) {
+          <div class="list-item-content">
+            {{ item.content }}
+          </div>
+        }
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
+} @else {
+  <div class="orca-list simple">
+    @for (item of config().items; track item.id || $index) {
+      <div
+        class="list-item"
+        role="button"
+        [tabindex]="item.disabled ? -1 : 0"
+        [class.disabled]="item.disabled"
+        [class.clickable]="!item.disabled"
+        (click)="onItemClick(item)"
+        (keydown.enter)="onItemClick(item)"
+        (keydown.space)="onItemClick(item)"
+      >
+        @if (config().showIcons && item.icon) {
+          <orca-icon
+            [config]="{ name: item.icon, size: 'sm' }"
+            class="item-icon"
+          ></orca-icon>
+        }
+        <div class="item-content">
+          <div class="item-title">{{ item.title }}</div>
+          @if (item.description) {
+            <div class="item-description">{{ item.description }}</div>
+          }
+        </div>
+        @if (item.badge) {
+          <span class="item-badge">{{ item.badge }}</span>
+        }
+      </div>
+    }
+  </div>
+}

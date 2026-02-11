@@ -1,7 +1,10 @@
+import { Injector } from '@angular/core';
+
 export type DesignSystemColor = 'primary' | 'accent' | 'warn';
 
 export interface ButtonConfig {
-    variant?: 'primary' | 'secondary' | 'ghost' | 'icon-button';
+    variant?: 'primary' | 'secondary' | 'ghost';
+    size?: 'sm' | 'md';
     disabled?: boolean;
     type?: 'button' | 'submit' | 'reset';
     icon?: IconConfig;
@@ -14,6 +17,9 @@ export interface InputConfig {
     error?: string;
     hint?: string;
     type?: string;
+    rows?: number;
+    prefixIcon?: IconConfig;
+    size?: 'sm' | 'md';
 }
 
 export interface CheckboxConfig {
@@ -51,7 +57,7 @@ export interface CardConfig {
 export type IconSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface IconConfig {
-    name: string;
+    name: IconName;
     size?: IconSize;
     color?: string;
 }
@@ -75,11 +81,35 @@ export interface SpinnerConfig {
     diameter?: number;
 }
 
-export type IconName =
-    | 'search' | 'home' | 'settings' | 'menu' | 'close'
-    | 'check' | 'error' | 'warning' | 'info' | 'add'
-    | 'remove' | 'edit' | 'delete' | 'arrow_forward'
-    | 'arrow_back' | 'expand_more' | 'expand_less';
+export enum IconName {
+    search = 'search',
+    home = 'home',
+    settings = 'settings',
+    menu = 'menu',
+    close = 'close',
+    check = 'check',
+    error = 'error',
+    warning = 'warning',
+    info = 'info',
+    add = 'add',
+    remove = 'remove',
+    edit = 'edit',
+    delete = 'delete',
+    arrow_forward = 'arrow_forward',
+    arrow_back = 'arrow_back',
+    expand_more = 'expand_more',
+    expand_less = 'expand_less',
+    view_kanban = 'view_kanban',
+    dashboard = 'dashboard',
+    link = 'link',
+    javascript = 'javascript',
+    css = 'css',
+    html = 'html',
+    article = 'article',
+    construction = 'construction',
+    more_vert = 'more_vert',
+    cancel = 'cancel'
+}
 
 export type DialogSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
@@ -112,4 +142,74 @@ export interface DropdownConfig<T> {
     error?: string;
     hint?: string;
     options: DropdownOption<T>[];
+}
+
+export interface MenuItem {
+    id?: string;
+    label: string;
+    icon?: IconName;
+    action?: (item: MenuItem) => void;
+    disabled?: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    route?: string | any[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    queryParams?: Record<string, any>;
+    divider?: boolean; // useful for separators
+    danger?: boolean; // red color for delete etc
+}
+
+export interface MenuConfig {
+    triggerIcon?: IconName;
+    triggerLabel?: string;
+    triggerVariant?: 'icon' | 'button' | 'ghost'; // defaults to icon
+    items: MenuItem[];
+    xPosition?: 'before' | 'after';
+    yPosition?: 'above' | 'below';
+}
+
+export interface TabConfig {
+    label: string;
+    icon?: IconName;
+    disabled?: boolean;
+}
+
+export interface TabsConfig {
+    tabs: TabConfig[];
+    selectedIndex?: number;
+    alignment?: 'start' | 'center';
+    animationDuration?: string;
+    disableRipple?: boolean;
+    headerPosition?: 'above' | 'below';
+}
+
+export type SidePanelPosition = 'left' | 'right';
+export type SidePanelSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+
+export interface SidePanelConfig {
+    title?: string;
+    subtitle?: string;
+    position?: SidePanelPosition;
+    size?: SidePanelSize;
+    showCloseButton?: boolean;
+    disableClose?: boolean;
+    hasBackdrop?: boolean;
+    backdropClass?: string;
+    injector?: Injector;
+}
+
+export interface ListItem {
+    id?: string;
+    title: string;
+    description?: string;
+    icon?: IconName;
+    badge?: string;
+    content?: string;
+    disabled?: boolean;
+}
+
+export interface ListConfig {
+    items: ListItem[];
+    expandable?: boolean;
+    showIcons?: boolean;
+    multipleExpanded?: boolean;
 }

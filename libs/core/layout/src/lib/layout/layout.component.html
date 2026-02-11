@@ -1,0 +1,36 @@
+<div class="orca-layout">
+  <aside class="layout-sidebar">
+    <orca-sidebar
+      [config]="sidebarConfig()"
+      (itemClick)="onSidebarItemClick($event)"
+    >
+      <div header class="sidebar-header">
+        <img
+          src="assets/orca_logo_no-bg.png"
+          alt="orca-logo"
+          width="56"
+          height="56"
+        />
+        @if (projectName()) {
+          <span class="project-name">{{ projectName() }}</span>
+        }
+      </div>
+      <ng-content select="[sidebar-footer]" footer></ng-content>
+    </orca-sidebar>
+  </aside>
+
+  <main class="layout-main">
+    <orca-topbar
+      [config]="topbarConfig()"
+      (actionClick)="onTopbarActionClick($event)"
+    >
+      <ng-content select="[topbar-left]" left></ng-content>
+      <ng-content select="[topbar-center]" center></ng-content>
+      <ng-content select="[topbar-right]" right></ng-content>
+    </orca-topbar>
+
+    <div class="layout-content">
+      <ng-content></ng-content>
+    </div>
+  </main>
+</div>

@@ -1,8 +1,13 @@
 <button
-  mat-ripple
+  mat-flat-button
   [type]="config().type"
+  class="orca-button"
+  [class.sm]="config().size === 'sm'"
+  [class.md]="config().size === 'md'"
+  [class.primary]="config().variant === 'primary'"
+  [class.secondary]="config().variant === 'secondary'"
+  [class.ghost]="config().variant === 'ghost'"
   [disabled]="config().disabled"
-  [class]="'orca-button ' + config().variant"
   (click)="onClick($event)"
 >
   @if (config().icon; as icon) {
