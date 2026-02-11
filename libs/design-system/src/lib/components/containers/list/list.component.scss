@@ -1,0 +1,181 @@
+@use '../../../styles/tokens' as *;
+
+.orca-list {
+  &.mat-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+
+  &.simple {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background-color: $surface-color;
+    border-radius: $radius-md;
+    overflow: hidden;
+  }
+}
+
+::ng-deep .orca-list .mat-expansion-panel {
+  background-color: $surface-color;
+  color: $text-primary;
+  border-radius: $radius-md;
+  box-shadow: none;
+  border: 1px solid $border-color;
+
+  &:not(.mat-expanded) {
+    .mat-expansion-panel-header:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.has-content {
+    .mat-expansion-panel-header {
+      cursor: pointer;
+    }
+  }
+}
+
+::ng-deep .orca-list .mat-expansion-panel-header {
+  background-color: transparent;
+  color: $text-primary;
+  height: auto;
+  min-height: 48px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
+
+  .mat-content {
+    align-items: center;
+  }
+
+  .mat-expansion-indicator {
+    color: $text-secondary;
+  }
+}
+
+::ng-deep .orca-list .mat-expansion-panel-body {
+  padding: 0 $spacing-md $spacing-md $spacing-md;
+  color: $text-secondary;
+}
+
+.list-item-header {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  width: 100%;
+
+  .item-icon {
+    flex-shrink: 0;
+    color: $primary-color;
+  }
+
+  .item-title {
+    flex: 1;
+    font-size: $font-size-md;
+    font-weight: 500;
+  }
+
+  .item-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 $spacing-xs;
+    background-color: $primary-color;
+    color: $text-primary;
+    border-radius: $radius-md;
+    font-size: $font-size-xs;
+    font-weight: 600;
+  }
+}
+
+.list-item-content {
+  font-size: $font-size-sm;
+  line-height: 1.5;
+  color: $text-secondary;
+}
+
+// Simple list styles
+.simple {
+  .list-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    border-bottom: 1px solid $border-color;
+    transition: background-color 0.2s ease;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &.clickable {
+      cursor: pointer;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      &:focus {
+        outline: 2px solid $primary-color;
+        outline-offset: -2px;
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      &:focus:not(:focus-visible) {
+        outline: none;
+      }
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .item-icon {
+      flex-shrink: 0;
+      color: $primary-color;
+    }
+
+    .item-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-xs;
+
+      .item-title {
+        font-size: $font-size-md;
+        font-weight: 500;
+        color: $text-primary;
+      }
+
+      .item-description {
+        font-size: $font-size-sm;
+        color: $text-secondary;
+      }
+    }
+
+    .item-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 $spacing-xs;
+      background-color: $primary-color;
+      color: $text-primary;
+      border-radius: $radius-md;
+      font-size: $font-size-xs;
+      font-weight: 600;
+    }
+  }
+}

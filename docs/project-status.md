@@ -51,54 +51,43 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 
 - **Framework:** Angular 18+ (Zoneless/Signals) + Angular Material.
 - **Core Libraries:**
-  - `libs/core/layout`: Centralized layout orchestration (`LayoutComponent`) driven by state.
   - `libs/core/projects`: Project detection services and TanStack Query integration.
-  - `libs/design-system`: Atomic UI components (Sidebar, Topbar, Card, Spinner, etc.).
+  - `libs/design-system`: Atomic UI components (Sidebar, Topbar, Card, Tabs, Spinner, etc.).
 - **Components:**
   - `App`: Main application component managing global project detection and layout state.
-  - `AgentPocComponent`: Real-time agent interaction interface.
-  - **Agent Mode Selector**: Dropdown to switch between "Quick" and "Deep" modes.
+  - **Orchestration Dashboard**:
+    - `KanbanViewComponent`: Visualizes job lifecycle with integrated drag-and-drop.
+    - `JobDetailsPanelComponent`: **Input-driven architecture** (removed shared state service). Merges query data with real-time SSE updates for logs and artifacts.
 - **Status:**
   - ✅ Connects to backend via proxy.
   - ✅ Consumes SSE stream for live updates.
-  - ✅ Displays logs and artifacts in real-time.
-  - ✅ **State Management:** TanStack Query (Experimental) integrated for server state.
-  - ✅ **Layout Orchestration:** `LayoutComponent` migrated to `core` and integrated with `AppLayoutQuery`.
-  - ✅ **DevTools:** Custom wrapper for Angular Query DevTools integrated with toggle.
-  - ✅ **Auto-Initialization:** App automatically initializes projects on detection. Simplified to 3 states: loading, error (with retry), loaded.
-  - ✅ **Orchestration Dashboard:**
-    - ✅ **Kanban Board:** Full visualization of job lifecycle (`Pending`, `Running`, `Completed`, `Failed`, `Waiting for User`).
-    - ✅ **Job Creation:** Integrated dialog with agent type selection (Docker/Local).
-    - ✅ **Real-time Monitoring:** SSE-driven updates for status changes, logs, and artifacts.
-    - ✅ **Job Details Panel:** High-performance side panel for deep inspection of running/finished jobs.
-    - ✅ **Project Context:** Automatic filtering of jobs based on the active project.
+  - ✅ **Routing & Navigation:** Deep-linkable job details (`/orchestration/:jobId`) with query parameter support for tab states (`?tab=logs`).
+  - ✅ **State Management:** TanStack Query + Signals for high-performance reactive updates.
+  - ✅ **Design System:** Reusable `TabsComponent` and improved `KanbanViewComponent`.
+  - ✅ **Automatic Initialization:** Seamless workspace onboarding.
   - ✅ Monorepo-safe test suite (non-watch mode by default).
 
 ## 3. Recent Accomplishments
+
+- **Input-Driven Job Details & Advanced Routing (Feb 11, 2026):**
+  - Refactored `JobDetailsPanelComponent` to be purely input-driven, eliminating the complex `JobDetailsStateService`.
+  - Implemented deep-linkable job routes and query-parameter-based tab switching (Overview, Logs, Artifacts).
+  - Integrated real-time SSE updates directly into the detail panel using Angular Signals.
+  - Cleaned up redundant imports and modernized component lifecycle handling using `effect` and `onCleanup`.
 
 - **Real-Time Orchestration (Feb 11, 2026):**
   - Completed the full Job Management lifecycle with backend repository decoupling.
   - Implemented SSE (Server-Sent Events) for real-time status, log, and artifact updates.
   - Launched the Job Creation dialog and the Detail Panel infrastructure.
-  - Achieved high accessibility standards (WCAG-compliant keyboard navigation) and strict typing across the orchestration stack.
 
-- **Kanban Foundation (Feb 10, 2026):**
-  - Initial implementation of the Kanban board to visualize and manage agent jobs.
-
-- **Automatic Project Initialization (Feb 10, 2026):** Refactored project initialization to be fully automatic:
-  - Backend auto-creates projects when detected (idempotent - no duplicates)
-  - Smart slug generation using parent directory for uniqueness
-  - Removed manual `LoadProjectDialog` component and workflow
-  - Frontend simplified to 3 states with error recovery via retry button
-  - Zero user intervention required - seamless onboarding experience
-- **DevTools Integration:** Added a toggleable DevTools button in the main application for improved debugging of TanStack Query state.
-- **Projects Module Implementation:** Launched a dedicated `Projects` module to manage workspace metadata, enabling agents to have localized context and safe file system access.
-- **Agent-Project Integration:** Updated `AgentJobs` to be project-aware, ensuring `LocalAgentRunner` correctly initializes file system tools with the project's root path.
+- **Kanban & Project Foundation (Feb 10, 2026):**
+  - Initial implementation of the Kanban board and automatic project initialization.
+  - Refactored project initialization to be zero-intervention and idempotent.
 
 ## 4. Next Steps (Orchestration & UI)
 
-1.  **Resume & Feedback UI:** Implement the `WAITING_FOR_USER` state in the frontend (display question, accept input, and API to resume).
-2.  **Job Interaction:** Implement drag-and-drop actions to update job status/priority via API.
-3.  **Project Management UI:** Create frontend views for managing/editing existing projects (rename, update excludes, etc.).
-4.  **Frontend Polish:** Render artifacts (HTML preview?) and improve log styling (themes, code highlighting).
-5.  **Agent UX:** Add progress visibility and improved error handling for "Deep" mode execution.
+1.  **Resume & Feedback UI:** Implement the `WAITING_FOR_USER` interaction (display question, accept input, API to resume).
+2.  **Generic List Components:** Utilize the new `ListItem` and `ListConfig` types to build specialized log and artifact lists.
+3.  **Project Management UI:** Create frontend views for managing/editing existing projects (rename, update excludes).
+4.  **Artifact Previews:** Enhance the Artifacts tab with code highlighting or HTML previews for generated files.
+5.  **Job Interaction:** Fully implement drag-and-drop logic to update job status/priority via API.

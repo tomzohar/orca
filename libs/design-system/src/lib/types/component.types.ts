@@ -189,3 +189,20 @@ export interface SidePanelConfig {
     backdropClass?: string;
     injector?: Injector;
 }
+
+export interface ListItem {
+    id?: string;
+    title: string;
+    description?: string;
+    icon?: string;
+    badge?: string;
+    content?: string;
+    disabled?: boolean;
+}
+
+export interface ListConfig {
+    items: ListItem[];
+    expandable?: boolean;
+    showIcons?: boolean;
+    multipleExpanded?: boolean;
+}

@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { injectProjectDetection } from '@orca/core/projects';
-import { EmptyStateComponent, EmptyStateConfig, SpinnerComponent, ButtonComponent, ButtonConfig } from '@orca/design-system';
+import { EmptyStateComponent, EmptyStateConfig, SpinnerComponent, ButtonComponent, ButtonConfig, IconName } from '@orca/design-system';
 import { AppLayoutService, LayoutComponent } from '@orca/core/layout';
 import { AngularQueryDevtoolsComponent } from "./utils/angular-query-devtools.component";
 import { appRoutes } from './app.routes';
@@ -30,7 +30,7 @@ export class App {
   readonly toggleDevtoolsButtonConfig: ButtonConfig = {
     variant: 'ghost',
     icon: {
-      name: 'construction'
+      name: IconName.construction,
     }
   };
 
