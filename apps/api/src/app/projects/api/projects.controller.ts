@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Post, UsePipes, ValidationPipe, Inject, forwardRef } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post, UsePipes, ValidationPipe, Inject, forwardRef } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ProjectsService } from '../application/projects.service';
 import { CreateProjectDto } from '../domain/dtos/create-project.dto';

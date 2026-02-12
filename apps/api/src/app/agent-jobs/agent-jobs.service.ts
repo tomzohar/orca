@@ -1,4 +1,4 @@
-import { Inject, Injectable, Logger, NotFoundException, forwardRef } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException, forwardRef, BadRequestException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AgentJobEntity, AgentJobStatus, AgentType } from './domain/entities/agent-job.entity';
 import { JobCreatedEvent } from './domain/events/agent-job-events';
@@ -11,6 +11,7 @@ import {
   type IAgentRunner,
 } from './domain/interfaces/agent-runner.interface';
 import { ProjectsService } from '../projects/application/projects.service';
+import { UsersService } from '../users/application/users.service';
 
 @Injectable()
 export class AgentJobsService {
@@ -24,23 +25,43 @@ export class AgentJobsService {
     private readonly eventEmitter: EventEmitter2,
     @Inject(forwardRef(() => ProjectsService))
     private readonly projectsService: ProjectsService,
+    private readonly usersService: UsersService,
   ) { }
 
   async createJob(
     prompt: string,
-    assignee?: string,
+    createdById?: number,
+    assignedAgentId?: number,
     type: AgentType = AgentType.FILE_SYSTEM,
     projectId?: number,
   ): Promise<AgentJobEntity> {
     if (!projectId) {
-      throw new Error('Project ID is required to create an agent job');
+      throw new BadRequestException('projectId is required');
+    }
+
+    // If createdById is not provided, use the project's owner
+    let finalCreatedById = createdById;
+    if (!finalCreatedById) {
+      const project = await this.projectsService.findOne(projectId);
+      if (!project) {
+        throw new BadRequestException(`Project with id ${projectId} not found`);
+      }
+      finalCreatedById = project.ownerId;
+      this.logger.log(`Auto-assigned createdById=${finalCreatedById} from project owner`);
+    }
+
+    // Validate user exists
+    const creator = await this.usersService.findById(finalCreatedById);
+    if (!creator) {
+      throw new BadRequestException(`User with id ${finalCreatedById} not found`);
     }
 
     // Create job with project relation loaded automatically by repository
     // The repository includes project details (rootPath, includes, excludes) in the returned entity
     const job = await this.repository.create({
       prompt,
-      assignee,
+      createdById: finalCreatedById,
+      assignedAgentId,
       type,
       projectId,
     });
@@ -79,8 +100,8 @@ export class AgentJobsService {
     return job;
   }
 
-  async getJobs(assignee?: string, projectId?: number): Promise<AgentJobEntity[]> {
-    return this.repository.findAll({ assignee, projectId });
+  async getJobs(createdById?: number, assignedAgentId?: number, projectId?: number): Promise<AgentJobEntity[]> {
+    return this.repository.findAll({ createdById, assignedAgentId, projectId });
   }
 
   async getJob(id: number): Promise<AgentJobEntity> {
