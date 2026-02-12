@@ -1,0 +1,10 @@
+<orca-dialog-container
+  [config]="dialogConfig"
+  [class.danger]="config.danger"
+  (closed)="onClose()"
+  (actionClick)="onActionClick($event)"
+>
+  <div class="confirmation-message">
+    {{ config.message }}
+  </div>
+</orca-dialog-container>

@@ -19,6 +19,7 @@ describe('ProjectsController', () => {
         'Test Description',
         ['**/*'],
         ['**/node_modules/**'],
+        1,
         new Date(),
         new Date(),
     );

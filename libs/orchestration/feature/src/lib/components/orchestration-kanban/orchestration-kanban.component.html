@@ -1,0 +1,33 @@
+<orca-kanban-view
+  [lists]="kanbanLists()"
+  [itemTemplate]="jobCardTemplate()"
+  (itemDrop)="onJobDrop($event)"
+></orca-kanban-view>
+
+<!-- Job Card Template -->
+<ng-template #jobCard let-job>
+  <div
+    class="job-card"
+    role="button"
+    tabindex="0"
+    (click)="onJobClick(job)"
+    (keydown)="onJobKeyDown($event, job)"
+  >
+    @if (job.prompt) {
+      <p class="job-description">
+        @if (job.prompt.length > 30) {
+          {{ job.prompt | slice: 0 : 30 }}...
+        } @else {
+          {{ job.prompt }}
+        }
+      </p>
+    }
+
+    <div class="job-footer">
+      @if (job.assignee) {
+        <span class="job-assignee">{{ job.assignee }}</span>
+      }
+      <span class="job-date">{{ job.formattedCreatedAt }}</span>
+    </div>
+  </div>
+</ng-template>

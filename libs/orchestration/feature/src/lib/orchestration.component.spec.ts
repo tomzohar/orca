@@ -2,7 +2,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { OrchestrationComponent } from './orchestration.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { QueryClient, provideAngularQuery } from '@tanstack/angular-query-experimental';
-import { JobStatus } from '@orca/orchestration-types';
 import { JobEventsService, JobsService } from '@orca/orchestration-data';
 import { DialogService, SidePanelService } from '@orca/design-system';
 import { CreateJobDialogComponent } from './components/create-job-dialog/create-job-dialog.component';
@@ -85,22 +84,6 @@ describe('OrchestrationComponent', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should have kanbanLists with 5 columns', () => {
-        const lists = component.kanbanLists();
-
-        expect(lists).toHaveLength(5);
-        expect(lists[0].id).toBe(JobStatus.PENDING);
-        expect(lists[0].title).toBe('Pending');
-        expect(lists[1].id).toBe(JobStatus.RUNNING);
-        expect(lists[1].title).toBe('Running');
-        expect(lists[2].id).toBe(JobStatus.WAITING_FOR_USER);
-        expect(lists[2].title).toBe('Waiting for user');
-        expect(lists[3].id).toBe(JobStatus.COMPLETED);
-        expect(lists[3].title).toBe('Completed');
-        expect(lists[4].id).toBe(JobStatus.FAILED);
-        expect(lists[4].title).toBe('Failed');
-    });
-
     it('should have empty state config', () => {
         expect(component.emptyStateConfig).toBeDefined();
         expect(component.emptyStateConfig.title).toBe('No jobs yet');
@@ -124,20 +107,20 @@ describe('OrchestrationComponent', () => {
     });
 
     it('should handle menu item click to open dialog', () => {
-        const dialogRefMock = {
-            closed: of(123)
-        } as DialogRef<number>;
-
-        const dialogService = TestBed.inject(DialogService);
-        const openSpy = jest.spyOn(dialogService, 'open').mockReturnValue(dialogRefMock);
-        const onJobCreatedSpy = jest.spyOn(component, 'onJobCreated');
-
         // Mock project data
         (component as any).projectDetection = {
             data: signal({
                 project: { id: 1, name: 'Test' }
             })
         } as any;
+
+        const dialogRefMock = {
+            closed: of(123)
+        } as any;
+
+        const dialogService = TestBed.inject(DialogService);
+        const openSpy = jest.spyOn(dialogService, 'open').mockReturnValue(dialogRefMock);
+        const onJobCreatedSpy = jest.spyOn(component, 'onJobCreated');
 
         component.onCreateJob();
 

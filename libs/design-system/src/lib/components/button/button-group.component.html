@@ -1,0 +1,10 @@
+<div class="orca-button-group" [class]="getVariantClass()">
+  @for (button of config().buttons; track button.value) {
+    <orca-button
+      [config]="getButtonConfig(button)"
+      (clicked)="onButtonClick(button.value)"
+    >
+      {{ button.label }}
+    </orca-button>
+  }
+</div>

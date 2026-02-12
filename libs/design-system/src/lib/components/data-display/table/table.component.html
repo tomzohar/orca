@@ -1,0 +1,87 @@
+<div class="orca-table-container">
+  <!-- Loading State -->
+  @if (showLoading()) {
+    <div class="orca-table-state">
+      <orca-spinner [config]="{ size: 'md' }" />
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (showError()) {
+    <div class="orca-table-state">
+      <orca-empty-state [config]="{ title: 'Error', description: config().error || 'An error occurred' }" />
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (showEmpty()) {
+    <div class="orca-table-state">
+      <orca-empty-state [config]="{ title: config().emptyMessage || 'No data available' }" />
+    </div>
+  }
+
+  <!-- Table -->
+  @if (showTable()) {
+    <table mat-table [dataSource]="dataSource()" matSort class="orca-table">
+      @for (column of config().columns; track column.key) {
+        <ng-container [matColumnDef]="column.key.toString()">
+          <!-- Header -->
+          @if (isSortable(column)) {
+            <th mat-header-cell *matHeaderCellDef
+                [mat-sort-header]="column.key.toString()"
+                [style.width]="column.width || 'auto'">
+              {{ column.label }}
+            </th>
+          } @else {
+            <th mat-header-cell *matHeaderCellDef
+                [style.width]="column.width || 'auto'">
+              {{ column.label }}
+            </th>
+          }
+
+          <!-- Cell -->
+          <td mat-cell *matCellDef="let row"
+              [style.width]="column.width || 'auto'"
+              [class.actions-cell]="column.type === 'actions'"
+              (click)="column.type === 'actions' ? $event.stopPropagation() : null">
+            @switch (column.type) {
+              @case ('badge') {
+                @if (column.badgeConfig) {
+                  <orca-badge [config]="column.badgeConfig(row)" />
+                }
+              }
+              @case ('actions') {
+                @if (column.actions && column.actions.length > 0) {
+                  <orca-menu [config]="{ items: getRowActions(column, row) }" />
+                }
+              }
+              @case ('custom') {
+                @if (column.template) {
+                  <ng-container *ngTemplateOutlet="column.template; context: { $implicit: row }" />
+                }
+              }
+              @default {
+                @if (column.pipe === 'relativeTime') {
+                  {{ row[column.key] | relativeTime }}
+                } @else if (column.pipe === 'date') {
+                  {{ row[column.key] | date }}
+                } @else {
+                  {{ formatCellValue(row, column) }}
+                }
+              }
+            }
+          </td>
+        </ng-container>
+      }
+
+      <!-- Header Row -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+
+      <!-- Data Rows -->
+      <tr mat-row *matRowDef="let row; columns: displayedColumns()"
+          class="orca-table-row"
+          [class.clickable]="config().onRowClick"
+          (click)="onRowClick(row)"></tr>
+    </table>
+  }
+</div>

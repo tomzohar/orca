@@ -1,0 +1,8 @@
+@use "component" as *;
+
+.form-content {
+    display: flex;
+    flex-direction: column;
+    gap: $tokens-spacing-md;
+    padding: $tokens-spacing-md 0;
+}

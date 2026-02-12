@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { JobArtifactsComponent } from './job-artifacts.component';
-import { JobUIModel, JobStatus } from '@orca/orchestration-types';
+import { JobUIModel, JobStatus, AgentType } from '@orca/orchestration-types';
 
 describe('JobArtifactsComponent', () => {
     let component: JobArtifactsComponent;
@@ -25,6 +25,7 @@ describe('JobArtifactsComponent', () => {
         it('should show loading state when job is running with no artifacts', () => {
             const mockJob: JobUIModel = {
                 id: '1',
+                type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.RUNNING,
                 createdAt: new Date().toISOString(),
@@ -48,6 +49,7 @@ describe('JobArtifactsComponent', () => {
         it('should show empty state when job is completed with no artifacts', () => {
             const mockJob: JobUIModel = {
                 id: '1',
+                type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.COMPLETED,
                 createdAt: new Date().toISOString(),
@@ -73,6 +75,7 @@ describe('JobArtifactsComponent', () => {
         it('should render list component when artifacts exist', () => {
             const mockJob: JobUIModel = {
                 id: '1',
+                type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.COMPLETED,
                 createdAt: new Date().toISOString(),
@@ -99,6 +102,7 @@ describe('JobArtifactsComponent', () => {
         it('should configure list as expandable with icons', () => {
             const mockJob: JobUIModel = {
                 id: '1',
+                type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.COMPLETED,
                 createdAt: new Date().toISOString(),
@@ -142,6 +146,7 @@ describe('JobArtifactsComponent', () => {
 
             const mockJob: JobUIModel = {
                 id: '1',
+                type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.COMPLETED,
                 createdAt: new Date().toISOString(),
@@ -221,6 +226,7 @@ describe('JobArtifactsComponent', () => {
         it('should wrap artifact content in pre/code tags within list item', () => {
             const mockJob: JobUIModel = {
                 id: '1',
+                type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.COMPLETED,
                 createdAt: new Date().toISOString(),

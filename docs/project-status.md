@@ -1,6 +1,6 @@
 # Project Status
 
-**Last Updated:** February 12, 2026 (Morning Update)
+**Last Updated:** February 12, 2026 (Afternoon Update)
 
 ## 1. Overview
 
@@ -15,6 +15,8 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - `agent-jobs`: Core execution engine.
   - `projects`: Manages file system project metadata and access.
   - `users`: User identity and attribution system.
+  - `agent-configurations`: Reusable agent persona configurations with system prompts and execution preferences.
+  - `skills`: Reads and manages Claude skills from project's `.claude/skills/` directory.
 - **Architecture:** **Pluggable Strategy Pattern**
   - `AgentRunnerFactory`: Dispatches jobs based on `AgentType`.
   - **Quick Mode (`LocalAgentRunner`)**: ✅ **Production-Ready** - In-process LangGraph execution with:
@@ -46,6 +48,7 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - `User`: Identity system with HUMAN and AGENT types, system prompt support (future).
   - `AgentJob`: Includes `agentType`, `projectId`, `createdById`, and `assignedAgentId` for full attribution.
   - `Project`: Defines root paths, includes, excludes, and owner for agent access.
+  - `AgentConfiguration`: Stores reusable agent personas with system prompts, rules, skills, and execution preferences.
   - `AgentJobLog` & `AgentJobArtifact`: Relational tables for streaming outputs.
 - **Status:**
   - ✅ "Blackboard" Schema implemented.
@@ -77,6 +80,75 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ Monorepo-safe test suite (non-watch mode by default).
 
 ## 3. Recent Accomplishments
+
+- **Agent Configuration System (Feb 12, 2026 - Afternoon):**
+  - **Implemented complete agent configuration management:**
+    - `AgentConfiguration` model with system prompts, rules, skills array, and execution preferences
+    - Full CRUD API with project-scoped configurations
+    - Automatic slug generation for URL-friendly identifiers
+    - User attribution via `userId` (linked to project owner)
+    - Active/inactive state management for configuration lifecycle
+  - **Database Schema:**
+    - Created `AgentConfiguration` table with relations to `User` and `Project`
+    - Supports both `DOCKER` and `FILE_SYSTEM` agent types
+    - Skills stored as string array for referencing Claude skills
+    - Text fields for system prompts and rules (unlimited length)
+    - Cascade delete on project removal
+  - **Module Architecture:**
+    - Domain layer: Pure TypeScript entities following DDD patterns
+    - Data layer: Prisma repository with proper type mapping
+    - Application layer: Business logic with slug uniqueness validation
+    - API layer: RESTful endpoints with flexible ID/slug lookup
+  - **Frontend Integration:**
+    - Agent configurations list view (`/agents`) with project filtering
+    - Create dialog with form validation and multiselect skills dropdown
+    - TanStack Query integration for real-time updates
+    - TypeScript interfaces synced with backend
+    - User ID automatically retrieved from project owner
+    - Skills dropdown populated from project's `.claude/skills/` directory
+  - **Automatic Initialization:**
+    - Default "Coding Agent" configuration created on project setup
+    - Hardcoded professional defaults (system prompt, rules, Docker execution)
+    - Idempotent: checks for existing config before creation
+    - Non-blocking: won't fail project creation if config creation fails
+  - **API Endpoints:**
+    - `POST /api/agent-configurations` - Create configuration
+    - `GET /api/agent-configurations?projectId=<id>` - List all or filter by project
+    - `GET /api/agent-configurations/:idOrSlug` - Get by ID or slug
+    - `PUT /api/agent-configurations/:id` - Update configuration
+    - `DELETE /api/agent-configurations/:id` - Delete configuration
+  - **Testing & Verification:**
+    - All builds passing (backend and frontend)
+    - Module dependencies properly configured with forwardRef
+    - Database migrations applied successfully
+  - **Status:** ✅ Complete - Foundation ready for agent persona management and job-config linking
+
+- **Skills Management System (Feb 12, 2026 - Afternoon):**
+  - **Implemented complete skills discovery and management:**
+    - Skills module reads from project's `.claude/skills/` directory structure
+    - Supports nested directory structure: `.claude/skills/skill-name/SKILL.md`
+    - API endpoint for listing available skills with automatic sorting
+    - Error handling for missing directories or permission issues
+  - **Module Architecture:**
+    - Service layer: Business logic for filesystem operations (proper separation of concerns)
+    - Controller layer: Thin HTTP request handlers delegating to service
+    - Repository pattern not needed (read-only filesystem operations)
+  - **Frontend Integration:**
+    - TanStack Query hooks for skills state management (`injectSkillsQuery`)
+    - Reusable skills state accessible from multiple components
+    - 10-minute cache with automatic invalidation
+    - Multiselect dropdown in agent configuration dialog
+    - Loading states during skills fetch
+  - **API Endpoint:**
+    - `GET /api/skills` - Returns array of available skills with names and file paths
+  - **Design System Enhancement:**
+    - Added `multiple` support to `DropdownComponent` for multiselect behavior
+    - Backend returns sorted skills for consistent UI presentation
+  - **Architecture Principle Applied:**
+    - Controllers only handle HTTP concerns (request/response)
+    - Services contain all business logic (filesystem reading, directory traversal)
+    - Clear separation enables better testability and maintainability
+  - **Status:** ✅ Complete - Skills can be discovered, listed, and selected during agent configuration
 
 - **Users Module - Phase 1: Core Attribution (Feb 12, 2026 - Morning):**
   - **Implemented complete identity and attribution system:**
@@ -171,13 +243,17 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 
 ## 4. Next Steps (Orchestration & UI)
 
-1.  **Users Module - Phase 2: Agent Personas API:**
-    - Implement `GET /users/agents` and `POST /users/agents` endpoints
-    - Add UI for managing custom agent personas
-    - Enable systemPrompt customization for specialized agents
-    - Support multiple agent personas beyond the default "Coding Agent"
+1.  **Agent Configuration Enhancements:**
+    - ✅ ~~Basic CRUD and automatic initialization~~ (Complete)
+    - Add detail panel for viewing/editing individual configurations
+    - Implement delete confirmation dialog
+    - Add agent testing/preview functionality
+    - Link jobs to configurations (optional agent selection during job creation)
+    - Validate skills against `.claude/skills/` directory
+    - Create configuration templates library
+    - Add version history tracking for configurations
 
-2.  **Users Module - Phase 3: Job Comments:**
+2.  **Users Module - Phase 2: Job Comments:**
     - Implement `AgentJobComment` model with user attribution
     - Add commenting API endpoints
     - Create UI for adding/viewing comments on jobs

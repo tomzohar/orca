@@ -57,7 +57,7 @@ export function injectDeleteAgentConfigMutation() {
     const queryClient = injectQueryClient();
 
     return injectMutation(() => ({
-        mutationFn: ({ id, projectId }: { id: number; projectId: number }) =>
+        mutationFn: ({ id }: { id: number; projectId: number }) =>
             lastValueFrom(service.deleteConfig(id)),
         onSuccess: (_, { projectId }) => {
             queryClient.invalidateQueries({ queryKey: agentConfigsKeys.byProject(projectId) });

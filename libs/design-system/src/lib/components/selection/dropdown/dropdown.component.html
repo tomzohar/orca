@@ -6,6 +6,7 @@
     [placeholder]="config().placeholder || ''"
     [formControl]="control"
     [errorStateMatcher]="errorStateMatcher"
+    [multiple]="config().multiple || false"
     (selectionChange)="onSelectionChange($event)"
   >
     @for (option of config().options; track option.value) {

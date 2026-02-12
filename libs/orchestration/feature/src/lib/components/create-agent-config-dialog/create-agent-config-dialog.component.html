@@ -1,0 +1,89 @@
+<orca-dialog-container
+    [config]="{
+        title: 'Create Agent Configuration',
+        subtitle: 'Define a new agent for your project',
+        size: 'lg',
+        showCloseButton: true,
+        actions: [
+            {
+                id: 'cancel',
+                label: 'Cancel',
+                variant: 'secondary',
+                disabled: isSubmitting(),
+            },
+            {
+                id: 'create',
+                label: isSubmitting() ? 'Creating...' : 'Create Agent',
+                variant: 'primary',
+                disabled: !canSubmit(),
+            },
+        ],
+    }"
+    (closed)="onClose()"
+    (actionClick)="$event === 'create' ? onSubmit() : onCancel()"
+>
+    <div class="form-content">
+        <orca-input
+            [config]="{
+                label: 'Agent Name',
+                placeholder: 'e.g., Code Reviewer',
+                type: 'text',
+                hint: 'Provide a descriptive name for this agent',
+            }"
+            [(value)]="name"
+        ></orca-input>
+
+        <orca-input
+            [config]="{
+                label: 'Description (optional)',
+                placeholder: 'What does this agent do?',
+                type: 'textarea',
+                rows: 2,
+            }"
+            [(value)]="description"
+        ></orca-input>
+
+        <orca-input
+            [config]="{
+                label: 'System Prompt',
+                placeholder: 'You are a helpful assistant that...',
+                type: 'textarea',
+                rows: 6,
+                hint: 'Define the agent\'s behavior and personality',
+                error: errorMessage(),
+            }"
+            [(value)]="systemPrompt"
+        ></orca-input>
+
+        <orca-input
+            [config]="{
+                label: 'Rules (optional)',
+                placeholder: 'Additional constraints...',
+                type: 'textarea',
+                rows: 3,
+            }"
+            [(value)]="rules"
+        ></orca-input>
+
+        <orca-dropdown
+            [config]="{
+                label: 'Skills (optional)',
+                placeholder: isLoadingSkills() ? 'Loading skills...' : 'Select skills',
+                hint: 'Select Claude skills from your .claude/skills directory',
+                options: skillsOptions(),
+                multiple: true,
+                disabled: isLoadingSkills(),
+            }"
+            [(value)]="skills"
+        ></orca-dropdown>
+
+        <orca-dropdown
+            [config]="{
+                label: 'Execution Mode',
+                hint: 'DOCKER provides isolation, FILE_SYSTEM is faster',
+                options: agentTypeOptions,
+            }"
+            [(value)]="agentType"
+        ></orca-dropdown>
+    </div>
+</orca-dialog-container>

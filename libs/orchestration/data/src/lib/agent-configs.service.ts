@@ -15,7 +15,7 @@ export interface CreateAgentConfigRequest {
     isActive?: boolean;
 }
 
-export interface UpdateAgentConfigRequest extends Partial<CreateAgentConfigRequest> {}
+export type UpdateAgentConfigRequest = Partial<CreateAgentConfigRequest>;
 
 @Injectable({ providedIn: 'root' })
 export class AgentConfigsService {

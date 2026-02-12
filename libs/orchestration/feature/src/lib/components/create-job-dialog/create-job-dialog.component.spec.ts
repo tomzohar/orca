@@ -5,6 +5,7 @@ import { signal } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { QueryClient, provideAngularQuery } from '@tanstack/angular-query-experimental';
 import * as orchestrationData from '@orca/orchestration-data';
+import { AgentType } from '@orca/orchestration-types';
 
 // Mock the injectCreateJobMutation function
 jest.mock('@orca/orchestration-data', () => {
@@ -88,14 +89,14 @@ describe('CreateJobDialogComponent', () => {
 
     it('should call mutate and close dialog on success', () => {
         component.prompt.set('Test prompt');
-        component.agentType.set('DOCKER');
+        component.agentType.set(AgentType.DOCKER);
 
         component.onSubmit();
 
         expect(mutationMock.mutate).toHaveBeenCalledWith(
             {
                 prompt: 'Test prompt',
-                type: 'DOCKER',
+                type: AgentType.DOCKER,
                 projectId: mockData.projectId,
             },
             expect.any(Object)

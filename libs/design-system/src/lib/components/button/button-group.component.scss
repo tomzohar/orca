@@ -1,0 +1,39 @@
+@use '../../styles/tokens' as *;
+
+:host {
+  display: inline-block;
+}
+
+.orca-button-group {
+  display: inline-flex;
+  gap: 0;
+  border-radius: $radius-sm;
+  overflow: hidden;
+  border: 1px solid $border-color;
+
+  orca-button {
+    border-radius: 0;
+    border-right: 1px solid $border-color;
+
+    &:last-child {
+      border-right: none;
+    }
+
+    // Override button component's border radius
+    ::ng-deep .orca-button {
+      border-radius: 0;
+    }
+  }
+
+  &.variant-primary {
+    border-color: $primary-color;
+
+    orca-button {
+      border-right-color: $primary-color;
+    }
+  }
+
+  &.variant-secondary {
+    border-color: $border-color;
+  }
+}

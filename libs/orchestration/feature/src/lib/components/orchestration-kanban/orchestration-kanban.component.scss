@@ -1,0 +1,22 @@
+@use 'component' as *;
+
+// Job Card Styles
+.job-card {
+  display: flex;
+  flex-direction: column;
+  gap: $tokens-spacing-sm;
+  transition: box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.job-description {
+  @include typography-typography-body-1;
+}
+
+.job-footer {
+  @include typography-typography-body-2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: $tokens-spacing-xs;
+}

@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy, inject } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Subject, Observable, filter } from 'rxjs';
 import { injectQueryClient } from '@tanstack/angular-query-experimental';
 import { jobsKeys } from './jobs.query';

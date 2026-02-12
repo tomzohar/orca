@@ -1,0 +1,7 @@
+@use 'component' as *;
+
+.orchestration-table-container {
+  flex: 1;
+  overflow: auto;
+  margin-top: $tokens-spacing-md;
+}

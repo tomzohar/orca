@@ -1,0 +1,95 @@
+@use '../../../styles/tokens' as *;
+
+.orca-table-container {
+  width: 100%;
+  overflow-x: auto;
+  background-color: $surface-color;
+  border-radius: $radius-md;
+  border: 1px solid $border-color;
+
+  .orca-table-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-xl;
+    min-height: 300px;
+  }
+
+  .orca-table {
+    width: 100%;
+    background-color: $surface-color;
+
+    .mat-mdc-header-cell {
+      color: $text-secondary;
+      font-family: $font-family;
+      font-size: $font-size-sm;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: $spacing-md $spacing-md;
+      border-bottom: 1px solid $border-color;
+
+      &.mat-column-actions {
+        text-align: center;
+      }
+    }
+
+    // Row styling
+    .mat-mdc-row {
+      transition: background-color 0.2s ease;
+
+      &.orca-table-row.clickable {
+        cursor: pointer;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+      }
+    }
+
+    .mat-mdc-cell {
+      color: $text-primary;
+      font-family: $font-family;
+      font-size: $font-size-sm;
+      padding: $spacing-md $spacing-md;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+      &.mat-column-actions {
+        text-align: center;
+      }
+    }
+
+    // Remove border from last row
+    .mat-mdc-row:last-child .mat-mdc-cell {
+      border-bottom: none;
+    }
+
+    // Sort header styling
+    .mat-sort-header-arrow {
+      color: $primary-color;
+    }
+
+    .mat-sort-header-sorted {
+      color: $primary-color;
+    }
+  }
+}
+
+// Override Material table styles for dark theme
+::ng-deep {
+  .orca-table {
+
+    .mdc-data-table__header-cell,
+    .mdc-data-table__cell {
+      border-bottom-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .mat-mdc-header-cell {
+      background-color: transparent;
+    }
+
+    .mat-mdc-row:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+  }
+}

@@ -1,20 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, DestroyRef, effect, inject, Injector, TemplateRef, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, Injector, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { injectProjectDetection } from '@orca/core/projects';
-import { ButtonComponent, DialogService, EmptyStateComponent, EmptyStateConfig, IconName, KanbanItemDropEvent, KanbanList, KanbanViewComponent, PageHeaderComponent, SidePanelService, SpinnerComponent } from '@orca/design-system';
+import { ButtonComponent, ButtonGroupComponent, ConfirmationDialogComponent, DialogService, EmptyStateComponent, EmptyStateConfig, IconName, KanbanItemDropEvent, PageHeaderComponent, SidePanelService, SpinnerComponent } from '@orca/design-system';
 import { injectJobsQuery, JobEventsService, mapJobsToUIModels } from '@orca/orchestration-data';
 import { Job, JobStatus, JobUIModel } from '@orca/orchestration-types';
 import { CreateJobDialogComponent } from './components/create-job-dialog/create-job-dialog.component';
 import { JobDetailsPanelComponent } from './components/job-details-panel/job-details-panel.component';
+import { OrchestrationTableComponent, JobActionEvent } from './components/orchestration-table/orchestration-table.component';
+import { OrchestrationKanbanComponent } from './components/orchestration-kanban/orchestration-kanban.component';
 
 @Component({
   selector: 'orca-orchestration',
   standalone: true,
   imports: [
     CommonModule,
-    KanbanViewComponent,
+    OrchestrationKanbanComponent,
+    OrchestrationTableComponent,
+    ButtonGroupComponent,
     SpinnerComponent,
     EmptyStateComponent,
     PageHeaderComponent,
@@ -57,56 +61,12 @@ export class OrchestrationComponent {
   // Pass the project ID signal to the jobs query
   private readonly jobsQuery = injectJobsQuery(this.projectId);
 
-  // Template reference for job card rendering
-  readonly jobCardTemplate = viewChild.required<TemplateRef<unknown>>('jobCard');
-
   // Computed states from query
   readonly isLoading = computed(() => this.jobsQuery.isLoading());
   readonly hasError = computed(() => this.jobsQuery.isError());
   readonly jobs = computed(() => {
     const data = this.jobsQuery.data();
     return data && Array.isArray(data) ? mapJobsToUIModels(data) : [];
-  });
-
-  // Kanban column configuration
-  readonly kanbanLists = computed<KanbanList<JobUIModel>[]>(() => {
-    const jobs = this.jobs();
-
-    const jobsByStatus = jobs.reduce((map, job) => {
-      if (!map[job.status]) {
-        map[job.status] = [];
-      }
-      map[job.status].push(job);
-      return map;
-    }, {} as Record<JobStatus, JobUIModel[]>);
-
-    return [
-      {
-        id: JobStatus.PENDING,
-        title: 'Pending',
-        items: jobsByStatus[JobStatus.PENDING] || [],
-      },
-      {
-        id: JobStatus.RUNNING,
-        title: 'Running',
-        items: jobsByStatus[JobStatus.RUNNING] || [],
-      },
-      {
-        id: JobStatus.WAITING_FOR_USER,
-        title: 'Waiting for user',
-        items: jobsByStatus[JobStatus.WAITING_FOR_USER] || [],
-      },
-      {
-        id: JobStatus.COMPLETED,
-        title: 'Completed',
-        items: jobsByStatus[JobStatus.COMPLETED] || [],
-      },
-      {
-        id: JobStatus.FAILED,
-        title: 'Failed',
-        items: jobsByStatus[JobStatus.FAILED] || [],
-      },
-    ];
   });
 
   // Empty state configuration
@@ -124,6 +84,10 @@ export class OrchestrationComponent {
   readonly showEmpty = computed(() => {
     return !this.isLoading() && !this.hasError() && this.jobs().length === 0;
   });
+
+  // View mode with localStorage persistence
+  private readonly VIEW_MODE_KEY = 'orchestration-view-mode';
+  readonly viewMode = signal<'kanban' | 'table'>(this.loadViewMode());
 
   /**
    * Effect to observe jobs when they change
@@ -190,7 +154,7 @@ export class OrchestrationComponent {
       size: 'md'
     });
 
-    dialogRef.closed.subscribe(jobId => {
+    dialogRef.closed.subscribe((jobId: number | undefined) => {
       if (jobId) {
         this.onJobCreated(jobId);
       }
@@ -210,31 +174,35 @@ export class OrchestrationComponent {
   }
 
   /**
-   * Handles clicking on a job card
-   * Navigates to the job details route
+   * Handles job click from child components
    */
   onJobClick(job: JobUIModel): void {
     this.router.navigate(['/orchestration', job.id]);
   }
 
   /**
-   * Handles keyboard events on a job card
-   */
-  onJobKeyDown(event: KeyboardEvent, job: JobUIModel): void {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      this.onJobClick(job);
-    }
-  }
-
-
-  /**
    * Handles drag-and-drop events from kanban
-   * TODO: Implement status update logic when backend is ready
    */
   onJobDrop(event: KanbanItemDropEvent<JobUIModel>): void {
     console.log('Job dropped:', event);
     // TODO: Update job status via targetListId
+  }
+
+  /**
+   * Handles job actions from table component
+   */
+  onJobAction(event: JobActionEvent): void {
+    switch (event.action) {
+      case 'cancel':
+        this.onCancelJob(event.job);
+        break;
+      case 'retry':
+        this.onRetryJob(event.job);
+        break;
+      case 'delete':
+        this.onDeleteJob(event.job);
+        break;
+    }
   }
 
   private handleJobIdChange(jobId: string | null | undefined): void {
@@ -263,6 +231,48 @@ export class OrchestrationComponent {
         job.status === JobStatus.WAITING_FOR_USER
       ) {
         this.jobEventsService.observeJob(jobId, projectIdStr);
+      }
+    });
+  }
+
+  // View mode management
+  private loadViewMode(): 'kanban' | 'table' {
+    const stored = localStorage.getItem(this.VIEW_MODE_KEY);
+    return stored === 'table' ? 'table' : 'kanban';
+  }
+
+  onViewModeChange(mode: string): void {
+    const viewMode = mode as 'kanban' | 'table';
+    this.viewMode.set(viewMode);
+    localStorage.setItem(this.VIEW_MODE_KEY, viewMode);
+  }
+
+  // Job action handlers
+  onCancelJob(job: JobUIModel): void {
+    console.log('Cancel job:', job);
+    // TODO: Implement cancel logic when backend is ready
+  }
+
+  onRetryJob(job: JobUIModel): void {
+    console.log('Retry job:', job);
+    // TODO: Implement retry logic when backend is ready
+  }
+
+  onDeleteJob(job: JobUIModel): void {
+    const dialogRef = this.dialogService.open<boolean>(ConfirmationDialogComponent, {
+      data: {
+        title: 'Delete Job',
+        message: 'Are you sure you want to delete this job? This action cannot be undone.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        danger: true,
+      },
+    });
+
+    dialogRef.closed.subscribe((confirmed) => {
+      if (confirmed) {
+        console.log('Delete job:', job);
+        // TODO: Implement delete logic when backend is ready
       }
     });
   }

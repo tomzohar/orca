@@ -1,6 +1,24 @@
 <div class="orchestration-container">
   <orca-page-header [title]="projectName()">
     <div actions>
+      <!-- View Toggle -->
+      <orca-button-group
+        class="view-modes"
+        [config]="{
+          buttons: [
+            {
+              value: 'kanban',
+              icon: { name: icons.view_kanban },
+            },
+            { value: 'table', icon: { name: icons.view_list } },
+          ],
+          selected: viewMode(),
+          variant: 'secondary',
+        }"
+        (selectionChanged)="onViewModeChange($event)"
+      />
+
+      <!-- Create Job Button -->
       <orca-button
         [config]="{
           variant: 'primary',
@@ -27,39 +45,22 @@
   }
 
   <!-- Kanban Board -->
-  @if (showKanban()) {
-    <orca-kanban-view
-      [lists]="kanbanLists()"
-      [itemTemplate]="jobCardTemplate()"
-      (itemDrop)="onJobDrop($event)"
-    ></orca-kanban-view>
+  @if (showKanban() && viewMode() === 'kanban') {
+    <orca-orchestration-kanban
+      [jobs]="jobs()"
+      (jobClicked)="onJobClick($event)"
+      (jobDropped)="onJobDrop($event)"
+    />
+  }
+
+  <!-- Table View -->
+  @if (viewMode() === 'table') {
+    <orca-orchestration-table
+      [jobs]="jobs()"
+      [loading]="isLoading()"
+      [error]="hasError() ? 'Failed to load jobs' : null"
+      (jobClicked)="onJobClick($event)"
+      (jobAction)="onJobAction($event)"
+    />
   }
 </div>
-
-<!-- Job Card Template -->
-<ng-template #jobCard let-job>
-  <div
-    class="job-card"
-    role="button"
-    tabindex="0"
-    (click)="onJobClick(job)"
-    (keydown)="onJobKeyDown($event, job)"
-  >
-    @if (job.prompt) {
-      <p class="job-description">
-        @if (job.prompt.length > 30) {
-          {{ job.prompt | slice: 0 : 30 }}...
-        } @else {
-          {{ job.prompt }}
-        }
-      </p>
-    }
-
-    <div class="job-footer">
-      @if (job.assignee) {
-        <span class="job-assignee">{{ job.assignee }}</span>
-      }
-      <span class="job-date">{{ job.formattedCreatedAt }}</span>
-    </div>
-  </div>
-</ng-template>

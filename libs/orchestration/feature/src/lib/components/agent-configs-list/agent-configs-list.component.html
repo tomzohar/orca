@@ -1,0 +1,32 @@
+<div class="agent-configs-container">
+  <orca-page-header title="Agent Configurations" [icon]="IconName.settings">
+    <div actions>
+      <orca-button
+        [config]="{ variant: 'primary', icon: { name: IconName.add } }"
+        (clicked)="onCreateConfig()"
+      >
+        Create Agent
+      </orca-button>
+    </div>
+  </orca-page-header>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <orca-spinner [config]="{ size: 'lg' }" />
+    </div>
+  }
+
+  @if (showEmpty()) {
+    <orca-empty-state
+      [config]="{
+        title: 'No agent configurations yet',
+        description: 'Create your first agent configuration to get started',
+      }"
+      (actionClicked)="onCreateConfig()"
+    />
+  }
+
+  @if (!isLoading() && configs().length > 0) {
+    <orca-list [config]="listConfig()" (itemClicked)="onConfigClick($event)" />
+  }
+</div>

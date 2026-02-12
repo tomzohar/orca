@@ -1,0 +1,18 @@
+@use '../../../styles/tokens' as *;
+
+.confirmation-message {
+  padding: $spacing-md 0;
+  color: $text-primary;
+  font-size: $font-size-md;
+  line-height: 1.5;
+}
+
+:host ::ng-deep {
+  .danger .orca-dialog-footer .actions-container orca-button:last-child button {
+    background-color: $error-color !important;
+
+    &:hover {
+      filter: brightness(0.9);
+    }
+  }
+}

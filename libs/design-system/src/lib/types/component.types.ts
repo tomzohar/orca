@@ -1,4 +1,4 @@
-import { Injector } from '@angular/core';
+import { Injector, TemplateRef } from '@angular/core';
 
 export type DesignSystemColor = 'primary' | 'accent' | 'warn';
 
@@ -45,6 +45,55 @@ export interface AlertConfig {
     type?: 'success' | 'info' | 'warning' | 'error';
     title?: string;
     showIcon?: boolean;
+}
+
+export interface BadgeConfig {
+    text: string;
+    variant: 'success' | 'info' | 'warning' | 'error' | 'neutral';
+    size?: 'sm' | 'md';
+}
+
+export interface ButtonGroupConfig {
+    buttons: ButtonGroupItem[];
+    selected?: string;
+    variant?: 'primary' | 'secondary';
+}
+
+export interface ButtonGroupItem {
+    label?: string;
+    value: string;
+    icon?: IconConfig;
+    disabled?: boolean;
+}
+
+export interface TableConfig<T = any> {
+    data: T[];
+    columns: TableColumn<T>[];
+    loading?: boolean;
+    error?: string | null;
+    emptyMessage?: string;
+    sortable?: boolean;
+    onRowClick?: (row: T) => void;
+}
+
+export interface TableColumn<T = any> {
+    key: keyof T | string;
+    label: string;
+    sortable?: boolean;
+    width?: string;
+    type?: 'text' | 'badge' | 'actions' | 'custom';
+    pipe?: 'date' | 'relativeTime' | 'truncate';
+    badgeConfig?: (row: T) => BadgeConfig;
+    actions?: TableAction<T>[];
+    template?: TemplateRef<{ $implicit: T }>;
+}
+
+export interface TableAction<T = any> {
+    label: string;
+    icon?: IconName;
+    onClick: (row: T) => void;
+    visible?: (row: T) => boolean;
+    disabled?: (row: T) => boolean;
 }
 
 export interface CardConfig {
@@ -100,6 +149,7 @@ export enum IconName {
     expand_more = 'expand_more',
     expand_less = 'expand_less',
     view_kanban = 'view_kanban',
+    view_list = 'view_list',
     dashboard = 'dashboard',
     link = 'link',
     javascript = 'javascript',
@@ -109,6 +159,7 @@ export enum IconName {
     construction = 'construction',
     more_vert = 'more_vert',
     cancel = 'cancel',
+    refresh = 'refresh',
     format_bold = 'format_bold',
     format_italic = 'format_italic',
     strikethrough_s = 'strikethrough_s',
@@ -152,6 +203,7 @@ export interface DropdownConfig<T> {
     error?: string;
     hint?: string;
     options: DropdownOption<T>[];
+    multiple?: boolean;
 }
 
 export interface MenuItem {

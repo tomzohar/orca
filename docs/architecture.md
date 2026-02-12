@@ -45,6 +45,7 @@ The current "Spawning" & "Blackboard" flow functions as follows:
       - Project link: Associated with the specified `Project`
       - **User Attribution**: `createdById` (auto-populated from project owner if not provided)
       - **Agent Assignment**: Optional `assignedAgentId` (set by orchestrator for task delegation)
+      - **Configuration Reference** (Future): Optional `configurationId` linking to an `AgentConfiguration` for persona-specific behavior
 
 2.  **Dispatcher & Execution:**
     - The `AgentJobsService` uses a **Factory** to select the appropriate Runner based on `job.agentType`:
@@ -116,6 +117,33 @@ To ensure long-term maintainability and prevent "Big Ball of Mud" anti-patterns,
 - **`application/`**: UsersService for user management (creation, lookup, validation).
 - **`initialization/`**: UsersInitializationService that runs on app startup via `OnModuleInit` to ensure default users exist.
 
+#### Folder Structure (`apps/api/src/app/agent-configurations/`)
+
+- **`domain/`**: AgentConfiguration entity, repository interface, and DTOs (CreateAgentConfigurationDto, UpdateAgentConfigurationDto).
+- **`data/`**: Prisma repository implementation for configuration persistence with domain entity mapping.
+- **`application/`**: AgentConfigurationsService for business logic (CRUD operations, slug generation, validation).
+- **`api/`**: REST controller with Swagger documentation, flexible ID/slug lookup.
+
+**Key Concepts:**
+- **Configuration Attributes**: name, slug, description, systemPrompt, rules, skills array, agentType, userId, projectId
+- **Automatic Initialization**: Default "Coding Agent" configuration created during project setup
+- **Slug Generation**: URL-friendly slugs auto-generated from names with uniqueness validation
+- **Skills Reference**: Array of skill names pointing to `.claude/skills/` directory contents
+- **User Attribution**: Every configuration is owned by a user (linked via userId)
+
+#### Folder Structure (`apps/api/src/app/skills/`)
+
+- **`skills.service.ts`**: Business logic for reading skills from filesystem (`.claude/skills/` directory).
+- **`skills.controller.ts`**: Thin HTTP controller delegating to service (no business logic).
+- **`skills.module.ts`**: Module registration with service provider and export.
+
+**Key Concepts:**
+- **Directory Structure**: Reads from `.claude/skills/skill-name/SKILL.md` pattern
+- **Read-Only Operations**: No repository needed (filesystem operations only)
+- **Separation of Concerns**: Controller handles HTTP, service handles filesystem logic
+- **Error Handling**: Graceful handling of missing directories or permission issues
+- **Sorting**: Skills automatically sorted alphabetically for consistent presentation
+
 **Key Concepts:**
 - **User Types**: `HUMAN` (project owners, job creators) and `AGENT` (autonomous personas like "Coding Agent").
 - **Default Users**: The system automatically creates:
@@ -141,13 +169,23 @@ The `Projects` module provides the structural context for agent execution. A pro
   - This ensures that when an agent is spawned, it "knows" where it is working and what files are relevant.
   - Execution tools (like `fileSystemTool`) are automatically scoped to the project's `rootPath`.
 - **Auto-Initialization**:
-  - When a project is detected or created, the system automatically ensures an owner user exists.
-  - The default "Human" user is used as the owner for all projects in Phase 1.
+  - When a project is detected or created, the system automatically:
+    - Ensures an owner user exists (uses default "Human" user in Phase 1)
+    - Creates a default "Coding Agent" configuration with professional defaults
+      - System prompt for software development tasks
+      - Recommended rules for code quality and safety
+      - Docker execution mode for isolated, safe operation
+    - Project initialization is idempotent and non-blocking (configuration creation failures won't prevent project setup)
 
 #### Best Practices
 
 - **Dependency Inversion**: Application logic (`execution/`) and Presentation (`api/`) depend on interfaces defined in `domain/` rather than concrete implementations. This allows for easy swapping of runners or database providers.
 - **Domain Isolation**: Domain entities (`AgentJobEntity`) are pure TypeScript classes. Prisma models are mapped to entities in the repository layer to prevent ORM leak into the business logic.
+- **Separation of Concerns**: Controllers are thin HTTP handlers that only deal with request/response concerns. All business logic belongs in services. This pattern:
+  - Makes controllers easy to read and maintain (typically 3-10 lines per endpoint)
+  - Enables business logic reuse across multiple controllers or contexts
+  - Improves testability by isolating HTTP concerns from business logic
+  - Example: `SkillsController` delegates to `SkillsService` for all filesystem operations
 - **Strict Typing with `import type`**: When importing interfaces for type-checking only (e.g., in service constructors), use `import type` to minimize bundle size and avoid circular dependency runtime issues.
 - **Module READMEs**: Every sub-folder contains a `README.md` explaining its responsibility, maintaining high tribal knowledge within the codebase.
 
@@ -158,6 +196,9 @@ To maintain scalability alongside the backend, the frontend follows a modular li
 #### State Management
 
 - **Server State:** Handled by **TanStack Query** (via `@tanstack/angular-query-experimental`). This eliminates boilerplate for data fetching, caching, and synchronization.
+  - Examples: Job data, project detection, agent configurations, skills directory
+  - Custom query hooks (e.g., `injectSkillsQuery`, `injectAgentConfigsQuery`) provide reactive, cached access to backend data
+  - Automatic cache invalidation on mutations ensures UI stays synchronized
 - **Local State:** Uses Angular Signals for reactive, fine-grained UI updates.
 
 #### Library Strategy
@@ -165,7 +206,16 @@ To maintain scalability alongside the backend, the frontend follows a modular li
 - **`apps/web`**: The application shell. Responsible for routing, layout, and page-level orchestration.
 - **`libs/core`**: Business logic and state management.
   - Example: `libs/core/layout` manages the global sidebar/topbar configuration via TanStack Query.
-- **`libs/ui`**: Pure UI components (Design System). Stateless and reusable.
+  - Example: `libs/core/projects` provides skills management with reusable query hooks.
+- **`libs/orchestration`**: Domain-specific modules for orchestration features.
+  - `types/`: Shared TypeScript interfaces (AgentConfiguration, Project, etc.)
+  - `data/`: HTTP services and TanStack Query hooks for backend communication
+  - `feature/`: Smart components with business logic (agent config list, job panels)
+  - `ui/`: Dumb presentation components specific to orchestration domain
+- **`libs/design-system`**: Pure UI components (Design System). Stateless and reusable.
+  - All components use `ui-` prefix (e.g., `ui-button`, `ui-dropdown`)
+  - Components accept configuration objects instead of multiple inputs
+  - Recently enhanced with multiselect dropdown support
 
 #### Experimental Integration
 

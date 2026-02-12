@@ -1,0 +1,15 @@
+@use "component" as *;
+
+.agent-configs-container {
+    padding: $tokens-spacing-lg;
+    display: flex;
+    flex-direction: column;
+    gap: $tokens-spacing-lg;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
