@@ -7,11 +7,15 @@
 The system uses a shared data store as the Single Source of Truth. Agents do not merely communicate; they update persistent records to reflect progress.
 
 - **Work Items:** Structured records defining the unit of work.
-  - Attributes: Status (OPEN, IN_PROGRESS, BLOCKED, REVIEW), Priority, Role Assignment.
+  - Attributes: Status (OPEN, IN_PROGRESS, BLOCKED, REVIEW), Priority, Role Assignment, **User Attribution** (who created, who assigned).
 - **Artifacts:** Flexible storage for work products produced by agents.
   - Stores deliverables such as code changes, specifications, or diagrams.
 - **Communication Channels:** Threaded logs linking conversation history to specific Work Items.
 - **System Audit Log:** A chronological feed of all system events and agent actions.
+- **Identity & Attribution:** Tracks human users and agent personas.
+  - **Human Users:** Project owners who create and monitor jobs.
+  - **Agent Personas:** Named agents (e.g., "Coding Agent") that execute work.
+  - All jobs track their creator (`createdById`) and optional assigned agent (`assignedAgentId`).
 
 ### 1.2 Agent Execution Environment
 
@@ -35,8 +39,12 @@ The control plane manages the lifecycle of tasks and agents.
 The current "Spawning" & "Blackboard" flow functions as follows:
 
 1.  **Job Creation (The Trigger):**
-    - A user or system event triggers a `POST /agent-jobs` request, which now requires a `projectId`.
-    - The `AgentJobsService` creates a new `AgentJob` record in the database (The Blackboard) with status `PENDING`, linked to the specified `Project`.
+    - A user or system event triggers a `POST /agent-jobs` request, which requires a `projectId`.
+    - The `AgentJobsService` creates a new `AgentJob` record in the database (The Blackboard) with:
+      - Status: `PENDING`
+      - Project link: Associated with the specified `Project`
+      - **User Attribution**: `createdById` (auto-populated from project owner if not provided)
+      - **Agent Assignment**: Optional `assignedAgentId` (set by orchestrator for task delegation)
 
 2.  **Dispatcher & Execution:**
     - The `AgentJobsService` uses a **Factory** to select the appropriate Runner based on `job.agentType`:
@@ -101,6 +109,23 @@ To ensure long-term maintainability and prevent "Big Ball of Mud" anti-patterns,
 - **`application/`**: Business logic for project generation and management.
 - **`data/`**: Prisma implementation of project persistence.
 
+#### Folder Structure (`apps/api/src/app/users/`)
+
+- **`domain/`**: User entity, UserType enum, and repository interface. Pure TypeScript with no framework dependencies.
+- **`data/`**: Prisma repository implementation for user persistence.
+- **`application/`**: UsersService for user management (creation, lookup, validation).
+- **`initialization/`**: UsersInitializationService that runs on app startup via `OnModuleInit` to ensure default users exist.
+
+**Key Concepts:**
+- **User Types**: `HUMAN` (project owners, job creators) and `AGENT` (autonomous personas like "Coding Agent").
+- **Default Users**: The system automatically creates:
+  - "Human" (id: 1, type: HUMAN) - Default project owner and job creator.
+  - "Coding Agent" (id: 2, type: AGENT) - Default agent for orchestrator task assignments.
+- **Attribution Flow**:
+  - Every `Project` has an `ownerId` pointing to a User.
+  - Every `AgentJob` has a `createdById` (required, who created it) and optional `assignedAgentId` (which agent is executing it).
+  - When creating a job without `createdById`, the system auto-populates it from the project's owner.
+
 ### 1.7 Workspace Awareness (Projects)
 
 The `Projects` module provides the structural context for agent execution. A project is not just a folder; it's a domain boundary.
@@ -109,10 +134,15 @@ The `Projects` module provides the structural context for agent execution. A pro
   - `rootPath`: Absolute path on the server filesystem.
   - `slug`: Human-readable unique identifier.
   - `includes`/`excludes`: Glob patterns to control agent visibility.
+  - `ownerId`: Reference to the User who owns this project.
 - **Lifecycle Integration**:
   - Every `AgentJob` must be associated with a `Project`.
+  - Every `Project` must be owned by a User (automatically created during project initialization).
   - This ensures that when an agent is spawned, it "knows" where it is working and what files are relevant.
   - Execution tools (like `fileSystemTool`) are automatically scoped to the project's `rootPath`.
+- **Auto-Initialization**:
+  - When a project is detected or created, the system automatically ensures an owner user exists.
+  - The default "Human" user is used as the owner for all projects in Phase 1.
 
 #### Best Practices
 

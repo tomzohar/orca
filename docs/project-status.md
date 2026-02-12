@@ -78,8 +78,6 @@ Orca is an autonomous software orchestration platform. We have successfully impl
 
 ## 3. Recent Accomplishments
 
-# <<<<<<< HEAD
-
 - **Users Module - Phase 1: Core Attribution (Feb 12, 2026 - Morning):**
   - **Implemented complete identity and attribution system:**
     - `User` model with `HUMAN` and `AGENT` types
@@ -112,8 +110,6 @@ Orca is an autonomous software orchestration platform. We have successfully impl
     - API validation working correctly
     - Server initialization logs confirm successful user setup
   - **Status:** ✅ Phase 1 complete - Foundation ready for future phases (Agent Personas API, Job Comments, Authentication)
-
-> > > > > > > f5da43f754360700b381968f465c8da1f05cc774
 
 - **Bulk Filesystem Operations (Feb 11, 2026 - Evening):**
   - **Enhanced file_system tool** with bulk operations to dramatically reduce recursion:
