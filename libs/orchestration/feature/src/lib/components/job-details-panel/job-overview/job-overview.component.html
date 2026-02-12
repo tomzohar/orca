@@ -2,7 +2,12 @@
   <div class="overview-tab">
     <div class="detail-section">
       <h4 class="section-title">Prompt</h4>
-      <p class="prompt-text">{{ currentJob.prompt }}</p>
+      <div class="prompt-content">
+        <orca-markdown-editor
+          [config]="promptMarkdownConfig"
+          [value]="currentJob.prompt"
+        />
+      </div>
     </div>
 
     <div class="detail-section">

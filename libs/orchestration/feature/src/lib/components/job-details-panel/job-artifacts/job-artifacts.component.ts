@@ -1,13 +1,21 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { DatePipe } from '@angular/common';
-import { EmptyStateComponent, EmptyStateConfig, ListComponent, SpinnerComponent } from '@orca/design-system';
-import { IconName, ListConfig, ListItem } from '@orca/design-system';
-import { JobStatus, JobUIModel } from '@orca/orchestration-types';
+import {
+    EmptyStateComponent,
+    EmptyStateConfig,
+    ListComponent,
+    SpinnerComponent,
+    MarkdownEditorComponent,
+    MarkdownEditorConfig,
+    IconName,
+    ListConfig,
+    ListItem,
+} from '@orca/design-system';
+import { JobStatus, JobUIModel, JobArtifact } from '@orca/orchestration-types';
 
 @Component({
     selector: 'orca-job-artifacts',
     standalone: true,
-    imports: [SpinnerComponent, ListComponent, EmptyStateComponent],
+    imports: [SpinnerComponent, ListComponent, EmptyStateComponent, MarkdownEditorComponent],
     templateUrl: './job-artifacts.component.html',
     styleUrl: './job-artifacts.component.scss',
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -50,7 +58,7 @@ export class JobArtifactsComponent {
             id: artifact.id.toString(),
             title: artifact.filename,
             icon: this.getFileIcon(artifact.filename),
-            content: artifact.content,
+            description: `${this.getFileExtension(artifact.filename).toUpperCase()} file`,
         }));
 
         return {
@@ -65,7 +73,7 @@ export class JobArtifactsComponent {
      * Determines the appropriate icon based on file extension
      */
     getFileIcon(filename: string): IconName {
-        const extension = filename.split('.').pop()?.toLowerCase();
+        const extension = this.getFileExtension(filename);
 
         // Map file extensions to Material Icons
         const iconMap: Record<string, IconName> = {
@@ -94,4 +102,67 @@ export class JobArtifactsComponent {
 
         return IconName.article;
     }
+
+    /**
+     * Gets file extension from filename
+     */
+    private getFileExtension(filename: string): string {
+        return filename.split('.').pop()?.toLowerCase() || '';
+    }
+
+    /**
+     * Gets the formatted markdown content for an artifact
+     * Wraps code files (JS, HTML, CSS) in markdown code blocks
+     */
+    getArtifactMarkdownContent(item: ListItem): string {
+        if (!item.id) return '';
+
+        const artifact = this.job()?.artifacts?.find(a => a.id.toString() === item.id);
+        if (!artifact) return '';
+
+        return this.formatArtifactContent(artifact);
+    }
+
+    /**
+     * Formats artifact content as markdown with code blocks for code files
+     */
+    private formatArtifactContent(artifact: JobArtifact): string {
+        const extension = this.getFileExtension(artifact.filename);
+        const codeExtensions = ['js', 'jsx', 'ts', 'tsx', 'mjs', 'cjs', 'html', 'htm', 'css', 'scss', 'sass', 'less'];
+
+        if (codeExtensions.includes(extension)) {
+            // Determine the language identifier for syntax highlighting
+            const languageMap: Record<string, string> = {
+                'js': 'javascript',
+                'jsx': 'javascript',
+                'ts': 'typescript',
+                'tsx': 'typescript',
+                'mjs': 'javascript',
+                'cjs': 'javascript',
+                'html': 'html',
+                'htm': 'html',
+                'css': 'css',
+                'scss': 'scss',
+                'sass': 'sass',
+                'less': 'less',
+            };
+
+            const language = languageMap[extension] || extension;
+            return `\`\`\`${language}\n${artifact.content}\n\`\`\``;
+        }
+
+        // For other files, render as-is (assuming it's already markdown or plain text)
+        return artifact.content;
+    }
+
+    /**
+     * Markdown editor config for preview-only mode (used in template)
+     */
+    readonly markdownConfig: MarkdownEditorConfig = {
+        mode: 'preview',
+        toolbar: { enabled: false },
+        showModeToggle: false,
+        height: 'auto',
+        minHeight: '200px',
+    };
 }

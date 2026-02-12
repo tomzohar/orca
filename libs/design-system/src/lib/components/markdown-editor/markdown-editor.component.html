@@ -1,0 +1,123 @@
+<div class="orca-markdown-editor" [class.disabled]="config().disabled">
+  <!-- Optional Label -->
+  @if (config().label) {
+    <label class="orca-markdown-label" [for]="editorId">{{
+      config().label
+    }}</label>
+  }
+
+  <!-- Toolbar (only in edit/split mode) -->
+  @if (
+    config().toolbar?.enabled !== false &&
+    (config().mode === 'edit' || config().mode === 'split')
+  ) {
+    <div class="orca-markdown-toolbar">
+      @for (item of toolbarItems(); track $index) {
+        @if (item === 'divider') {
+          <span class="toolbar-divider"></span>
+        } @else {
+          <orca-button
+            [config]="{
+              variant: 'ghost',
+              size: 'sm',
+              icon: getToolbarIcon(item),
+            }"
+            (clicked)="handleToolbarClick(item)"
+            [attr.title]="getToolbarTooltip(item)"
+          ></orca-button>
+        }
+      }
+
+      <!-- Mode toggle buttons -->
+      @if (config().showModeToggle !== false) {
+        <span class="toolbar-divider"></span>
+        <div class="mode-toggle-group">
+          <orca-button
+            [config]="{
+              variant: config().mode === 'edit' ? 'primary' : 'ghost',
+              size: 'sm',
+              icon: { name: IconName.edit, size: 'sm' },
+            }"
+            (clicked)="requestModeChange('edit')"
+            [attr.title]="'Edit mode'"
+          ></orca-button>
+          <orca-button
+            [config]="{
+              variant: config().mode === 'preview' ? 'primary' : 'ghost',
+              size: 'sm',
+              icon: { name: IconName.article, size: 'sm' },
+            }"
+            (clicked)="requestModeChange('preview')"
+            [attr.title]="'Preview mode'"
+          ></orca-button>
+          <orca-button
+            [config]="{
+              variant: config().mode === 'split' ? 'primary' : 'ghost',
+              size: 'sm',
+              icon: { name: IconName.view_kanban, size: 'sm' },
+            }"
+            (clicked)="requestModeChange('split')"
+            [attr.title]="'Split mode'"
+          ></orca-button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Content Area -->
+  <div
+    class="orca-markdown-content"
+    [style.height]="config().height || '300px'"
+    [style.min-height]="config().minHeight"
+  >
+    <!-- Edit Mode -->
+    @if (config().mode === 'edit') {
+      <textarea
+        #textarea
+        [id]="editorId"
+        class="orca-markdown-textarea"
+        [value]="value()"
+        [placeholder]="config().placeholder || 'Enter markdown...'"
+        [disabled]="config().disabled"
+        (input)="onInput($event)"
+        (blur)="onTouched()"
+      ></textarea>
+    }
+
+    <!-- Preview Mode -->
+    @if (config().mode === 'preview') {
+      <div class="orca-markdown-preview" markdown [data]="value()"></div>
+    }
+
+    <!-- Split Mode -->
+    @if (config().mode === 'split') {
+      <div class="orca-markdown-split">
+        <textarea
+          #textarea
+          class="orca-markdown-textarea split"
+          [value]="value()"
+          [placeholder]="config().placeholder || 'Enter markdown...'"
+          [disabled]="config().disabled"
+          (input)="onInput($event)"
+          (blur)="onTouched()"
+        ></textarea>
+        <div class="split-divider"></div>
+        <div
+          class="orca-markdown-preview split"
+          markdown
+          [data]="value()"
+        ></div>
+      </div>
+    }
+  </div>
+
+  <!-- Hint/Error Messages -->
+  <div class="orca-markdown-messages">
+    @if (config().hint && !config().error) {
+      <span class="hint-text">{{ config().hint }}</span>
+    }
+    @if (config().error) {
+      <span class="error-text">{{ config().error }}</span>
+    }
+  </div>
+</div>

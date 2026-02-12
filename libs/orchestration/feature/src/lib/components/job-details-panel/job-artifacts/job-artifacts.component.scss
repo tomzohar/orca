@@ -21,24 +21,18 @@
     }
 }
 
-// Styles for artifact content displayed within the list component
-::ng-deep .artifact-content-container {
-    padding: $tokens-spacing-md;
-    background-color: $tokens-surface-color;
-    max-height: 500px;
-    overflow-y: auto;
-    border-top: 1px solid $tokens-border-color;
+// Styles for markdown editor inside list items
+::ng-deep .list-item-content {
+    .orca-markdown-editor {
+        .orca-markdown-content {
+            border: none;
+            background: transparent;
+            border-radius: 0;
+        }
 
-    pre {
-        margin: 0;
-        white-space: pre-wrap;
-        word-break: break-word;
-
-        code {
-            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-            font-size: $tokens-font-size-sm;
-            line-height: 1.5;
-            color: $tokens-text-primary;
+        .orca-markdown-preview {
+            padding: 0;
+            background: transparent;
         }
     }
 }

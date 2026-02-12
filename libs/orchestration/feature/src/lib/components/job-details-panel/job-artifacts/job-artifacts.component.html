@@ -8,7 +8,15 @@
     } @else if (currentJob.artifacts.length === 0) {
       <orca-empty-state [config]="emptyStateConfig()" />
     } @else {
-      <orca-list [config]="artifactsListConfig()" />
+      <orca-list [config]="artifactsListConfig()">
+        <!-- Custom content template for artifact markdown rendering -->
+        <ng-template #itemContent let-item>
+          <orca-markdown-editor
+            [config]="markdownConfig"
+            [value]="getArtifactMarkdownContent(item)"
+          />
+        </ng-template>
+      </orca-list>
     }
   </div>
 }

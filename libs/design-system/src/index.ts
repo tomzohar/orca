@@ -28,3 +28,4 @@ export * from './lib/types/kanban.types';
 export * from './lib/components/page-header/page-header.component';
 export * from './lib/components/menu/menu.component';
 export * from './lib/components/tabs/tabs.component';
+export * from './lib/components/markdown-editor/markdown-editor.component';

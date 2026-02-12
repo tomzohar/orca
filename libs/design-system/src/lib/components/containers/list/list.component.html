@@ -29,7 +29,13 @@
             </mat-panel-description>
           }
         </mat-expansion-panel-header>
-        @if (item.content) {
+        @if (itemContentTemplate()) {
+          <div class="list-item-content">
+            <ng-container
+              *ngTemplateOutlet="itemContentTemplate(); context: { $implicit: item }"
+            ></ng-container>
+          </div>
+        } @else if (item.content) {
           <div class="list-item-content">
             {{ item.content }}
           </div>

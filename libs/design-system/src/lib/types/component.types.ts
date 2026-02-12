@@ -108,7 +108,17 @@ export enum IconName {
     article = 'article',
     construction = 'construction',
     more_vert = 'more_vert',
-    cancel = 'cancel'
+    cancel = 'cancel',
+    format_bold = 'format_bold',
+    format_italic = 'format_italic',
+    strikethrough_s = 'strikethrough_s',
+    title = 'title',
+    code = 'code',
+    format_list_bulleted = 'format_list_bulleted',
+    format_list_numbered = 'format_list_numbered',
+    format_quote = 'format_quote',
+    logout = "logout",
+    person = "person"
 }
 
 export type DialogSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
@@ -213,3 +223,5 @@ export interface ListConfig {
     showIcons?: boolean;
     multipleExpanded?: boolean;
 }
+
+export * from '../components/markdown-editor/markdown-editor.types';

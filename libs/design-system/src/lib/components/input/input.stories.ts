@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { InputComponent } from './input.component';
+import { IconName } from '../../types/component.types';
 
 const meta: Meta<InputComponent> = {
     title: 'Components/Input',
@@ -27,7 +28,7 @@ export const Search: Story = {
     args: {
         config: {
             placeholder: 'Search...',
-            prefixIcon: { name: 'search', size: 'md' },
+            prefixIcon: { name: IconName.search, size: 'md' },
         },
     },
     render: (args) => ({
@@ -41,7 +42,7 @@ export const Small: Story = {
         config: {
             placeholder: 'Small Input...',
             size: 'sm',
-            prefixIcon: { name: 'search', size: 'sm' },
+            prefixIcon: { name: IconName.search, size: 'sm' },
         },
     },
     render: (args) => ({

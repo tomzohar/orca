@@ -11,7 +11,6 @@
 
     ::ng-deep {
         .mat-mdc-form-field-flex {
-            background-color: $surface-color !important;
             border-radius: $radius-md !important;
             min-height: 56px;
         }
@@ -81,7 +80,7 @@
 
 // Global styles for the dropdown panel
 ::ng-deep .mat-mdc-select-panel {
-    background-color: #001e3c !important; // Matching Figma bg-[#001e3c]
+    background-color: $background-color !important;
     border-radius: $radius-md !important;
     padding-top: 8px !important;
     box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12) !important;

@@ -1,0 +1,200 @@
+@use '../../styles/tokens' as *;
+
+.orca-markdown-editor {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+
+  &.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+.orca-markdown-label {
+  font-size: $font-size-sm;
+  color: $text-secondary;
+  font-weight: 500;
+}
+
+.orca-markdown-toolbar {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-sm;
+  background: $surface-color;
+  border: 1px solid $border-color;
+  border-radius: $radius-sm $radius-sm 0 0;
+
+  .toolbar-divider {
+    width: 1px;
+    height: 20px;
+    background: $border-color;
+    margin: 0 $spacing-xs;
+  }
+
+  .mode-toggle-group {
+    display: flex;
+    gap: $spacing-xs;
+    margin-left: auto;
+  }
+}
+
+.orca-markdown-content {
+  position: relative;
+  border: 1px solid $border-color;
+  border-radius: $radius-sm;
+  overflow: hidden;
+
+  .orca-markdown-editor:has(.orca-markdown-toolbar) & {
+    border-top: none;
+    border-radius: 0 0 $radius-sm $radius-sm;
+  }
+}
+
+.orca-markdown-textarea {
+  width: 100%;
+  height: 100%;
+  padding: $spacing-md;
+  background: $background-color;
+  color: $text-primary;
+  border: none;
+  outline: none;
+  resize: vertical;
+  font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
+  font-size: $font-size-sm;
+  line-height: 1.6;
+
+  &::placeholder {
+    color: $text-disabled;
+  }
+
+  &.split {
+    resize: none;
+    width: 50%;
+  }
+}
+
+.orca-markdown-preview {
+  width: 100%;
+  height: 100%;
+  padding: $spacing-md;
+  background: $surface-color;
+  color: $text-primary;
+  overflow-y: auto;
+
+  &.split {
+    width: 50%;
+  }
+
+  // Markdown content styling
+  ::ng-deep {
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      color: $text-primary;
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: 2em;
+      line-height: 56px;
+    }
+
+    h2 {
+      font-size: 1.5em;
+      line-height: 48px;
+    }
+
+    h3 {
+      font-size: 1.25em;
+      line-height: 40px;
+    }
+
+    p {
+      margin-bottom: $spacing-sm;
+      line-height: 1.6;
+    }
+
+    code {
+      background: $surface-search;
+      padding: 2px 6px;
+      border-radius: $radius-sm;
+      font-family: 'Fira Code', 'Monaco', 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+
+    pre {
+      background: $surface-search;
+      padding: $spacing-md;
+      border-radius: $radius-sm;
+      overflow-x: auto;
+      margin-bottom: $spacing-md;
+
+      code {
+        background: none;
+        padding: 0;
+      }
+    }
+
+    ul,
+    ol {
+      margin-left: $spacing-lg;
+      margin-bottom: $spacing-sm;
+
+      li {
+        margin-bottom: $spacing-xs;
+      }
+    }
+
+    blockquote {
+      border-left: 4px solid $primary-color;
+      padding-left: $spacing-md;
+      margin-left: 0;
+      color: $text-muted;
+      font-style: italic;
+    }
+
+    a {
+      color: $color-accent;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid $border-color;
+      margin: $spacing-md 0;
+    }
+  }
+}
+
+.orca-markdown-split {
+  display: flex;
+  height: 100%;
+
+  .split-divider {
+    width: 1px;
+    background: $border-color;
+  }
+}
+
+.orca-markdown-messages {
+  min-height: 20px;
+  font-size: $font-size-xs;
+
+  .hint-text {
+    color: $text-secondary;
+  }
+
+  .error-text {
+    color: $error-color;
+  }
+}

@@ -2,6 +2,7 @@ import { Meta, StoryObj, moduleMetadata } from '@storybook/angular';
 import { PageHeaderComponent } from './page-header.component';
 import { MatButtonModule } from '@angular/material/button';
 import { IconComponent } from '../icon/icon.component';
+import { IconName } from '../../types/component.types';
 
 const meta: Meta<PageHeaderComponent> = {
     title: 'Components/Page Header',
@@ -38,7 +39,7 @@ export const WithSubtitle: Story = {
 export const WithIcon: Story = {
     args: {
         title: 'Settings',
-        icon: 'settings',
+        icon: IconName.settings,
     },
 };
 
@@ -62,7 +63,7 @@ export const WithActions: Story = {
 export const FullFeature: Story = {
     args: {
         title: 'Project Details',
-        icon: 'folder',
+        icon: IconName.dashboard,
         subTitle: 'Edit project configuration',
     },
     render: (args) => ({

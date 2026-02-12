@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { TabsComponent } from './tabs.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { TabsConfig } from '../../types/component.types';
+import { TabsConfig, IconName } from '../../types/component.types';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 
 describe('TabsComponent', () => {
@@ -103,8 +103,8 @@ describe('TabsComponent', () => {
         it('should render tabs with icons', () => {
             const config: TabsConfig = {
                 tabs: [
-                    { label: 'Home', icon: 'home' },
-                    { label: 'Settings', icon: 'settings' }
+                    { label: 'Home', icon: IconName.home },
+                    { label: 'Settings', icon: IconName.settings }
                 ]
             };
             fixture.componentRef.setInput('config', config);

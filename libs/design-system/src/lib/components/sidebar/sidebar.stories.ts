@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { SidebarComponent } from './sidebar.component';
+import { IconName } from '../../types/component.types';
 
 const meta: Meta<SidebarComponent> = {
   title: 'Components/Sidebar',
@@ -14,12 +15,12 @@ export const Default: Story = {
   args: {
     config: {
       items: [
-        { id: 'dashboard', label: 'Dashboard', icon: { name: 'dashboard' }, isActive: true },
-        { id: 'orchestration', label: 'Orchestration', icon: { name: 'analytics' } },
-        { id: 'intervention', label: 'Intervention', icon: { name: 'handyman' } },
-        { id: 'agents', label: 'Agents', icon: { name: 'smart_toy' } },
-        { id: 'design-system', label: 'Design System', icon: { name: 'code' } },
-        { id: 'settings', label: 'Settings', icon: { name: 'settings' } },
+        { id: 'dashboard', label: 'Dashboard', icon: { name: IconName.dashboard }, isActive: true },
+        { id: 'orchestration', label: 'Orchestration', icon: { name: IconName.view_kanban } },
+        { id: 'intervention', label: 'Intervention', icon: { name: IconName.construction } },
+        { id: 'agents', label: 'Agents', icon: { name: IconName.settings } },
+        { id: 'design-system', label: 'Design System', icon: { name: IconName.code } },
+        { id: 'settings', label: 'Settings', icon: { name: IconName.settings } },
       ],
     },
   },

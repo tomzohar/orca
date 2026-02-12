@@ -1,15 +1,15 @@
 @use '../../../styles/tokens' as *;
 
 .orca-dialog-container {
-    background: var(--background-color, #1a1e2e);
-    border-radius: var(--radius-lg, 12px);
+    background: $surface-color;
+    border-radius: $radius-lg;
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
     display: flex;
     flex-direction: column;
     max-height: 90vh;
-    border: 1px solid var(--border-color, #2d3748);
+    border: 1px solid $border-color;
     overflow: hidden;
-    color: var(--text-primary, #e2e8f0);
+    color: $text-primary;
 }
 
 .xs {
@@ -42,37 +42,31 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    border-bottom: 1px solid var(--border-color, #2d3748);
+    border-bottom: 1px solid $border-color;
 }
-
-// .header-text h2 {
-//     margin: 0;
-//     font-size: 1.25rem;
-//     font-weight: 600;
-// }
 
 .subtitle {
     margin: 4px 0 0;
     font-size: 0.875rem;
-    color: var(--text-secondary, #94a3b8);
+    color: $text-secondary;
 }
 
 .orca-dialog-content {
-    padding: var(--spacing-xl, 24px);
+    padding: $spacing-xl $spacing-xl;
     overflow-y: auto;
     flex: 1;
 }
 
 .orca-dialog-footer {
-    padding: var(--spacing-md, 16px) var(--spacing-xl, 24px);
-    border-top: 1px solid var(--border-color, #2d3748);
+    padding: $spacing-md $spacing-xl;
+    border-top: 1px solid $border-color;
     background: rgba(0, 0, 0, 0.1);
     display: flex;
     justify-content: flex-end;
-    gap: var(--spacing-md, 12px);
+    gap: $spacing-md;
 }
 
 .actions-container {
     display: flex;
-    gap: var(--spacing-md, 12px);
+    gap: $spacing-md;
 }

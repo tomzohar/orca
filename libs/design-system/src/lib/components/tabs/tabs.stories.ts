@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/angular';
 import { TabsComponent } from './tabs.component';
 import { moduleMetadata } from '@storybook/angular';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { IconName } from '../../types/component.types';
 
 const meta: Meta<TabsComponent> = {
     title: 'Components/Tabs',
@@ -40,9 +41,9 @@ export const WithIconsCorrect: Story = {
     args: {
         config: {
             tabs: [
-                { label: 'Home', icon: 'home' },
-                { label: 'Search', icon: 'search' },
-                { label: 'Settings', icon: 'settings' },
+                { label: 'Home', icon: IconName.home },
+                { label: 'Search', icon: IconName.search },
+                { label: 'Settings', icon: IconName.settings },
             ],
         },
     },
@@ -66,8 +67,8 @@ export const WithDisabledTab: Story = {
     args: {
         config: {
             tabs: [
-                { label: 'Enabled Tab', icon: 'check' },
-                { label: 'Disabled Tab', icon: 'block', disabled: true }, // 'block' might not be valid, let's check or remove icon
+                { label: 'Enabled Tab', icon: IconName.check },
+                { label: 'Disabled Tab', icon: IconName.cancel, disabled: true },
                 { label: 'Another Tab' },
             ],
         },

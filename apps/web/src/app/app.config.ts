@@ -9,12 +9,14 @@ import {
   provideTanStackQuery,
   QueryClient,
 } from '@tanstack/angular-query-experimental';
+import { provideMarkdown } from 'ngx-markdown';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(appRoutes),
     provideHttpClient(),
+    provideMarkdown(),
     provideTanStackQuery(
       new QueryClient({
         defaultOptions: {

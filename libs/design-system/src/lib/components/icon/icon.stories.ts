@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from '@storybook/angular';
 import { IconComponent } from './icon.component';
+import { IconName } from '../../types/component.types';
 
 const meta: Meta<IconComponent> = {
     title: 'Components/Icon',
@@ -12,7 +13,7 @@ type Story = StoryObj<IconComponent>;
 
 export const Default: Story = {
     args: {
-        config: { name: 'search' }
+        config: { name: IconName.search }
     }
 };
 

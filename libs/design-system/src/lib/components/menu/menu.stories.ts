@@ -3,6 +3,7 @@ import { MenuComponent } from './menu.component';
 import { moduleMetadata } from '@storybook/angular';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
+import { IconName } from '../../types/component.types';
 
 const meta: Meta<MenuComponent> = {
     title: 'Components/Menu',
@@ -22,8 +23,8 @@ export const Default: Story = {
     args: {
         config: {
             items: [
-                { label: 'Item 1', icon: 'settings' },
-                { label: 'Item 2', icon: 'logout' },
+                { label: 'Item 1', icon: IconName.settings },
+                { label: 'Item 2', icon: IconName.logout },
             ],
         },
     },
@@ -34,10 +35,10 @@ export const WithButtonTrigger: Story = {
         config: {
             triggerVariant: 'button',
             triggerLabel: 'Actions',
-            triggerIcon: 'expand_more',
+            triggerIcon: IconName.expand_more,
             items: [
-                { label: 'Edit', icon: 'edit' },
-                { label: 'Delete', icon: 'delete', danger: true },
+                { label: 'Edit', icon: IconName.edit },
+                { label: 'Delete', icon: IconName.delete, danger: true },
             ],
         },
     },
@@ -48,10 +49,10 @@ export const WithDivider: Story = {
         config: {
             triggerVariant: 'icon',
             items: [
-                { label: 'Profile', icon: 'person' },
-                { label: 'Settings', icon: 'settings' },
+                { label: 'Profile', icon: IconName.person },
+                { label: 'Settings', icon: IconName.settings },
                 { label: '', divider: true },
-                { label: 'Logout', icon: 'logout', danger: true },
+                { label: 'Logout', icon: IconName.logout, danger: true },
             ]
         }
     }

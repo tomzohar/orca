@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/angular';
 import { ButtonComponent } from './button.component';
+import { IconName } from '../../types/component.types';
 
 const meta: Meta<ButtonComponent> = {
     title: 'Components/Button',
@@ -53,7 +54,7 @@ export const Disabled: Story = {
 
 export const IconButton: Story = {
     args: {
-        config: { variant: 'primary', icon: { name: 'settings' } },
+        config: { variant: 'primary', icon: { name: IconName.settings } },
     },
     render: (args) => ({
         props: args,
@@ -63,7 +64,7 @@ export const IconButton: Story = {
 
 export const IconButtonWithText: Story = {
     args: {
-        config: { variant: 'ghost', icon: { name: 'add' } },
+        config: { variant: 'ghost', icon: { name: IconName.add } },
     },
     render: (args) => ({
         props: args,
@@ -93,7 +94,7 @@ export const Medium: Story = {
 
 export const SmallWithIcon: Story = {
     args: {
-        config: { variant: 'primary', size: 'sm', icon: { name: 'add' } },
+        config: { variant: 'primary', size: 'sm', icon: { name: IconName.add } },
     },
     render: (args) => ({
         props: args,
