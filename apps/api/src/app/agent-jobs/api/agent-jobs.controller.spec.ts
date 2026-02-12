@@ -52,7 +52,7 @@ describe('AgentJobsController', () => {
       expect(service.createJob).toHaveBeenCalledWith(
         prompt,
         undefined,
-        AgentType.LANGGRAPH,
+        AgentType.FILE_SYSTEM,
         undefined,
       );
       expect(result).toEqual(mockJob);

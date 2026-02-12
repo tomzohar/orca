@@ -26,7 +26,7 @@ describe('DockerAgentRunner', () => {
     id: 1,
     prompt: 'test prompt',
     status: AgentJobStatus.PENDING,
-    type: AgentType.CLAUDE_SDK,
+    type: AgentType.DOCKER,
     logs: [],
     artifacts: [],
   });

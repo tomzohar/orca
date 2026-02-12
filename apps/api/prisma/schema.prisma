@@ -27,13 +27,13 @@ enum JobStatus {
 }
 
 enum AgentType {
-  CLAUDE_SDK
-  LANGGRAPH
+  DOCKER
+  FILE_SYSTEM
 }
 
 model AgentJob {
   id        Int       @id @default(autoincrement())
-  type      AgentType @default(LANGGRAPH)
+  type      AgentType @default(FILE_SYSTEM)
   prompt    String
   assignee  String?
   status    JobStatus @default(PENDING)

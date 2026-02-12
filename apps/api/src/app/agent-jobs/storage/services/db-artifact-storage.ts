@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { IArtifactStorage } from '../../domain/interfaces/artifact-storage.interface';
+import type { IArtifactStorage, StoredArtifactReference } from '../../domain/interfaces/artifact-storage.interface';
 import {
   AGENT_JOBS_REPOSITORY,
   type IAgentJobsRepository,
@@ -16,12 +16,15 @@ export class DbArtifactStorage implements IArtifactStorage {
     jobId: number,
     filename: string,
     content: string,
-  ): Promise<string> {
+  ): Promise<StoredArtifactReference> {
     const job = await this.repository.addArtifact(jobId, { filename, content });
 
-    // We assume the artifact was just added and is the last one.
+    // The artifact was just added and is the last one in the array.
     const artifact = job.artifacts[job.artifacts.length - 1];
 
-    return `db://${artifact.id}`;
+    return {
+      id: artifact.id,
+      path: `db://${artifact.id}`,
+    };
   }
 }

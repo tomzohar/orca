@@ -40,8 +40,8 @@ The current "Spawning" & "Blackboard" flow functions as follows:
 
 2.  **Dispatcher & Execution:**
     - The `AgentJobsService` uses a **Factory** to select the appropriate Runner based on `job.agentType`:
-      - **`CLAUDE_SDK`**: Dispatches a Docker Container running the Claude Agent SDK.
-      - **`LANGGRAPH`**: Dispatches the local LangGraph loop.
+      - **`DOCKER`**: Dispatches a Docker Container running the Claude Agent SDK.
+      - **`FILE_SYSTEM`**: Dispatches the local LangGraph loop.
     - The Runner initializes the environment and **injects project context**:
       - Retrieves the `rootPath`, `includes`, and `excludes` from the associated `Project`.
     - **Tools as Actuators:** The agent is equipped with specific tools that wrap the "Blackboard" and the localized Workspace:
@@ -59,8 +59,8 @@ The current "Spawning" & "Blackboard" flow functions as follows:
 
 1.  **Task Definition:** User opens the Dashboard and describes a task (e.g., "Refactor the auth service").
 2.  **Mode Selection:** User selects an Execution Mode:
-    - **Quick / Interactive:** Best for Q&A, small fixes, or "chat with codebase" (RAG). Uses the **Local Runner** (`LANGGRAPH`) which runs instantly in the server process.
-    - **Deep / Autonomous:** Best for complex coding, heavy refactoring, or long-running tasks. Uses the **Docker Runner** (`CLAUDE_SDK`) which provisions an isolated environment for safe execution.
+    - **Quick / Interactive:** Best for Q&A, small fixes, or "chat with codebase" (RAG). Uses the **Local Runner** (`FILE_SYSTEM`) which runs instantly in the server process.
+    - **Deep / Autonomous:** Best for complex coding, heavy refactoring, or long-running tasks. Uses the **Docker Runner** (`DOCKER`) which provisions an isolated environment for safe execution.
 3.  **Job Initialization:**
     - The API creates an `AgentJob` record and sets the `agentType` based on the selected mode.
     - Status is set to `PENDING`.

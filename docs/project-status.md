@@ -1,6 +1,6 @@
 # Project Status
 
-**Last Updated:** February 11, 2026
+**Last Updated:** February 11, 2026 (Evening Update)
 
 ## 1. Overview
 
@@ -16,7 +16,13 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - `projects`: Manages file system project metadata and access.
 - **Architecture:** **Pluggable Strategy Pattern**
   - `AgentRunnerFactory`: Dispatches jobs based on `AgentType`.
-  - **Quick Mode (`LocalAgentRunner`)**: In-process LangGraph execution (Fast, Project-aware).
+  - **Quick Mode (`LocalAgentRunner`)**: ✅ **Production-Ready** - In-process LangGraph execution with:
+    - Robust error handling and status management
+    - Enhanced stream processing with agent response capture
+    - Execution timing and tool invocation monitoring
+    - Glob pattern file search (recursion limit: 50)
+    - Dual file creation (filesystem + database artifacts)
+    - Full project-aware filesystem access with security validation
   - **Testing Infrastructure:**
     - Centralized mocking system for LLMs, Runners, and Repositories.
     - Automated test execution via Nx (monorepo-safe).
@@ -43,9 +49,10 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ "Blackboard" Schema implemented.
   - ✅ Project management system integrated.
   - ✅ Docker Infrastructure verified (Image built, permissions configured).
-  - ✅ Granular SSE event stream (`log_added`, `artifact_added`).
+  - ✅ Granular SSE event stream (`log_added`, `artifact_added`, `status_changed`).
   - ✅ Domain Isolation: Prisma models decoupled from domain events.
-  - ✅ Test Coverage: High coverage for execution services and project module.
+  - ✅ Test Coverage: High coverage (50 tests passing) for execution services and project module.
+  - ✅ **LocalAgentRunner Production-Ready**: Full codebase interaction (read, write, search) with robust error handling and observability.
 
 ### Frontend (`apps/web`)
 
@@ -68,6 +75,49 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ Monorepo-safe test suite (non-watch mode by default).
 
 ## 3. Recent Accomplishments
+
+- **Bulk Filesystem Operations (Feb 11, 2026 - Evening):**
+  - **Enhanced file_system tool** with bulk operations to dramatically reduce recursion:
+    - `read_multiple`: Read multiple files in a single call (limit: 20 files)
+    - `tree`: Get directory structure with configurable depth (default: 3 levels)
+    - `git_diff`: Get uncommitted or staged changes directly
+    - `read_matching`: Read all files matching a glob pattern (limit: 15 files)
+  - **Reduced Tool Calls:** Review tasks now use 3-5 calls instead of 25+
+  - **Updated System Prompt:** Agent now prioritizes bulk operations
+  - **Benefits:** Lower recursion, faster execution, reduced API costs, better context
+  - **Status:** ✅ Implemented and tested (all 50 tests passing)
+
+- **AgentType Enum Rename (Feb 11, 2026 - Evening):**
+  - Renamed enum values for clarity: `LANGGRAPH` → `FILE_SYSTEM`, `CLAUDE_SDK` → `DOCKER`
+  - Updated 24 files across backend, frontend, tests, and documentation
+  - Database migrated with new enum values
+  - All tests passing after migration
+
+- **LocalAgentRunner Production Readiness (Feb 11, 2026):**
+  - **Fixed Critical Bugs:**
+    - Artifact storage interface now returns structured objects (id + path) instead of fragile string parsing.
+    - Enhanced error handling in fire-and-forget pattern with proper status updates and logging.
+    - Clarified and validated project loading strategy with fail-fast validation.
+  - **Enhanced Observability:**
+    - Stream processing now captures and logs agent responses to database (visible in UI).
+    - Added execution timing (start time, duration) with millisecond precision.
+    - Tool invocations now logged with arguments for debugging.
+    - Agent intermediate thoughts/actions now visible in logs.
+  - **Improved Agent Capabilities:**
+    - Increased recursion limit from 25 to 50 for complex tasks.
+    - Added `find` action to file_system tool with glob pattern support (`**/*.ts`).
+    - Automatically excludes `node_modules`, `.git`, `.nx`, `dist` from searches.
+    - Limits search results to 500 files to prevent overwhelming output.
+  - **Dual File Creation:**
+    - File system tool's `write` action now creates both:
+      - Actual files on disk (primary behavior)
+      - Artifacts in database for UI viewing (automatic)
+    - Events emitted for both filesystem writes and artifact creation.
+  - **Test Coverage:**
+    - All 50 unit tests passing.
+    - Updated tool descriptions for clarity (file_system vs save_artifact).
+    - Enhanced system prompt to guide agent tool selection.
+  - **Status:** ✅ LocalAgentRunner is now **production-ready** for reading files, writing files, performing codebase searches, and creating artifacts.
 
 - **Input-Driven Job Details & Advanced Routing (Feb 11, 2026):**
   - Refactored `JobDetailsPanelComponent` to be purely input-driven, eliminating the complex `JobDetailsStateService`.

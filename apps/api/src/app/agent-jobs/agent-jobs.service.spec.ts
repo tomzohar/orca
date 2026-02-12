@@ -73,6 +73,12 @@ describe('AgentJobsService', () => {
         status: AgentJobStatus.PENDING,
         logs: [],
         artifacts: [],
+        projectId: 1,
+        project: {
+          rootPath: '/test/project',
+          includes: [],
+          excludes: []
+        },
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -84,7 +90,7 @@ describe('AgentJobsService', () => {
       expect(repository.create).toHaveBeenCalledWith({
         prompt,
         assignee: undefined,
-        type: AgentType.LANGGRAPH,
+        type: AgentType.FILE_SYSTEM,
         projectId: 1,
       });
       expect(eventEmitter.emit).toHaveBeenCalledWith(
@@ -93,6 +99,27 @@ describe('AgentJobsService', () => {
       );
       expect(runner.run).toHaveBeenCalledWith(mockJob);
       expect(result).toEqual(mockJob);
+    });
+
+    it('should throw error if project context is not loaded', async () => {
+      const prompt = 'Test Prompt';
+      const mockJobWithoutProject = new AgentJobEntity({
+        id: 1,
+        prompt,
+        status: AgentJobStatus.PENDING,
+        logs: [],
+        artifacts: [],
+        projectId: 1,
+        // project is undefined
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      mockRepository.create.mockResolvedValue(mockJobWithoutProject);
+
+      await expect(service.createJob(prompt, undefined, undefined, 1))
+        .rejects
+        .toThrow('Project 1 not found or could not be loaded');
     });
   });
 

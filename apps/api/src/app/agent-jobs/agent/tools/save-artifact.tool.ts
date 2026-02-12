@@ -5,20 +5,20 @@ import { IArtifactStorage } from '../../domain/interfaces/artifact-storage.inter
 export const createSaveArtifactTool = (
   jobId: number,
   artifactStorage: IArtifactStorage,
-  eventCallback: (path: string, filename: string) => void,
+  eventCallback: (artifactId: number, path: string, filename: string) => void,
 ) => {
   return new DynamicStructuredTool({
     name: 'save_artifact',
     description:
-      'Save a code file or artifact to the storage. Use this when you have generated code that needs to be persisted.',
+      'Save a code snippet or artifact to the DATABASE for viewing in the UI. This does NOT create actual files in the project. To write actual files to the project filesystem, use the file_system tool with write action instead.',
     schema: z.object({
       filename: z.string().describe('The name of the file, e.g., main.ts'),
       content: z.string().describe('The content of the file'),
     }),
     func: async ({ filename, content }) => {
-      const path = await artifactStorage.store(jobId, filename, content);
-      eventCallback(path, filename);
-      return `Artifact saved to ${path}`;
+      const artifact = await artifactStorage.store(jobId, filename, content);
+      eventCallback(artifact.id, artifact.path, filename);
+      return `Artifact saved to ${artifact.path}`;
     },
   });
 };

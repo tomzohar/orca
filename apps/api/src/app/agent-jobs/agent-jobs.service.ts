@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger, NotFoundException, forwardRef } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { AgentJobEntity, AgentType } from './domain/entities/agent-job.entity';
+import { AgentJobEntity, AgentJobStatus, AgentType } from './domain/entities/agent-job.entity';
 import { JobCreatedEvent } from './domain/events/agent-job-events';
 import {
   AGENT_JOBS_REPOSITORY,
@@ -29,13 +29,15 @@ export class AgentJobsService {
   async createJob(
     prompt: string,
     assignee?: string,
-    type: AgentType = AgentType.LANGGRAPH,
+    type: AgentType = AgentType.FILE_SYSTEM,
     projectId?: number,
   ): Promise<AgentJobEntity> {
     if (!projectId) {
       throw new Error('Project ID is required to create an agent job');
     }
 
+    // Create job with project relation loaded automatically by repository
+    // The repository includes project details (rootPath, includes, excludes) in the returned entity
     const job = await this.repository.create({
       prompt,
       assignee,
@@ -43,28 +45,36 @@ export class AgentJobsService {
       projectId,
     });
 
+    // Validate that project context was loaded
+    if (!job.project) {
+      throw new Error(`Project ${projectId} not found or could not be loaded`);
+    }
+
     this.eventEmitter.emit('agent-job.created', new JobCreatedEvent(job));
 
     // Fire and forget async processing
+    // The job entity includes full project context (rootPath, includes, excludes) loaded by repository.
+    // Note: The runner's internal try-catch will handle most errors and update job status to FAILED.
+    // This catch block handles errors that occur before the runner's error handling kicks in.
     const runner = this.runnerFactory(job.type);
-
-    // Inject project context into the job if needed by the runner?
-    // The runner should fetch the job which now has projectId (if we loaded it)
-    // Actually, we might need to pass the project root path to the runner.
-    // The runner usually fetches the job from DB or we pass the entity.
-    // The entity we just created has 'projectId'.
-    // We should probably fetch the project details to pass rootPath to the runner, 
-    // OR the runner should do it.
-    // For now, let's assume the runner will resolve it or we pass it.
-    // BUT the runner interface `run(job: AgentJobEntity)` takes the entity.
-    // The entity has `projectId`. The runner can look it up.
-    // HOWEVER, `AgentJobEntity` in `agent-job.entity.ts` does NOT have `Project` relation loaded by default in `create`.
-    // We should probably make sure the runner has access to project info.
-    // But for this step, let's just create the job properly.
 
     runner
       .run(job)
-      .catch((err) => this.logger.error(`Error running job ${job.id}`, err));
+      .catch(async (err: unknown) => {
+        this.logger.error(`Critical error running job ${job.id}`, err);
+        // Attempt to mark job as failed if runner didn't handle it
+        try {
+          await this.repository.update(job.id, {
+            status: AgentJobStatus.FAILED
+          });
+          await this.repository.addLog(
+            job.id,
+            `Critical Error: ${err instanceof Error ? err.message : String(err)}`
+          );
+        } catch (updateError: unknown) {
+          this.logger.error(`Failed to update job status after error`, updateError);
+        }
+      });
 
     return job;
   }

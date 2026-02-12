@@ -88,14 +88,14 @@ describe('CreateJobDialogComponent', () => {
 
     it('should call mutate and close dialog on success', () => {
         component.prompt.set('Test prompt');
-        component.agentType.set('CLAUDE_SDK');
+        component.agentType.set('DOCKER');
 
         component.onSubmit();
 
         expect(mutationMock.mutate).toHaveBeenCalledWith(
             {
                 prompt: 'Test prompt',
-                type: 'CLAUDE_SDK',
+                type: 'DOCKER',
                 projectId: mockData.projectId,
             },
             expect.any(Object)

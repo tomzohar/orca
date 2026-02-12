@@ -76,7 +76,7 @@ export class AgentJobsController {
   @Post()
   createJob(@Body() dto: CreateAgentJobDto) {
     // Map simplified string/enum from DTO to strictly typed AgentType if needed
-    const type = dto.type ? AgentType[dto.type] : AgentType.LANGGRAPH;
+    const type = dto.type ? AgentType[dto.type] : AgentType.FILE_SYSTEM;
     return this.agentJobsService.createJob(dto.prompt, dto.assignee, type, dto.projectId);
   }
 

@@ -7,8 +7,8 @@ export enum AgentJobStatus {
 }
 
 export enum AgentType {
-  CLAUDE_SDK = 'CLAUDE_SDK',
-  LANGGRAPH = 'LANGGRAPH',
+  DOCKER = 'DOCKER',
+  FILE_SYSTEM = 'FILE_SYSTEM',
 }
 
 export interface AgentJobLog {

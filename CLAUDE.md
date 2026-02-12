@@ -150,8 +150,8 @@ The backend follows a **Layered Architecture** with strict domain isolation:
 1. User submits job via dashboard (must specify `projectId`)
 2. `AgentJobsService` creates `AgentJob` record with status `PENDING`
 3. `AgentRunnerFactory` selects runner based on `agentType`:
-   - `LANGGRAPH`: Local in-process execution (fast)
-   - `CLAUDE_SDK`: Docker container execution (isolated)
+   - `FILE_SYSTEM`: Local in-process execution (fast)
+   - `DOCKER`: Docker container execution (isolated)
 4. Agent receives project-scoped tools:
    - `logTool`: Write to `AgentJobLog`
    - `saveArtifactTool`: Write to `AgentJobArtifact`
@@ -219,7 +219,7 @@ Every component must have separate files:
 
 **Enums:**
 - `JobStatus`: `PENDING`, `RUNNING`, `COMPLETED`, `FAILED`, `WAITING_FOR_USER`
-- `AgentType`: `CLAUDE_SDK`, `LANGGRAPH`
+- `AgentType`: `DOCKER`, `FILE_SYSTEM`
 
 ## Project Awareness
 

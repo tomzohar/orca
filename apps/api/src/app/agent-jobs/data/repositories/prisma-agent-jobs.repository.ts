@@ -32,7 +32,7 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
         projectId: data.projectId,
         type: data.type
           ? PrismaAgentType[data.type]
-          : PrismaAgentType.LANGGRAPH,
+          : PrismaAgentType.FILE_SYSTEM,
       },
       include: { logs: true, artifacts: true, project: true },
     });

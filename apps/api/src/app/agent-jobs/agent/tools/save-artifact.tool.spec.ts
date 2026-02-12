@@ -26,9 +26,9 @@ describe('createSaveArtifactTool', () => {
   it('should save artifact and call event callback', async () => {
     const filename = 'test.ts';
     const content = 'console.log("hello");';
-    const expectedPath = '/path/to/test.ts';
+    const expectedArtifact = { id: 1, path: 'db://1' };
 
-    mockArtifactStorage.store.mockResolvedValue(expectedPath);
+    mockArtifactStorage.store.mockResolvedValue(expectedArtifact);
 
     const tool = createSaveArtifactTool(
       jobId,
@@ -42,7 +42,7 @@ describe('createSaveArtifactTool', () => {
       filename,
       content,
     );
-    expect(mockEventCallback).toHaveBeenCalledWith(expectedPath, filename);
-    expect(result).toBe(`Artifact saved to ${expectedPath}`);
+    expect(mockEventCallback).toHaveBeenCalledWith(expectedArtifact.id, expectedArtifact.path, filename);
+    expect(result).toBe(`Artifact saved to ${expectedArtifact.path}`);
   });
 });

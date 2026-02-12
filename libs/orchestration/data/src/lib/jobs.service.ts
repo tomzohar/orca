@@ -5,7 +5,7 @@ import { Job } from '@orca/orchestration-types';
 
 export interface CreateJobDto {
     prompt: string;
-    type: 'LANGGRAPH' | 'CLAUDE_SDK';
+    type: 'FILE_SYSTEM' | 'DOCKER';
     projectId: number;
 }
 

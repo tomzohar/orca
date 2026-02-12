@@ -29,7 +29,7 @@ import { ProjectsModule } from '../projects/projects.module';
       provide: AGENT_RUNNER, // Provide AGENT_RUNNER token
       useFactory: (local: LocalAgentRunner, docker: DockerAgentRunner) => {
         return (type: AgentType) => {
-          if (type === AgentType.CLAUDE_SDK) {
+          if (type === AgentType.DOCKER) {
             return docker;
           }
           return local;

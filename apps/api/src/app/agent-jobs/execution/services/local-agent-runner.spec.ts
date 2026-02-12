@@ -38,7 +38,7 @@ describe('LocalAgentRunner', () => {
     id: 1,
     prompt: 'test prompt',
     status: AgentJobStatus.PENDING,
-    type: AgentType.LANGGRAPH,
+    type: AgentType.FILE_SYSTEM,
     logs: [],
     artifacts: [],
   });
@@ -56,7 +56,7 @@ describe('LocalAgentRunner', () => {
     };
 
     const mockStorage = {
-      store: jest.fn().mockResolvedValue('db://1'),
+      store: jest.fn().mockResolvedValue({ id: 1, path: 'db://1' }),
     };
 
     const mockLlm = createLlmServiceMock();
