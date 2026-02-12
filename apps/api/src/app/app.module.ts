@@ -4,6 +4,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { HealthModule } from './health/health.module';
 import { AgentJobsModule } from './agent-jobs/agent-jobs.module';
 import { ProjectsModule } from './projects/projects.module';
+import { UsersModule } from './users/users.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -12,6 +13,7 @@ import { AppService } from './app.service';
     ConfigModule.forRoot({ isGlobal: true }),
     PrismaModule,
     HealthModule,
+    UsersModule,
     ProjectsModule,
     AgentJobsModule,
   ],

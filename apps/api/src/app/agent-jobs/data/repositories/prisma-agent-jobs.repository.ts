@@ -12,7 +12,7 @@ import {
 import type { IAgentJobsRepository } from '../../domain/interfaces/agent-jobs.repository.interface';
 
 type AgentJobWithRelations = Prisma.AgentJobGetPayload<{
-  include: { logs: true; artifacts: true; project: true };
+  include: { logs: true; artifacts: true; project: true; createdBy: true; assignedAgent: true };
 }>;
 
 @Injectable()
@@ -21,20 +21,22 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
 
   async create(data: {
     prompt: string;
-    assignee?: string;
+    createdById: number;
+    assignedAgentId?: number;
     type?: AgentType;
     projectId?: number;
   }): Promise<AgentJobEntity> {
     const job = await this.prisma.agentJob.create({
       data: {
         prompt: data.prompt,
-        assignee: data.assignee,
+        createdById: data.createdById,
+        assignedAgentId: data.assignedAgentId,
         projectId: data.projectId,
         type: data.type
           ? PrismaAgentType[data.type]
           : PrismaAgentType.FILE_SYSTEM,
       },
-      include: { logs: true, artifacts: true, project: true },
+      include: { logs: true, artifacts: true, project: true, createdBy: true, assignedAgent: true },
     });
     return this.mapToEntity(job);
   }
@@ -42,7 +44,7 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
   async findById(id: number): Promise<AgentJobEntity | null> {
     const job = await this.prisma.agentJob.findUnique({
       where: { id },
-      include: { logs: true, artifacts: true, project: true },
+      include: { logs: true, artifacts: true, project: true, createdBy: true, assignedAgent: true },
     });
     return job ? this.mapToEntity(job) : null;
   }
@@ -54,25 +56,31 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
     // Only update basic scalar fields. Logs and Artifacts should be added via Add methods
     const updateData: Prisma.AgentJobUpdateInput = {};
     if (data.status) updateData.status = data.status;
-    if (data.assignee !== undefined) updateData.assignee = data.assignee;
+    if (data.assignedAgentId !== undefined) {
+      // Use Prisma's relation syntax for updating foreign keys
+      updateData.assignedAgent = data.assignedAgentId
+        ? { connect: { id: data.assignedAgentId } }
+        : { disconnect: true };
+    }
 
     // logs/artifacts in 'data' are ignored here as they are handled separately or read-only in this context
 
     const updated = await this.prisma.agentJob.update({
       where: { id },
       data: updateData,
-      include: { logs: true, artifacts: true, project: true },
+      include: { logs: true, artifacts: true, project: true, createdBy: true, assignedAgent: true },
     });
     return this.mapToEntity(updated);
   }
 
-  async findAll(filters?: { assignee?: string; projectId?: number }): Promise<AgentJobEntity[]> {
+  async findAll(filters?: { createdById?: number; assignedAgentId?: number; projectId?: number }): Promise<AgentJobEntity[]> {
     const jobs = await this.prisma.agentJob.findMany({
       where: {
-        assignee: filters?.assignee,
+        createdById: filters?.createdById,
+        assignedAgentId: filters?.assignedAgentId,
         projectId: filters?.projectId,
       },
-      include: { logs: true, artifacts: true, project: true },
+      include: { logs: true, artifacts: true, project: true, createdBy: true, assignedAgent: true },
       orderBy: { createdAt: 'desc' },
     });
     return jobs.map((j) => this.mapToEntity(j));
@@ -108,7 +116,6 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
     return new AgentJobEntity({
       id: dbJob.id,
       prompt: dbJob.prompt,
-      assignee: dbJob.assignee ?? undefined,
       status: dbJob.status as AgentJobStatus,
       type: AgentType[dbJob.type],
       projectId: dbJob.projectId ?? undefined,
@@ -117,6 +124,8 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
         includes: dbJob.project.includes,
         excludes: dbJob.project.excludes
       } : undefined,
+      createdById: dbJob.createdById,
+      assignedAgentId: dbJob.assignedAgentId ?? undefined,
       logs: dbJob.logs.map((l) => ({
         id: l.id,
         message: l.message,

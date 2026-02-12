@@ -27,11 +27,12 @@ export interface AgentJobArtifact {
 export class AgentJobEntity {
   id: number;
   prompt: string;
-  assignee?: string;
   status: AgentJobStatus;
   type: AgentType;
   projectId?: number;
   project?: { rootPath: string; includes: string[]; excludes: string[] }; // Minimal interface to avoid cyclic dependency
+  createdById: number;
+  assignedAgentId?: number;
   logs: AgentJobLog[];
   artifacts: AgentJobArtifact[];
   createdAt: Date;

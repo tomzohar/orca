@@ -1,13 +1,12 @@
 import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { IProjectsRepository } from '../domain/projects.repository.interface';
+import { PROJECTS_REPOSITORY } from '../domain/projects.repository.interface';
+import type { IProjectsRepository } from '../domain/projects.repository.interface';
 import { Project } from '../domain/project.entity';
 import { CreateProjectDto } from '../domain/dtos/create-project.dto';
 import type { ProjectDetectionResult, ProjectType } from '../domain/types';
 import { existsSync } from 'fs';
 import { join } from 'path';
-
-// Define a token for DI
-export const PROJECTS_REPOSITORY = 'PROJECTS_REPOSITORY';
+import { UsersService } from '../../users/application/users.service';
 
 @Injectable()
 export class ProjectsService {
@@ -15,7 +14,8 @@ export class ProjectsService {
 
     constructor(
         @Inject(PROJECTS_REPOSITORY)
-        private readonly projectsRepository: IProjectsRepository
+        private readonly projectsRepository: IProjectsRepository,
+        private readonly usersService: UsersService
     ) { }
 
     async create(dto: CreateProjectDto): Promise<Project> {
@@ -27,10 +27,14 @@ export class ProjectsService {
             throw new ConflictException(`Project with slug '${slug}' already exists`);
         }
 
+        // Create or get Human user for this project
+        const owner = await this.usersService.ensureProjectOwner(slug);
+
         const project = Project.create(
             dto.name,
             slug,
             dto.rootPath,
+            owner.id,
             dto.description
         );
 
@@ -121,10 +125,14 @@ export class ProjectsService {
                 const name = this.generateProjectNameFromPath(cwd);
                 const slug = this.generateUniqueSlug(cwd);
 
+                // Create or get Human user for this project
+                const owner = await this.usersService.ensureProjectOwner(slug);
+
                 const project = Project.create(
                     name,
                     slug,
-                    cwd
+                    cwd,
+                    owner.id
                 );
 
                 // Set default includes and excludes

@@ -17,6 +17,7 @@ export class PrismaProjectsRepository implements IProjectsRepository {
                 description: project.description,
                 includes: project.includes,
                 excludes: project.excludes,
+                ownerId: project.ownerId,
             },
         });
         return this.mapToEntity(created);
@@ -69,6 +70,7 @@ export class PrismaProjectsRepository implements IProjectsRepository {
             prismaProject.description,
             prismaProject.includes,
             prismaProject.excludes,
+            prismaProject.ownerId,
             prismaProject.createdAt,
             prismaProject.updatedAt,
         );

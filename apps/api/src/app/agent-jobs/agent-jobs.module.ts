@@ -13,9 +13,10 @@ import { DockerAgentRunner } from './execution/services/docker-agent-runner';
 import { LocalAgentRunner } from './execution/services/local-agent-runner';
 import { DbArtifactStorage } from './storage/services/db-artifact-storage';
 import { ProjectsModule } from '../projects/projects.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [PrismaModule, EventEmitterModule.forRoot(), LlmModule, forwardRef(() => ProjectsModule)],
+  imports: [PrismaModule, EventEmitterModule.forRoot(), LlmModule, UsersModule, forwardRef(() => ProjectsModule)],
   controllers: [AgentJobsController],
   providers: [
     AgentJobsService,
