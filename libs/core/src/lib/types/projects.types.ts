@@ -13,6 +13,7 @@ export interface Project {
     description: string | null;
     includes: string[];
     excludes: string[];
+    ownerId: number;
     createdAt: Date;
     updatedAt: Date;
 }

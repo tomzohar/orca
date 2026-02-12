@@ -45,9 +45,10 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  ownedProjects Project[]   @relation("ProjectOwner")
-  createdJobs   AgentJob[]  @relation("CreatedJobs")
-  assignedJobs  AgentJob[]  @relation("AssignedJobs")
+  ownedProjects       Project[]              @relation("ProjectOwner")
+  createdJobs         AgentJob[]             @relation("CreatedJobs")
+  assignedJobs        AgentJob[]             @relation("AssignedJobs")
+  agentConfigurations AgentConfiguration[]   @relation("UserConfigurations")
 }
 
 model AgentJob {
@@ -71,6 +72,34 @@ model AgentJob {
   updatedAt DateTime           @updatedAt
 }
 
+model AgentConfiguration {
+  id          Int       @id @default(autoincrement())
+  name        String
+  slug        String    @unique
+  description String?
+
+  // Core configuration
+  systemPrompt String   @db.Text
+  rules        String?  @db.Text
+  skills       String[] @default([])
+
+  // Execution settings
+  agentType    AgentType
+
+  // Project association
+  projectId    Int
+  project      Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  // User association (creator)
+  userId       Int
+  user         User      @relation("UserConfigurations", fields: [userId], references: [id], onDelete: Cascade)
+
+  // Lifecycle
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
 model Project {
   id          Int        @id @default(autoincrement())
   name        String
@@ -83,9 +112,10 @@ model Project {
   ownerId Int
   owner   User @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
 
-  jobs        AgentJob[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  jobs           AgentJob[]
+  configurations AgentConfiguration[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
 }
 
 model AgentJobLog {

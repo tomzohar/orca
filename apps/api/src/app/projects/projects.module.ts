@@ -6,9 +6,15 @@ import { PrismaProjectsRepository } from './data/prisma-projects.repository';
 import { PrismaModule } from '../prisma/prisma.module'; // Adjust path if needed
 import { AgentJobsModule } from '../agent-jobs/agent-jobs.module';
 import { UsersModule } from '../users/users.module';
+import { AgentConfigurationsModule } from '../agent-configurations/agent-configurations.module';
 
 @Module({
-    imports: [PrismaModule, UsersModule, forwardRef(() => AgentJobsModule)],
+    imports: [
+        PrismaModule,
+        UsersModule,
+        forwardRef(() => AgentJobsModule),
+        forwardRef(() => AgentConfigurationsModule),
+    ],
     controllers: [ProjectsController],
     providers: [
         ProjectsService,

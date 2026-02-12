@@ -7,8 +7,10 @@
     @for (item of config().items; track item.id) {
     <a
       mat-list-item
+      [routerLink]="item.route || null"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: false }"
       tabindex="0"
-      [class.active]="item.isActive"
       (click)="onItemClick(item)"
       (keydown.enter)="onItemClick(item)"
       class="sidebar-item"

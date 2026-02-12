@@ -52,6 +52,7 @@ describe('AgentJobsController', () => {
       expect(service.createJob).toHaveBeenCalledWith(
         prompt,
         undefined,
+        undefined,
         AgentType.FILE_SYSTEM,
         undefined,
       );
@@ -82,9 +83,9 @@ describe('AgentJobsController', () => {
       ];
       mockService.getJobs.mockResolvedValue(mockJobs);
 
-      const result = await controller.getJobs(undefined, 5);
+      const result = await controller.getJobs(undefined, undefined, 5);
 
-      expect(service.getJobs).toHaveBeenCalledWith(undefined, 5);
+      expect(service.getJobs).toHaveBeenCalledWith(undefined, undefined, 5);
       expect(result).toEqual(mockJobs);
     });
   });

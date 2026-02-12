@@ -60,6 +60,7 @@ export function injectCreateJobMutation() {
             // Optimistically update to the new value
             const optimisticJob: Job = {
                 id: `temp-${Date.now()}`, // Temporary ID
+                type: dto.type,
                 prompt: dto.prompt,
                 status: JobStatus.PENDING,
                 createdAt: new Date().toISOString(),

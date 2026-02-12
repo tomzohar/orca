@@ -11,6 +11,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AGENT_RUNNER } from './domain/interfaces/agent-runner.interface';
 import { JobCreatedEvent } from './domain/events/agent-job-events';
 import { ProjectsService } from '../projects/application/projects.service';
+import { UsersService } from '../users/application/users.service';
 
 describe('AgentJobsService', () => {
   let service: AgentJobsService;
@@ -36,10 +37,11 @@ describe('AgentJobsService', () => {
   };
 
   const mockProjectsService = {
-    findById: jest.fn(),
+    findOne: jest.fn(),
   };
 
   beforeEach(async () => {
+    mockProjectsService.findOne.mockResolvedValue({ id: 1, ownerId: 1 });
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         AgentJobsService,
@@ -47,6 +49,7 @@ describe('AgentJobsService', () => {
         { provide: EventEmitter2, useValue: mockEventEmitter },
         { provide: AGENT_RUNNER, useValue: () => mockRunner },
         { provide: ProjectsService, useValue: mockProjectsService },
+        { provide: UsersService, useValue: { findById: jest.fn().mockResolvedValue({ id: 1 }) } },
       ],
     }).compile();
 
@@ -85,11 +88,12 @@ describe('AgentJobsService', () => {
 
       mockRepository.create.mockResolvedValue(mockJob);
 
-      const result = await service.createJob(prompt, undefined, undefined, 1);
+      const result = await service.createJob(prompt, undefined, undefined, AgentType.FILE_SYSTEM, 1);
 
       expect(repository.create).toHaveBeenCalledWith({
         prompt,
-        assignee: undefined,
+        createdById: 1,
+        assignedAgentId: undefined,
         type: AgentType.FILE_SYSTEM,
         projectId: 1,
       });
@@ -117,7 +121,7 @@ describe('AgentJobsService', () => {
 
       mockRepository.create.mockResolvedValue(mockJobWithoutProject);
 
-      await expect(service.createJob(prompt, undefined, undefined, 1))
+      await expect(service.createJob(prompt, undefined, undefined, AgentType.FILE_SYSTEM, 1))
         .rejects
         .toThrow('Project 1 not found or could not be loaded');
     });
@@ -141,8 +145,8 @@ describe('AgentJobsService', () => {
   describe('getJobs', () => {
     it('should return all jobs when no filters provided', async () => {
       const mockJobs = [
-        new AgentJobEntity({ id: 1, prompt: 'job1', status: AgentJobStatus.PENDING }),
-        new AgentJobEntity({ id: 2, prompt: 'job2', status: AgentJobStatus.COMPLETED }),
+        new AgentJobEntity({ id: 1, prompt: 'job1', status: AgentJobStatus.PENDING, createdById: 1 }),
+        new AgentJobEntity({ id: 2, prompt: 'job2', status: AgentJobStatus.COMPLETED, createdById: 1 }),
       ];
       mockRepository.findAll.mockResolvedValue(mockJobs);
 
@@ -154,25 +158,25 @@ describe('AgentJobsService', () => {
 
     it('should filter jobs by projectId', async () => {
       const mockJobs = [
-        new AgentJobEntity({ id: 1, prompt: 'job1', status: AgentJobStatus.PENDING, projectId: 5 }),
+        new AgentJobEntity({ id: 1, prompt: 'job1', status: AgentJobStatus.PENDING, projectId: 5, createdById: 1 }),
       ];
       mockRepository.findAll.mockResolvedValue(mockJobs);
 
-      const result = await service.getJobs(undefined, 5);
+      const result = await service.getJobs(undefined, undefined, 5);
 
-      expect(repository.findAll).toHaveBeenCalledWith({ assignee: undefined, projectId: 5 });
+      expect(repository.findAll).toHaveBeenCalledWith({ createdById: undefined, assignedAgentId: undefined, projectId: 5 });
       expect(result).toEqual(mockJobs);
     });
 
     it('should filter jobs by assignee and projectId', async () => {
       const mockJobs = [
-        new AgentJobEntity({ id: 1, prompt: 'job1', status: AgentJobStatus.PENDING, projectId: 5, assignee: 'alice' }),
+        new AgentJobEntity({ id: 1, prompt: 'job1', status: AgentJobStatus.PENDING, projectId: 5, createdById: 1 }),
       ];
       mockRepository.findAll.mockResolvedValue(mockJobs);
 
-      const result = await service.getJobs('alice', 5);
+      const result = await service.getJobs(1, undefined, 5);
 
-      expect(repository.findAll).toHaveBeenCalledWith({ assignee: 'alice', projectId: 5 });
+      expect(repository.findAll).toHaveBeenCalledWith({ createdById: 1, assignedAgentId: undefined, projectId: 5 });
       expect(result).toEqual(mockJobs);
     });
   });

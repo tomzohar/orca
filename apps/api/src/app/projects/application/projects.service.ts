@@ -1,4 +1,4 @@
-import { ConflictException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Inject, Injectable, Logger, NotFoundException, forwardRef } from '@nestjs/common';
 import { PROJECTS_REPOSITORY } from '../domain/projects.repository.interface';
 import type { IProjectsRepository } from '../domain/projects.repository.interface';
 import { Project } from '../domain/project.entity';
@@ -7,6 +7,8 @@ import type { ProjectDetectionResult, ProjectType } from '../domain/types';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { UsersService } from '../../users/application/users.service';
+import { AgentConfigurationsService } from '../../agent-configurations/application/agent-configurations.service';
+import { AgentType } from '../../agent-jobs/domain/entities/agent-job.entity';
 
 @Injectable()
 export class ProjectsService {
@@ -15,7 +17,9 @@ export class ProjectsService {
     constructor(
         @Inject(PROJECTS_REPOSITORY)
         private readonly projectsRepository: IProjectsRepository,
-        private readonly usersService: UsersService
+        private readonly usersService: UsersService,
+        @Inject(forwardRef(() => AgentConfigurationsService))
+        private readonly agentConfigurationsService: AgentConfigurationsService
     ) { }
 
     async create(dto: CreateProjectDto): Promise<Project> {
@@ -42,7 +46,12 @@ export class ProjectsService {
         if (dto.includes) project.includes = dto.includes;
         if (dto.excludes) project.excludes = dto.excludes;
 
-        return this.projectsRepository.create(project);
+        const createdProject = await this.projectsRepository.create(project);
+
+        // Create default coding agent configuration for the project
+        await this.createDefaultAgentConfiguration(createdProject);
+
+        return createdProject;
     }
 
     async findAll(): Promise<Project[]> {
@@ -141,6 +150,9 @@ export class ProjectsService {
 
                 matchedProject = await this.projectsRepository.create(project);
                 this.logger.log(`Auto-created project: ${matchedProject.name} (${matchedProject.slug})`);
+
+                // Create default coding agent configuration for the new project
+                await this.createDefaultAgentConfiguration(matchedProject);
             }
 
             return {
@@ -193,6 +205,53 @@ export class ProjectsService {
             // If file system check fails, default to unknown
             this.logger.warn(`Error detecting project type: ${error.message}`);
             return 'unknown';
+        }
+    }
+
+    /**
+     * Creates a default "Coding Agent" configuration for a new project
+     * This is called automatically when a project is initialized
+     */
+    private async createDefaultAgentConfiguration(project: Project): Promise<void> {
+        try {
+            // Check if a coding agent config already exists for this project
+            const existingConfigs = await this.agentConfigurationsService.findByProject(project.id);
+            const codingAgentExists = existingConfigs.some(config =>
+                config.slug === 'coding-agent'
+            );
+
+            if (codingAgentExists) {
+                this.logger.log(`Coding Agent configuration already exists for project: ${project.name}`);
+                return;
+            }
+
+            // Create default coding agent configuration
+            const defaultConfig = {
+                name: 'Coding Agent',
+                description: 'Default coding assistant for development tasks',
+                systemPrompt: `You are an expert software engineer and coding assistant. Your role is to:
+- Write clean, maintainable, and well-documented code
+- Follow best practices and design patterns
+- Provide clear explanations for your decisions
+- Test your code thoroughly
+- Help debug and fix issues efficiently`,
+                rules: `- Always write type-safe code with proper type annotations
+- Follow the project's existing code style and conventions
+- Write unit tests for new functionality
+- Document complex logic with clear comments
+- Ask for clarification when requirements are unclear`,
+                skills: [], // Empty for now, can be populated later
+                agentType: AgentType.DOCKER, // Use Docker for isolation by default
+                projectId: project.id,
+                userId: project.ownerId,
+                isActive: true,
+            };
+
+            await this.agentConfigurationsService.create(defaultConfig);
+            this.logger.log(`Created default Coding Agent configuration for project: ${project.name}`);
+        } catch (error) {
+            // Don't fail project creation if agent config creation fails
+            this.logger.error(`Failed to create default agent configuration: ${error.message}`, error.stack);
         }
     }
 }

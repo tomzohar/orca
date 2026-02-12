@@ -8,6 +8,7 @@ import {
     DropdownOption,
 } from '@orca/design-system';
 import { injectCreateJobMutation } from '@orca/orchestration-data';
+import { AgentType } from '@orca/orchestration-types';
 
 export interface CreateJobDialogData {
     projectId: number;
@@ -31,15 +32,15 @@ export class CreateJobDialogComponent {
 
     // Form state
     readonly prompt = signal('');
-    readonly agentType = signal<'FILE_SYSTEM' | 'DOCKER'>('DOCKER');
+    readonly agentType = signal<AgentType>(AgentType.DOCKER);
 
     // Mutation
     private readonly createJobMutation = injectCreateJobMutation();
 
     // Agent type options for dropdown
-    readonly agentTypeOptions: DropdownOption<'FILE_SYSTEM' | 'DOCKER'>[] = [
-        { label: 'Docker', value: 'DOCKER' },
-        { label: 'Local', value: 'FILE_SYSTEM' },
+    readonly agentTypeOptions: DropdownOption<AgentType>[] = [
+        { label: 'Docker', value: AgentType.DOCKER },
+        { label: 'Local', value: AgentType.FILE_SYSTEM },
     ];
 
     // Computed states

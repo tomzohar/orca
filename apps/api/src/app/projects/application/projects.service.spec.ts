@@ -1,10 +1,13 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
-import { ProjectsService, PROJECTS_REPOSITORY } from './projects.service';
+import { ProjectsService } from './projects.service';
+import { PROJECTS_REPOSITORY } from '../domain/projects.repository.interface';
 import { IProjectsRepository } from '../domain/projects.repository.interface';
 import { Project } from '../domain/project.entity';
 import { CreateProjectDto } from '../domain/dtos/create-project.dto';
 import { ConflictException, NotFoundException } from '@nestjs/common';
+import { UsersService } from '../../users/application/users.service';
+import { AgentConfigurationsService } from '../../agent-configurations/application/agent-configurations.service';
 
 describe('ProjectsService', () => {
     let service: ProjectsService;
@@ -18,6 +21,7 @@ describe('ProjectsService', () => {
         'Test Description',
         ['**/*'],
         ['**/node_modules/**'],
+        1, // ownerId
         new Date(),
         new Date(),
     );
@@ -38,6 +42,14 @@ describe('ProjectsService', () => {
                 {
                     provide: PROJECTS_REPOSITORY,
                     useValue: mockProjectsRepository,
+                },
+                {
+                    provide: UsersService,
+                    useValue: { ensureProjectOwner: jest.fn().mockResolvedValue({ id: 1 }) },
+                },
+                {
+                    provide: AgentConfigurationsService,
+                    useValue: { findByProject: jest.fn().mockResolvedValue([]), create: jest.fn() },
                 },
             ],
         }).compile();
@@ -156,6 +168,7 @@ describe('ProjectsService', () => {
                 'Main project',
                 ['**/*'],
                 ['**/node_modules/**'],
+                1, // ownerId
                 new Date(),
                 new Date()
             );
@@ -182,9 +195,10 @@ describe('ProjectsService', () => {
                 'some-js-project',
                 'projects-some-js-project',
                 cwd,
-                undefined,
+                null,
                 ['**/*'],
                 ['**/node_modules/**', '**/.git/**'],
+                1, // ownerId
                 new Date(),
                 new Date()
             );
@@ -213,9 +227,10 @@ describe('ProjectsService', () => {
                 'python-app',
                 'projects-python-app',
                 cwd,
-                undefined,
+                null,
                 ['**/*'],
                 ['**/node_modules/**', '**/.git/**'],
+                1, // ownerId
                 new Date(),
                 new Date()
             );
@@ -261,6 +276,7 @@ describe('ProjectsService', () => {
                 'Main project',
                 ['**/*'],
                 ['**/node_modules/**'],
+                1, // ownerId
                 new Date(),
                 new Date()
             );

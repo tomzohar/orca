@@ -10,6 +10,14 @@ export enum JobStatus {
 }
 
 /**
+ * Agent execution type
+ */
+export enum AgentType {
+  DOCKER = 'DOCKER',
+  FILE_SYSTEM = 'FILE_SYSTEM',
+}
+
+/**
  * Job log entry
  */
 export interface JobLog {
@@ -33,6 +41,7 @@ export interface JobArtifact {
  */
 export interface Job {
   id: string;
+  type: AgentType;
   prompt: string;
   status: JobStatus;
   assignee?: string;

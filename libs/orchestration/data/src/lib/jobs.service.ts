@@ -1,11 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Job } from '@orca/orchestration-types';
+import { Job, AgentType } from '@orca/orchestration-types';
 
 export interface CreateJobDto {
     prompt: string;
-    type: 'FILE_SYSTEM' | 'DOCKER';
+    type: AgentType;
     projectId: number;
 }
 

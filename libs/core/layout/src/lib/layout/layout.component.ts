@@ -60,7 +60,10 @@ export class LayoutComponent {
     sidebarItemClick = output<SidebarItem>();
     topbarActionClick = output<TopbarAction>();
 
-    onSidebarItemClick(item: SidebarItem) {
+    onSidebarItemClick(item: SidebarItem): void {
+        if (item.route) {
+            this.router.navigate([item.route]);
+        }
         this.sidebarItemClick.emit(item);
     }
 

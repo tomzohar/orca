@@ -19,4 +19,8 @@ export const appRoutes: Route[] = [
             }
         ]
     },
+    {
+        path: 'agents',
+        loadComponent: () => import('@orca/orchestration-feature').then(m => m.AgentConfigsListComponent),
+    },
 ];
