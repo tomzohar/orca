@@ -31,15 +31,15 @@ export class CreateJobDialogComponent {
 
     // Form state
     readonly prompt = signal('');
-    readonly agentType = signal<'LANGGRAPH' | 'CLAUDE_SDK'>('CLAUDE_SDK');
+    readonly agentType = signal<'FILE_SYSTEM' | 'DOCKER'>('DOCKER');
 
     // Mutation
     private readonly createJobMutation = injectCreateJobMutation();
 
     // Agent type options for dropdown
-    readonly agentTypeOptions: DropdownOption<'LANGGRAPH' | 'CLAUDE_SDK'>[] = [
-        { label: 'Docker', value: 'CLAUDE_SDK' },
-        { label: 'Local', value: 'LANGGRAPH' },
+    readonly agentTypeOptions: DropdownOption<'FILE_SYSTEM' | 'DOCKER'>[] = [
+        { label: 'Docker', value: 'DOCKER' },
+        { label: 'Local', value: 'FILE_SYSTEM' },
     ];
 
     // Computed states

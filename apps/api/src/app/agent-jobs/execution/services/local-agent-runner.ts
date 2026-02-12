@@ -40,7 +40,8 @@ export class LocalAgentRunner implements IAgentRunner {
   ) { }
 
   async run(job: AgentJobEntity): Promise<void> {
-    this.logger.log(`Starting LangGraph job ${job.id}`);
+    const startTime = Date.now();
+    this.logger.log(`Starting LangGraph job ${job.id} at ${new Date(startTime).toISOString()}`);
 
     await this.updateStatus(job.id, AgentJobStatus.RUNNING);
 
@@ -50,6 +51,7 @@ export class LocalAgentRunner implements IAgentRunner {
 
       // 2. Initialize Tools
       const logTool = createLogTool(job.id, this.repository, (msg) => {
+        this.logger.debug(`[Tool: log_progress] message="${msg.substring(0, 100)}${msg.length > 100 ? '...' : ''}"`);
         // We also emit the event here if the tool is called
         const log = {
           id: 0,
@@ -66,16 +68,9 @@ export class LocalAgentRunner implements IAgentRunner {
       const artifactTool = createSaveArtifactTool(
         job.id,
         this.artifactStorage,
-        (path, filename) => {
-          // We need to fetch the artifact ID properly, but for now we might need to query or assume.
-          // The tool stores it, but we need the ID for the event.
-          // Let's rely on the storage returning the path, and we might need to look it up or change the interface.
-          // For now, let's parse the ID from the path if it's db://<id>
-          let artifactId = 0;
-          if (path.startsWith('db://')) {
-            artifactId = parseInt(path.replace('db://', ''), 10);
-          }
-
+        (artifactId, path, filename) => {
+          this.logger.log(`[Tool: save_artifact] filename="${filename}", id=${artifactId}`);
+          // Emit event with artifact details returned from storage
           this.eventEmitter.emit(
             'agent-job.artifact-added',
             new JobArtifactAddedEvent(job.id, artifactId, filename, path),
@@ -86,11 +81,26 @@ export class LocalAgentRunner implements IAgentRunner {
       const tools: DynamicStructuredTool[] = [logTool, artifactTool];
 
       if (job.project) {
-        this.logger.log(`Adding file system tool for project root: ${job.project.rootPath}`);
-        const fsTool = createFileSystemTool(job.project.rootPath);
+        this.logger.log(`[Setup] Adding file system tool for project root: ${job.project.rootPath}`);
+        // Pass jobId and artifactStorage so write action can also save as artifact
+        const fsTool = createFileSystemTool(
+          job.project.rootPath,
+          job.id,
+          this.artifactStorage,
+          (artifactId, path, filename) => {
+            this.logger.log(`[Tool: file_system write] Created file and artifact: filename="${filename}", id=${artifactId}`);
+            // Emit event with artifact details
+            this.eventEmitter.emit(
+              'agent-job.artifact-added',
+              new JobArtifactAddedEvent(job.id, artifactId, filename, path),
+            );
+          }
+        );
         tools.push(fsTool);
+        this.logger.log(`[Setup] Total tools available: ${tools.length} (log_progress, save_artifact, file_system)`);
       } else {
         this.logger.warn(`Job ${job.id} has no project context. File system tool disabled.`);
+        this.logger.log(`[Setup] Total tools available: ${tools.length} (log_progress, save_artifact)`);
       }
 
       // 3. Create Graph
@@ -102,21 +112,61 @@ export class LocalAgentRunner implements IAgentRunner {
         jobId: job.id,
       };
 
-      // Stream events from the graph
-      const stream = await graph.stream(inputs);
+      // Stream events from the graph with increased recursion limit for complex tasks
+      const stream = await graph.stream(inputs, {
+        recursionLimit: 50, // Increased from default 25
+      });
 
       for await (const chunk of stream) {
-        // We can log internal graph steps if needed
-        // For now, we rely on the tools to emit user-facing logs
+        // Log graph execution steps for observability
         this.logger.debug(`Graph chunk: ${JSON.stringify(chunk)}`);
+
+        // Process chunk to extract useful information
+        // LangGraph chunks contain node updates with messages and state
+        if (chunk && typeof chunk === 'object') {
+          // Extract node name and content
+          const nodeNames = Object.keys(chunk);
+          for (const nodeName of nodeNames) {
+            const nodeData = chunk[nodeName];
+
+            // Log agent thoughts/actions if available
+            if (nodeData?.messages && Array.isArray(nodeData.messages)) {
+              for (const message of nodeData.messages) {
+                if (message?.content && typeof message.content === 'string') {
+                  const content = message.content;
+                  // Log significant agent messages to both console and database
+                  if (content.length > 0 && !content.startsWith('[Tool:')) {
+                    this.logger.log(`[Agent] ${content.substring(0, 200)}${content.length > 200 ? '...' : ''}`);
+
+                    // Also add to job logs so it appears in UI
+                    // Only log non-empty, meaningful responses
+                    if (content.length > 10) {
+                      await this.addLog(job.id, content);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
 
       // 5. Complete
-      await this.addLog(job.id, 'Job Completed successfully.');
+      const endTime = Date.now();
+      const durationMs = endTime - startTime;
+      const durationSec = (durationMs / 1000).toFixed(2);
+
+      this.logger.log(`Job ${job.id} completed successfully in ${durationSec}s`);
+      await this.addLog(job.id, `Job Completed successfully. Duration: ${durationSec}s`);
       await this.updateStatus(job.id, AgentJobStatus.COMPLETED);
-    } catch (error) {
-      this.logger.error(`Job ${job.id} failed`, error);
-      await this.addLog(job.id, `Job Failed: ${error.message}`);
+    } catch (error: unknown) {
+      const endTime = Date.now();
+      const durationMs = endTime - startTime;
+      const durationSec = (durationMs / 1000).toFixed(2);
+
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Job ${job.id} failed after ${durationSec}s`, error);
+      await this.addLog(job.id, `Job Failed: ${errorMessage} (Duration: ${durationSec}s)`);
       await this.updateStatus(job.id, AgentJobStatus.FAILED);
     }
   }

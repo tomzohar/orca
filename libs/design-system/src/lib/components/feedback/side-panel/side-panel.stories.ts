@@ -43,7 +43,7 @@ export const JobDetails: Story = {
                     
                     <section>
                         <h4>Agent Type</h4>
-                        <p>CLAUDE_SDK (Deep Mode)</p>
+                        <p>DOCKER (Deep Mode)</p>
                     </section>
                     
                     <section>

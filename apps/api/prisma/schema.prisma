@@ -27,19 +27,43 @@ enum JobStatus {
 }
 
 enum AgentType {
-  CLAUDE_SDK
-  LANGGRAPH
+  DOCKER
+  FILE_SYSTEM
+}
+
+enum UserType {
+  HUMAN
+  AGENT
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  avatar       String?
+  type         UserType @default(HUMAN)
+  systemPrompt String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  ownedProjects Project[]   @relation("ProjectOwner")
+  createdJobs   AgentJob[]  @relation("CreatedJobs")
+  assignedJobs  AgentJob[]  @relation("AssignedJobs")
 }
 
 model AgentJob {
   id        Int       @id @default(autoincrement())
-  type      AgentType @default(LANGGRAPH)
+  type      AgentType @default(FILE_SYSTEM)
   prompt    String
-  assignee  String?
   status    JobStatus @default(PENDING)
-  
+
   projectId Int?
   project   Project?  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  createdById     Int
+  createdBy       User  @relation("CreatedJobs", fields: [createdById], references: [id])
+
+  assignedAgentId Int?
+  assignedAgent   User? @relation("AssignedJobs", fields: [assignedAgentId], references: [id])
 
   logs      AgentJobLog[]
   artifacts AgentJobArtifact[]
@@ -55,6 +79,10 @@ model Project {
   description String?
   includes    String[]   @default(["**/*"])
   excludes    String[]   @default(["**/node_modules/**", "**/.git/**"])
+
+  ownerId Int
+  owner   User @relation("ProjectOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
   jobs        AgentJob[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt

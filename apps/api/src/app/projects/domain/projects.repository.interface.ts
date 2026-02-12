@@ -8,3 +8,5 @@ export interface IProjectsRepository {
     update(id: number, project: Partial<Project>): Promise<Project>;
     delete(id: number): Promise<void>;
 }
+
+export const PROJECTS_REPOSITORY = Symbol('PROJECTS_REPOSITORY');

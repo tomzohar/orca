@@ -13,9 +13,10 @@ import { DockerAgentRunner } from './execution/services/docker-agent-runner';
 import { LocalAgentRunner } from './execution/services/local-agent-runner';
 import { DbArtifactStorage } from './storage/services/db-artifact-storage';
 import { ProjectsModule } from '../projects/projects.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [PrismaModule, EventEmitterModule.forRoot(), LlmModule, forwardRef(() => ProjectsModule)],
+  imports: [PrismaModule, EventEmitterModule.forRoot(), LlmModule, UsersModule, forwardRef(() => ProjectsModule)],
   controllers: [AgentJobsController],
   providers: [
     AgentJobsService,
@@ -29,7 +30,7 @@ import { ProjectsModule } from '../projects/projects.module';
       provide: AGENT_RUNNER, // Provide AGENT_RUNNER token
       useFactory: (local: LocalAgentRunner, docker: DockerAgentRunner) => {
         return (type: AgentType) => {
-          if (type === AgentType.CLAUDE_SDK) {
+          if (type === AgentType.DOCKER) {
             return docker;
           }
           return local;

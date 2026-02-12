@@ -5,7 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 @ApiTags('Health')
 @Controller('health')
 export class HealthController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   @Get()
   @ApiOperation({ summary: 'Check the health of the application and database' })
@@ -14,7 +14,7 @@ export class HealthController {
     let dbStatus = 'up';
     try {
       await this.prisma.$queryRaw`SELECT 1`;
-    } catch (e) {
+    } catch {
       dbStatus = 'down';
     }
 
