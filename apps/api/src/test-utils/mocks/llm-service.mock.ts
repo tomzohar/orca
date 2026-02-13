@@ -14,5 +14,5 @@ export const createLlmServiceMock = (): jest.Mocked<Partial<LlmService>> => {
 
   return {
     getModel: jest.fn().mockReturnValue(mockModel),
-  } as any;
+  };
 };

@@ -24,7 +24,7 @@ export class GitService {
   async getDiff(
     projectRoot: string,
     branch: string,
-    base: string = 'main'
+    base = 'main'
   ): Promise<string> {
     this.validateBranchName(branch);
     this.validateBranchName(base);
@@ -60,7 +60,7 @@ export class GitService {
   async getChangedFiles(
     projectRoot: string,
     branch: string,
-    base: string = 'main'
+    base = 'main'
   ): Promise<string[]> {
     this.validateBranchName(branch);
     this.validateBranchName(base);
