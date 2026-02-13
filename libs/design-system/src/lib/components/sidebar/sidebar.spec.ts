@@ -3,6 +3,7 @@ import { SidebarComponent } from './sidebar.component';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
 
 describe('SidebarComponent', () => {
   let component: SidebarComponent;
@@ -16,6 +17,7 @@ describe('SidebarComponent', () => {
         MatIconModule,
         NoopAnimationsModule,
       ],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SidebarComponent);

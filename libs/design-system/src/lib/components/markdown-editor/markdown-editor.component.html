@@ -111,13 +111,15 @@
     }
   </div>
 
-  <!-- Hint/Error Messages -->
-  <div class="orca-markdown-messages">
-    @if (config().hint && !config().error) {
-      <span class="hint-text">{{ config().hint }}</span>
-    }
-    @if (config().error) {
-      <span class="error-text">{{ config().error }}</span>
-    }
-  </div>
+  @if (config().hint || config().error) {
+    <!-- Hint/Error Messages -->
+    <div class="orca-markdown-messages">
+      @if (config().hint && !config().error) {
+        <span class="hint-text">{{ config().hint }}</span>
+      }
+      @if (config().error) {
+        <span class="error-text">{{ config().error }}</span>
+      }
+    </div>
+  }
 </div>

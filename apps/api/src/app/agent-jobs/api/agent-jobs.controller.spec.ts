@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AgentJobsController } from './agent-jobs.controller';
 import { AgentJobsService } from '../agent-jobs.service';
+import { JobCommentsService } from '../application/job-comments.service';
 import {
   AgentJobEntity,
   AgentJobStatus,
@@ -18,11 +19,19 @@ describe('AgentJobsController', () => {
     getJob: jest.fn(),
   };
 
+  const mockCommentsService = {
+    addComment: jest.fn(),
+    getComments: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [EventEmitterModule.forRoot()],
       controllers: [AgentJobsController],
-      providers: [{ provide: AgentJobsService, useValue: mockService }],
+      providers: [
+        { provide: AgentJobsService, useValue: mockService },
+        { provide: JobCommentsService, useValue: mockCommentsService },
+      ],
     }).compile();
 
     controller = module.get<AgentJobsController>(AgentJobsController);

@@ -1,6 +1,6 @@
 # Project Status
 
-**Last Updated:** February 12, 2026 (Afternoon Update)
+**Last Updated:** February 13, 2026 (Phase 1 Parallel Execution Complete)
 
 ## 1. Overview
 
@@ -80,6 +80,76 @@ Orca is an autonomous software orchestration platform. We have successfully impl
   - ✅ Monorepo-safe test suite (non-watch mode by default).
 
 ## 3. Recent Accomplishments
+
+- **Parallel Execution - Phase 1: Database Schema & Git Service (Feb 13, 2026):**
+  - **Implemented database foundation for parallel agent orchestration:**
+    - Database Schema Changes:
+      - Added `TaskType` enum (ORCHESTRATOR, CODING, REVIEW) for job classification
+      - Added `MergeStatus` enum (PENDING, READY, CONFLICT, MERGED) for merge workflow tracking
+      - Added job hierarchy fields to `AgentJob`: `parentJobId` and `childJobs` relation
+      - Added git isolation field: `gitBranch` for tracking agent branches
+      - Added classification fields: `taskType` and `mergeStatus` to `AgentJob`
+      - Created and applied migration `20260213084725_add_job_hierarchy_and_git_tracking`
+    - Domain Layer Updates:
+      - Updated `AgentJobEntity` with new enums and fields
+      - Updated repository interface with parentJobId and taskType support
+      - Updated Prisma repository implementation to handle new Prisma enums
+    - GitService Implementation:
+      - Created complete `GitService` with security-first design
+      - `getDiff()`: Get diff between branches with configurable base branch
+      - `getChangedFiles()`: List files modified in a branch vs base
+      - `detectConflicts()`: Analyze multiple job branches for overlapping file changes
+      - Security features: Uses `execFile` instead of `exec` to prevent command injection
+      - Branch name validation: Rejects suspicious patterns to prevent shell injection
+      - Comprehensive error handling with proper logging
+    - Testing & Quality:
+      - 15 new GitService tests covering all methods and edge cases
+      - 90 total tests passing (75 existing + 15 new)
+      - Solved complex Jest mocking issue with hoisting and temporal dead zones
+      - Zero breaking changes to existing functionality
+    - Module Integration:
+      - Created `GitModule` and added to `AppModule`
+      - Service ready for Phase 2 orchestration integration
+  - **Status:** ✅ Phase 1 Complete - Database schema and git infrastructure ready for orchestration. Phase 2 (Orchestrator Tools + Docker Clone) ready to begin.
+
+- **Job Comments System (Feb 12, 2026 - Evening):**
+  - **Implemented complete commenting system for agent jobs:**
+    - `AgentJobComment` model with user attribution and metadata support
+    - Full database schema with foreign keys to `User` and `AgentJob`
+    - Cascade delete on job removal to prevent orphaned comments
+    - Optional metadata field for structured data (JSON)
+  - **Backend Implementation:**
+    - Domain layer: `AgentJobComment` interface and `JobCommentAddedEvent`
+    - Repository layer: `addComment()` and `getComments()` methods with DESC sorting (newest first)
+    - Service layer: `JobCommentsService` with validation and event emission
+    - API layer: POST/GET endpoints at `/agent-jobs/:id/comments`
+    - SSE integration: Real-time `comment_added` events broadcast to all clients
+  - **Agent Tools:**
+    - `postComment`: Allows agents to post comments to job threads
+    - `readComments`: Allows agents to read existing comments
+    - Full integration with agent execution context (jobId and authorId injected)
+  - **Frontend Implementation:**
+    - Type definitions: `JobComment` interface in orchestration-types
+    - Data access: TanStack Query hooks for comments (`injectCommentsQuery`, `injectAddCommentMutation`)
+    - UI components: `JobCommentsComponent` with markdown editor for viewing
+    - Form component: `JobCommentFormComponent` with markdown editor for creating
+    - Integration: Comments section in job overview tab with scrollable list and sticky input form
+  - **Markdown Support:**
+    - Full markdown editor for creating comments (edit mode with toolbar and preview toggle)
+    - Markdown preview for viewing comments (read-only mode)
+    - Proper formatting for code blocks, lists, links, and emphasis
+  - **UX Enhancements:**
+    - Comments list is scrollable with custom-styled scrollbar
+    - Comment input form sticks to bottom of container
+    - Comments sorted newest first for better conversation flow
+    - Real-time updates via SSE for collaborative commenting
+    - Optimistic updates for instant feedback
+  - **Testing & Quality:**
+    - All backend tests passing (58/58 including new comment service and controller tests)
+    - All frontend tests passing (45/45 including new comment component tests)
+    - TanStack Query providers properly mocked in tests
+    - Strict typing throughout (no `any` types)
+  - **Status:** ✅ Phase 1 Complete - Users and agents can comment on jobs with real-time updates. Phase 2 (Resume functionality) planned for next iteration.
 
 - **Agent Configuration System (Feb 12, 2026 - Afternoon):**
   - **Implemented complete agent configuration management:**
@@ -254,17 +324,27 @@ Orca is an autonomous software orchestration platform. We have successfully impl
     - Add version history tracking for configurations
 
 2.  **Users Module - Phase 2: Job Comments:**
-    - Implement `AgentJobComment` model with user attribution
-    - Add commenting API endpoints
-    - Create UI for adding/viewing comments on jobs
-    - Real-time comment updates via SSE
+    - ✅ ~~Implement `AgentJobComment` model with user attribution~~ (Complete)
+    - ✅ ~~Add commenting API endpoints~~ (Complete)
+    - ✅ ~~Create UI for adding/viewing comments on jobs~~ (Complete)
+    - ✅ ~~Real-time comment updates via SSE~~ (Complete)
+    - ✅ ~~Agent tools for posting and reading comments~~ (Complete)
+    - ✅ ~~Markdown support for comment formatting~~ (Complete)
 
-3.  **Resume & Feedback UI:** Implement the `WAITING_FOR_USER` interaction (display question, accept input, API to resume).
+3.  **Users Module - Phase 3: Job Resume Functionality:**
+    - Implement job lineage tracking (baseJobId self-reference)
+    - Add `resumeJob()` service method with context enrichment
+    - Create Resume Job Dialog component
+    - Build enriched context prompt from logs, artifacts, and comments
+    - Add "Resume with Feedback" button to completed/failed jobs
+    - Real-time resume events via SSE
 
-4.  **Generic List Components:** Utilize the new `ListItem` and `ListConfig` types to build specialized log and artifact lists.
+4.  **Resume & Feedback UI:** Implement the `WAITING_FOR_USER` interaction (display question, accept input, API to resume).
 
-5.  **Project Management UI:** Create frontend views for managing/editing existing projects (rename, update excludes).
+5.  **Generic List Components:** Utilize the new `ListItem` and `ListConfig` types to build specialized log and artifact lists.
 
-6.  **Artifact Previews:** Enhance the Artifacts tab with code highlighting or HTML previews for generated files.
+6.  **Project Management UI:** Create frontend views for managing/editing existing projects (rename, update excludes).
 
-7.  **Job Interaction:** Fully implement drag-and-drop logic to update job status/priority via API.
+7.  **Artifact Previews:** Enhance the Artifacts tab with code highlighting or HTML previews for generated files.
+
+8.  **Job Interaction:** Fully implement drag-and-drop logic to update job status/priority via API.

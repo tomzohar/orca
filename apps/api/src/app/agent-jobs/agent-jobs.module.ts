@@ -3,6 +3,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { PrismaModule } from '../prisma/prisma.module';
 import { LlmModule } from '../shared/llm/llm.module';
 import { AgentJobsService } from './agent-jobs.service';
+import { JobCommentsService } from './application/job-comments.service';
 import { AgentJobsController } from './api/agent-jobs.controller';
 import { PrismaAgentJobsRepository } from './data/repositories/prisma-agent-jobs.repository';
 import { AgentType } from './domain/entities/agent-job.entity';
@@ -20,6 +21,7 @@ import { UsersModule } from '../users/users.module';
   controllers: [AgentJobsController],
   providers: [
     AgentJobsService,
+    JobCommentsService,
     LocalAgentRunner,
     DockerAgentRunner,
     {
@@ -43,6 +45,6 @@ import { UsersModule } from '../users/users.module';
       useClass: DbArtifactStorage,
     },
   ],
-  exports: [AgentJobsService],
+  exports: [AgentJobsService, JobCommentsService],
 })
 export class AgentJobsModule { }

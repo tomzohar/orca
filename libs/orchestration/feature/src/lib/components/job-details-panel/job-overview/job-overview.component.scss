@@ -4,6 +4,17 @@
     display: flex;
     flex-direction: column;
     gap: $tokens-spacing-lg;
+    height: 100%;
+    overflow: hidden;
+
+    .comment-form-container {
+        flex-shrink: 0;
+        background: $tokens-surface-color;
+        position: absolute;
+        bottom: 0;
+        width: 716px;
+        left: 40px;
+    }
 }
 
 .detail-section {
@@ -72,6 +83,39 @@
 
         .timestamp-value {
             color: $tokens-text-primary;
+        }
+    }
+
+    &.comments-section {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+
+        .comments-list-container {
+            flex: 1;
+            overflow-y: auto;
+            margin-top: $tokens-spacing-md;
+            margin-bottom: 130px;
+            padding-right: $tokens-spacing-xs;
+
+            &::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background: transparent;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background: $tokens-border-color;
+                border-radius: 3px;
+
+                &:hover {
+                    background: $tokens-text-secondary;
+                }
+            }
         }
     }
 }

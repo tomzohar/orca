@@ -1,0 +1,18 @@
+<div class="comment-form">
+  <orca-markdown-editor
+    [config]="editorConfig"
+    [value]="commentContent()"
+    (valueChange)="onContentChange($event)"
+  />
+  <div class="form-actions">
+    <orca-button
+      [config]="{
+        variant: 'primary',
+        disabled: !commentContent().trim(),
+      }"
+      (click)="onSubmit()"
+    >
+      Post Comment
+    </orca-button>
+  </div>
+</div>

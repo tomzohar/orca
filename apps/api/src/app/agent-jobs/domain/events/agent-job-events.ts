@@ -2,6 +2,7 @@ import {
   AgentJobEntity,
   AgentJobStatus,
   AgentJobLog,
+  AgentJobComment,
 } from '../entities/agent-job.entity';
 
 export class JobCreatedEvent {
@@ -29,5 +30,12 @@ export class JobArtifactAddedEvent {
     public readonly artifactId: number,
     public readonly filename: string,
     public readonly path: string,
+  ) {}
+}
+
+export class JobCommentAddedEvent {
+  constructor(
+    public readonly jobId: number,
+    public readonly comment: AgentJobComment,
   ) {}
 }

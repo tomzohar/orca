@@ -37,6 +37,18 @@ export interface JobArtifact {
 }
 
 /**
+ * Job comment
+ */
+export interface JobComment {
+  id: number;
+  jobId: number;
+  authorId: number;
+  content: string;
+  metadata?: Record<string, any>;
+  createdAt: string;
+}
+
+/**
  * Core Job entity from backend
  */
 export interface Job {
@@ -45,10 +57,13 @@ export interface Job {
   prompt: string;
   status: JobStatus;
   assignee?: string;
+  projectId?: number;
+  createdById: number;
   createdAt: string;
   updatedAt: string;
   logs: JobLog[];
   artifacts: JobArtifact[];
+  comments: JobComment[];
 }
 
 /**

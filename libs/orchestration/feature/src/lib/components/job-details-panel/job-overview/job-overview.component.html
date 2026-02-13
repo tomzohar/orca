@@ -22,11 +22,15 @@
       <div class="timestamp-group">
         <div class="timestamp-item">
           <span class="timestamp-label">Created:</span>
-          <span class="timestamp-value">{{ currentJob.createdAt | date:'medium' }}</span>
+          <span class="timestamp-value">{{
+            currentJob.createdAt | date: 'medium'
+          }}</span>
         </div>
         <div class="timestamp-item">
           <span class="timestamp-label">Updated:</span>
-          <span class="timestamp-value">{{ currentJob.updatedAt | date:'medium' }}</span>
+          <span class="timestamp-value">{{
+            currentJob.updatedAt | date: 'medium'
+          }}</span>
         </div>
       </div>
     </div>
@@ -37,5 +41,20 @@
         <p>{{ currentJob.assignee }}</p>
       </div>
     }
+
+    <div class="detail-section comments-section">
+      @if (comments() && comments().length > 0) {
+        <h4 class="section-title">Comments</h4>
+        <div class="comments-list-container">
+          <orca-job-comments
+            [comments]="comments()"
+            [loading]="commentsLoading()"
+          />
+        </div>
+      }
+    </div>
+    <div class="comment-form-container">
+      <orca-job-comment-form (submitComment)="onSubmitComment($event)" />
+    </div>
   </div>
 }

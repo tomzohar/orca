@@ -1,0 +1,21 @@
+@use 'component' as *;
+
+.comment-form {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: $tokens-spacing-lg;
+  position: relative;
+
+  orca-markdown-editor {
+    position: sticky;
+    bottom: 0;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  position: absolute;
+  bottom: 32px;
+  right: 8px;
+}

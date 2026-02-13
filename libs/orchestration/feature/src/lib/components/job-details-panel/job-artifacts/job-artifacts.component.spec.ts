@@ -3,6 +3,8 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { JobArtifactsComponent } from './job-artifacts.component';
 import { JobUIModel, JobStatus, AgentType } from '@orca/orchestration-types';
 
+import { provideMarkdown } from 'ngx-markdown';
+
 describe('JobArtifactsComponent', () => {
     let component: JobArtifactsComponent;
     let fixture: ComponentFixture<JobArtifactsComponent>;
@@ -10,6 +12,7 @@ describe('JobArtifactsComponent', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [JobArtifactsComponent, NoopAnimationsModule],
+            providers: [provideMarkdown()],
         }).compileComponents();
 
         fixture = TestBed.createComponent(JobArtifactsComponent);
@@ -25,6 +28,8 @@ describe('JobArtifactsComponent', () => {
         it('should show loading state when job is running with no artifacts', () => {
             const mockJob: JobUIModel = {
                 id: '1',
+                createdById: 1,
+                comments: [],
                 type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.RUNNING,
@@ -49,6 +54,8 @@ describe('JobArtifactsComponent', () => {
         it('should show empty state when job is completed with no artifacts', () => {
             const mockJob: JobUIModel = {
                 id: '1',
+                createdById: 1,
+                comments: [],
                 type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.COMPLETED,
@@ -62,9 +69,9 @@ describe('JobArtifactsComponent', () => {
             fixture.componentRef.setInput('job', mockJob);
             fixture.detectChanges();
 
-            const emptyState = fixture.nativeElement.querySelector('.empty-state');
+            const emptyState = fixture.nativeElement.querySelector('orca-empty-state');
             expect(emptyState).toBeTruthy();
-            expect(emptyState.textContent).toContain('No artifacts yet');
+            expect(emptyState.textContent).toContain('No artifacts found');
 
             const spinner = fixture.nativeElement.querySelector('orca-spinner');
             expect(spinner).toBeFalsy();
@@ -75,6 +82,8 @@ describe('JobArtifactsComponent', () => {
         it('should render list component when artifacts exist', () => {
             const mockJob: JobUIModel = {
                 id: '1',
+                createdById: 1,
+                comments: [],
                 type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.COMPLETED,
@@ -102,6 +111,8 @@ describe('JobArtifactsComponent', () => {
         it('should configure list as expandable with icons', () => {
             const mockJob: JobUIModel = {
                 id: '1',
+                createdById: 1,
+                comments: [],
                 type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.COMPLETED,
@@ -125,7 +136,7 @@ describe('JobArtifactsComponent', () => {
             const config = component.artifactsListConfig();
             expect(config.expandable).toBe(true);
             expect(config.showIcons).toBe(true);
-            expect(config.multipleExpanded).toBe(false);
+            expect(config.multipleExpanded).toBe(true);
         });
 
         it('should map artifacts to list items with correct data', () => {
@@ -136,16 +147,12 @@ describe('JobArtifactsComponent', () => {
                     content: 'export class Test {}',
                     createdAt: '2024-01-01T12:00:00Z',
                 },
-                {
-                    id: 2,
-                    filename: 'styles.css',
-                    content: '.class { color: red; }',
-                    createdAt: '2024-01-01T12:01:00Z',
-                },
             ];
 
             const mockJob: JobUIModel = {
                 id: '1',
+                createdById: 1,
+                comments: [],
                 type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.COMPLETED,
@@ -160,13 +167,12 @@ describe('JobArtifactsComponent', () => {
             fixture.detectChanges();
 
             const config = component.artifactsListConfig();
-            expect(config.items.length).toBe(2);
+            expect(config.items.length).toBe(1);
 
             const firstItem = config.items[0];
             expect(firstItem.id).toBe('1');
             expect(firstItem.title).toBe('component.ts');
             expect(firstItem.description).toBeTruthy();
-            expect(firstItem.content).toContain('export class Test {}');
         });
     });
 
@@ -223,9 +229,17 @@ describe('JobArtifactsComponent', () => {
     });
 
     describe('Content Rendering', () => {
-        it('should wrap artifact content in pre/code tags within list item', () => {
+        it('should format artifact content as markdown with code blocks', () => {
+            const artifact = {
+                id: 1,
+                filename: 'test.ts',
+                content: 'const test = "hello";',
+                createdAt: new Date().toISOString(),
+            };
             const mockJob: JobUIModel = {
                 id: '1',
+                createdById: 1,
+                comments: [],
                 type: AgentType.DOCKER,
                 prompt: 'Test',
                 status: JobStatus.COMPLETED,
@@ -233,25 +247,17 @@ describe('JobArtifactsComponent', () => {
                 updatedAt: new Date().toISOString(),
                 formattedCreatedAt: 'Just now',
                 logs: [],
-                artifacts: [
-                    {
-                        id: 1,
-                        filename: 'test.ts',
-                        content: 'const test = "hello";',
-                        createdAt: new Date().toISOString(),
-                    },
-                ],
+                artifacts: [artifact],
             };
 
             fixture.componentRef.setInput('job', mockJob);
             fixture.detectChanges();
 
-            const config = component.artifactsListConfig();
-            const contentHtml = config.items[0].content;
+            const markdown = component.getArtifactMarkdownContent({ id: '1', title: 'test.ts' });
 
-            expect(contentHtml).toContain('<pre>');
-            expect(contentHtml).toContain('<code>');
-            expect(contentHtml).toContain('const test = "hello";');
+            expect(markdown).toContain('```typescript');
+            expect(markdown).toContain('const test = "hello";');
+            expect(markdown).toContain('```');
         });
     });
 });

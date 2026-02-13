@@ -1,12 +1,13 @@
 import { inject } from '@angular/core';
 import { injectQuery, injectMutation, injectQueryClient } from '@tanstack/angular-query-experimental';
 import { lastValueFrom } from 'rxjs';
-import { JobsService, CreateJobDto } from './jobs.service';
-import { Job, JobStatus } from '@orca/orchestration-types';
+import { JobsService, CreateJobDto, CreateCommentDto } from './jobs.service';
+import { Job, JobStatus, JobComment } from '@orca/orchestration-types';
 
 export const jobsKeys = {
     all: ['jobs'] as const,
     byProject: (projectId: string) => [...jobsKeys.all, 'project', projectId] as const,
+    comments: (jobId: number) => [...jobsKeys.all, 'comments', jobId] as const,
 };
 
 /**
@@ -63,10 +64,13 @@ export function injectCreateJobMutation() {
                 type: dto.type,
                 prompt: dto.prompt,
                 status: JobStatus.PENDING,
+                projectId: dto.projectId,
+                createdById: 0, // Placeholder - will be replaced by real value from backend
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 logs: [],
                 artifacts: [],
+                comments: [],
             };
 
             queryClient.setQueryData<Job[]>(queryKey, (old) => {
@@ -86,6 +90,55 @@ export function injectCreateJobMutation() {
             // Invalidate and refetch jobs query to get the real job from backend
             queryClient.invalidateQueries({
                 queryKey: jobsKeys.byProject(dto.projectId.toString())
+            });
+        },
+    }));
+}
+
+/**
+ * TanStack Query hook for fetching comments for a job
+ *
+ * @param jobIdOrSignal - The job ID as a number, signal, or function
+ * @returns Query result signal containing comments data, loading state, and error
+ */
+export function injectCommentsQuery(jobIdOrSignal: number | (() => number | undefined | null)) {
+    const service = inject(JobsService);
+
+    return injectQuery(() => {
+        const jobId = typeof jobIdOrSignal === 'function'
+            ? jobIdOrSignal()
+            : jobIdOrSignal;
+
+        return {
+            queryKey: jobId ? jobsKeys.comments(jobId) : ['comments'],
+            queryFn: async () => {
+                if (!jobId) return [];
+                return lastValueFrom(service.getComments(jobId));
+            },
+            enabled: !!jobId,
+            staleTime: 1000 * 30, // 30 seconds
+        };
+    });
+}
+
+/**
+ * TanStack Mutation hook for adding a comment to a job
+ * Implements automatic query invalidation
+ *
+ * @returns Mutation result with mutate function, loading state, and error
+ */
+export function injectAddCommentMutation() {
+    const service = inject(JobsService);
+    const queryClient = injectQueryClient();
+
+    return injectMutation(() => ({
+        mutationFn: async ({ jobId, authorId, dto }: { jobId: number; authorId: number; dto: CreateCommentDto }) => {
+            return lastValueFrom(service.addComment(jobId, authorId, dto));
+        },
+        onSuccess: (_data, variables) => {
+            // Invalidate comments query to refetch the updated list
+            queryClient.invalidateQueries({
+                queryKey: jobsKeys.comments(variables.jobId)
             });
         },
     }));

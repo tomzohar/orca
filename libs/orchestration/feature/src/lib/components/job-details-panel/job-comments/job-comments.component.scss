@@ -1,0 +1,31 @@
+@use 'component' as *;
+
+.loading-state {
+  padding: $tokens-spacing-lg;
+  text-align: center;
+  color: $tokens-text-secondary;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: $tokens-spacing-md;
+  overflow: auto;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: $tokens-spacing-sm;
+  @include typography-typography-body-2;
+}
+
+.comment-date {
+  color: $tokens-text-secondary;
+}
+
+.comment-content {
+  color: $tokens-text-primary;
+  white-space: normal;
+}

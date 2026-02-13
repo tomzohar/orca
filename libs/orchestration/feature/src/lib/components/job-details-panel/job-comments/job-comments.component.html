@@ -1,0 +1,31 @@
+@if (loading()) {
+  <div class="loading-state">
+    <orca-spinner [config]="{ size: 'md' }"></orca-spinner>
+  </div>
+} @else if (comments().length === 0) {
+  <orca-empty-state
+    [config]="{
+      title: 'No comments yet',
+      description: 'Be the first to add a comment to this job',
+    }"
+  />
+} @else {
+  <div class="comments-list">
+    @for (comment of comments(); track comment.id) {
+      <div class="comment">
+        <div class="comment-header">
+          <span class="comment-author">User #{{ comment.authorId }}</span>
+          <span class="comment-date">{{
+            comment.createdAt | date: 'short'
+          }}</span>
+        </div>
+        <div class="comment-content">
+          <orca-markdown-editor
+            [config]="markdownConfig"
+            [value]="comment.content"
+          />
+        </div>
+      </div>
+    }
+  </div>
+}

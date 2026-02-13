@@ -12,26 +12,33 @@ import {
 import { OnEvent } from '@nestjs/event-emitter';
 import { Observable, Subject, filter, map } from 'rxjs';
 import { AgentJobsService } from '../agent-jobs.service';
+import { JobCommentsService } from '../application/job-comments.service';
 import { AgentType } from '../domain/entities/agent-job.entity';
 import {
   JobArtifactAddedEvent,
   JobCreatedEvent,
   JobLogAddedEvent,
   JobStatusChangedEvent,
+  JobCommentAddedEvent,
 } from '../domain/events/agent-job-events';
 import { CreateAgentJobDto } from './dto/create-agent-job.dto';
+import { CreateCommentDto } from './dto/create-comment.dto';
 
 type AgentJobEventPayload =
   | { type: 'job_created'; payload: any; jobId: number }
   | { type: 'status_changed'; payload: { status: string; job: any }; jobId: number }
   | { type: 'log_added'; payload: any; jobId: number }
-  | { type: 'artifact_added'; payload: { artifactId: number; filename: string; path: string }; jobId: number };
+  | { type: 'artifact_added'; payload: { artifactId: number; filename: string; path: string }; jobId: number }
+  | { type: 'comment_added'; payload: any; jobId: number };
 
 @Controller('agent-jobs')
 export class AgentJobsController {
   private readonly updates$ = new Subject<AgentJobEventPayload>();
 
-  constructor(private readonly agentJobsService: AgentJobsService) { }
+  constructor(
+    private readonly agentJobsService: AgentJobsService,
+    private readonly commentsService: JobCommentsService,
+  ) { }
 
   @OnEvent('agent-job.created')
   handleJobCreated(event: JobCreatedEvent) {
@@ -73,6 +80,15 @@ export class AgentJobsController {
     });
   }
 
+  @OnEvent('agent-job.comment-added')
+  handleCommentAdded(event: JobCommentAddedEvent) {
+    this.updates$.next({
+      type: 'comment_added',
+      payload: event.comment,
+      jobId: event.jobId,
+    });
+  }
+
   @Post()
   createJob(@Body() dto: CreateAgentJobDto) {
     // Map simplified string/enum from DTO to strictly typed AgentType if needed
@@ -107,5 +123,19 @@ export class AgentJobsController {
           }) as MessageEvent,
       ),
     );
+  }
+
+  @Post(':id/comments')
+  addComment(
+    @Param('id', ParseIntPipe) jobId: number,
+    @Body() dto: CreateCommentDto,
+    @Query('authorId', ParseIntPipe) authorId: number,
+  ) {
+    return this.commentsService.addComment(jobId, authorId, dto.content, dto.metadata);
+  }
+
+  @Get(':id/comments')
+  getComments(@Param('id', ParseIntPipe) jobId: number) {
+    return this.commentsService.getComments(jobId);
   }
 }

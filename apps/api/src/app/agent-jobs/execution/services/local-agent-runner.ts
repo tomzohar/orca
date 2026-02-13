@@ -8,6 +8,10 @@ import { createLogTool } from '../../agent/tools/log-progress.tool';
 import { createSaveArtifactTool } from '../../agent/tools/save-artifact.tool';
 import { createFileSystemTool } from '../../agent/tools/file-system.tool';
 import {
+  createPostCommentTool,
+  createReadCommentsTool,
+} from '../../agent/tools/comment.tools';
+import {
   AgentJobEntity,
   AgentJobStatus,
 } from '../../domain/entities/agent-job.entity';
@@ -15,6 +19,7 @@ import {
   JobArtifactAddedEvent,
   JobLogAddedEvent,
   JobStatusChangedEvent,
+  JobCommentAddedEvent,
 } from '../../domain/events/agent-job-events';
 import {
   AGENT_JOBS_REPOSITORY,
@@ -78,7 +83,23 @@ export class LocalAgentRunner implements IAgentRunner {
         },
       );
 
-      const tools: DynamicStructuredTool[] = [logTool, artifactTool];
+      const postCommentTool = createPostCommentTool(
+        job.id,
+        job.assignedAgentId ?? job.createdById,
+        this.repository,
+      );
+
+      const readCommentsTool = createReadCommentsTool(
+        job.id,
+        this.repository,
+      );
+
+      const tools: DynamicStructuredTool[] = [
+        logTool,
+        artifactTool,
+        postCommentTool,
+        readCommentsTool,
+      ];
 
       if (job.project) {
         this.logger.log(`[Setup] Adding file system tool for project root: ${job.project.rootPath}`);

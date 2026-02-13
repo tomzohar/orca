@@ -1,4 +1,4 @@
-import { AgentJobEntity, AgentType } from '../entities/agent-job.entity';
+import type { AgentJobEntity, AgentType, AgentJobComment, TaskType } from '../entities/agent-job.entity';
 
 export const AGENT_JOBS_REPOSITORY = Symbol('AGENT_JOBS_REPOSITORY');
 
@@ -9,13 +9,25 @@ export interface IAgentJobsRepository {
     assignedAgentId?: number;
     type?: AgentType;
     projectId?: number;
+    parentJobId?: number;
+    taskType?: TaskType;
   }): Promise<AgentJobEntity>;
   findById(id: number): Promise<AgentJobEntity | null>;
   update(id: number, data: Partial<AgentJobEntity>): Promise<AgentJobEntity>;
-  findAll(filters?: { createdById?: number; assignedAgentId?: number; projectId?: number }): Promise<AgentJobEntity[]>;
+  findAll(filters?: {
+    createdById?: number;
+    assignedAgentId?: number;
+    projectId?: number;
+    parentJobId?: number;
+  }): Promise<AgentJobEntity[]>;
   addLog(jobId: number, message: string): Promise<AgentJobEntity>;
   addArtifact(
     jobId: number,
     artifact: { filename: string; content: string },
   ): Promise<AgentJobEntity>;
+  addComment(
+    jobId: number,
+    data: { authorId: number; content: string; metadata?: Record<string, any> },
+  ): Promise<AgentJobComment>;
+  getComments(jobId: number): Promise<AgentJobComment[]>;
 }

@@ -36,6 +36,19 @@ enum UserType {
   AGENT
 }
 
+enum TaskType {
+  ORCHESTRATOR
+  CODING
+  REVIEW
+}
+
+enum MergeStatus {
+  PENDING
+  READY
+  CONFLICT
+  MERGED
+}
+
 model User {
   id           Int      @id @default(autoincrement())
   name         String
@@ -49,6 +62,7 @@ model User {
   createdJobs         AgentJob[]             @relation("CreatedJobs")
   assignedJobs        AgentJob[]             @relation("AssignedJobs")
   agentConfigurations AgentConfiguration[]   @relation("UserConfigurations")
+  comments            AgentJobComment[]      @relation("AuthoredComments")
 }
 
 model AgentJob {
@@ -66,8 +80,21 @@ model AgentJob {
   assignedAgentId Int?
   assignedAgent   User? @relation("AssignedJobs", fields: [assignedAgentId], references: [id])
 
+  // Job hierarchy for orchestration
+  parentJobId Int?
+  parentJob   AgentJob?  @relation("JobHierarchy", fields: [parentJobId], references: [id], onDelete: Cascade)
+  childJobs   AgentJob[] @relation("JobHierarchy")
+
+  // Git isolation (branch created by Docker agents)
+  gitBranch String?
+
+  // Task classification
+  taskType    TaskType     @default(CODING)
+  mergeStatus MergeStatus  @default(PENDING)
+
   logs      AgentJobLog[]
   artifacts AgentJobArtifact[]
+  comments  AgentJobComment[]
   createdAt DateTime           @default(now())
   updatedAt DateTime           @updatedAt
 }
@@ -132,5 +159,16 @@ model AgentJobArtifact {
   job       AgentJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   filename  String
   content   String
+  createdAt DateTime @default(now())
+}
+
+model AgentJobComment {
+  id        Int      @id @default(autoincrement())
+  jobId     Int
+  job       AgentJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  authorId  Int
+  author    User     @relation("AuthoredComments", fields: [authorId], references: [id])
+  content   String   @db.Text
+  metadata  Json?
   createdAt DateTime @default(now())
 }

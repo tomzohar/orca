@@ -169,7 +169,8 @@ export enum IconName {
     format_list_numbered = 'format_list_numbered',
     format_quote = 'format_quote',
     logout = "logout",
-    person = "person"
+    person = "person",
+    comment = "comment"
 }
 
 export type DialogSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
