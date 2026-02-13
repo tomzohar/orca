@@ -1,4 +1,4 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module, forwardRef, OnModuleInit } from '@nestjs/common';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { PrismaModule } from '../prisma/prisma.module';
 import { LlmModule } from '../shared/llm/llm.module';
@@ -15,6 +15,15 @@ import { LocalAgentRunner } from './execution/services/local-agent-runner';
 import { DbArtifactStorage } from './storage/services/db-artifact-storage';
 import { ProjectsModule } from '../projects/projects.module';
 import { UsersModule } from '../users/users.module';
+import { ToolRegistryService } from './registry/tool-registry.service';
+import {
+  logProgressToolFactory,
+  saveArtifactToolFactory,
+  fileSystemToolFactory,
+  postCommentToolFactory,
+  readCommentsToolFactory,
+  spawnJobToolFactory,
+} from './agent/tools';
 
 @Module({
   imports: [PrismaModule, EventEmitterModule.forRoot(), LlmModule, UsersModule, forwardRef(() => ProjectsModule)],
@@ -24,6 +33,7 @@ import { UsersModule } from '../users/users.module';
     JobCommentsService,
     LocalAgentRunner,
     DockerAgentRunner,
+    ToolRegistryService,
     {
       provide: AGENT_JOBS_REPOSITORY,
       useClass: PrismaAgentJobsRepository,
@@ -45,6 +55,24 @@ import { UsersModule } from '../users/users.module';
       useClass: DbArtifactStorage,
     },
   ],
-  exports: [AgentJobsService, JobCommentsService],
+  exports: [AgentJobsService, JobCommentsService, ToolRegistryService],
 })
-export class AgentJobsModule { }
+export class AgentJobsModule implements OnModuleInit {
+  constructor(private readonly toolRegistry: ToolRegistryService) {}
+
+  onModuleInit(): void {
+    // Register core tools
+    this.toolRegistry.register(logProgressToolFactory);
+    this.toolRegistry.register(saveArtifactToolFactory);
+
+    // Register communication tools
+    this.toolRegistry.register(postCommentToolFactory);
+    this.toolRegistry.register(readCommentsToolFactory);
+
+    // Register filesystem tools
+    this.toolRegistry.register(fileSystemToolFactory);
+
+    // Register orchestration tools
+    this.toolRegistry.register(spawnJobToolFactory);
+  }
+}

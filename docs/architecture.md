@@ -22,6 +22,11 @@ The system uses a shared data store as the Single Source of Truth. Agents do not
 - **Pluggable Execution Strategy:** The system supports multiple agent runtimes via a Strategy Pattern:
   - **Local Runner:** Runs simple LangGraph agents directly in the Node.js process (fast, low overhead).
   - **Docker Runner:** Spins up ephemeral Docker containers for complex agents (e.g., Claude Agent SDK) ensuring complete isolation.
+- **Tool Registry System:** Centralized management of agent capabilities:
+  - **ToolRegistryService:** Single source of truth for all available tools with dependency injection.
+  - **Conditional Activation:** Tools only available when requirements are met (project context, task type, etc.).
+  - **Tool Categories:** CORE (logging, artifacts), FILESYSTEM (file operations), ORCHESTRATION (job spawning), COMMUNICATION (comments).
+  - **Factory Pattern:** Declarative tool definitions with metadata, activation predicates, and creation logic.
 - **Tools & Interfaces:**
   - **Filesystem:** Agents interact with the project via direct bind-mounts (Docker) or direct FS access (Local).
   - **State Access:** All agents report back to the "Blackboard" via `stdout` parsing (Docker) or direct events (Local).
@@ -53,10 +58,21 @@ The current "Spawning" & "Blackboard" flow functions as follows:
       - **`FILE_SYSTEM`**: Dispatches the local LangGraph loop.
     - The Runner initializes the environment and **injects project context**:
       - Retrieves the `rootPath`, `includes`, and `excludes` from the associated `Project`.
-    - **Tools as Actuators:** The agent is equipped with specific tools that wrap the "Blackboard" and the localized Workspace:
-      - `logTool`: Writes progress to `AgentJobLog`.
-      - `saveArtifactTool`: Writes outputs to `AgentJobArtifact`.
-      - `fileSystemTool`: Provides the agent with safe, scoped access to the project's `rootPath`.
+    - **Tools as Actuators:** The agent is equipped with tools via the **Tool Registry**:
+      - **Core Tools** (always available):
+        - `log_progress`: Writes progress messages to `AgentJobLog`.
+        - `save_artifact`: Writes outputs to `AgentJobArtifact` for UI display.
+      - **Communication Tools** (always available):
+        - `post_comment`: Posts comments to job threads for coordination.
+        - `read_comments`: Reads comments from job threads for monitoring.
+      - **Filesystem Tools** (conditional - requires project):
+        - `file_system`: Safe, scoped access to project's `rootPath` with actions like read, write, list, find, git_diff, read_multiple, tree.
+      - **Orchestration Tools** (conditional - requires orchestrator task type):
+        - `spawn_job`: Creates child jobs for task delegation (multi-agent coordination).
+      - Tools are **conditionally activated** based on job context:
+        - `file_system` only available when job has associated project.
+        - `spawn_job` only available for `TaskType.ORCHESTRATOR` jobs.
+        - Registry gracefully skips unavailable tools with debug logging.
 
 3.  **Real-Time Feedback Loop:**
     - As the Agent thinks and acts, it calls these tools.
@@ -96,6 +112,18 @@ To ensure long-term maintainability and prevent "Big Ball of Mud" anti-patterns,
 - **`execution/` (Application Layer)**:
   - Responsibility: Orchestrating the execution of agents. Translates domain intentions into runner-specific actions.
   - Key Files: `services/` (`DockerAgentRunner`, `LocalAgentRunner`), `matchers/`.
+- **`registry/` (Tool Management Layer)**:
+  - Responsibility: Centralized management of agent tools with conditional activation and dependency injection.
+  - Key Files: `tool-registry.service.ts`, `tool-registry.service.spec.ts`.
+  - **Key Concepts:**
+    - **ToolFactory**: Interface for declarative tool definitions (metadata, activation predicates, creation logic).
+    - **ToolContext**: Rich context object with job details, project paths, dependencies, and event callbacks.
+    - **ToolCategory**: Enum for tool organization (CORE, FILESYSTEM, ORCHESTRATION, COMMUNICATION).
+    - **Conditional Activation**: Tools use `canActivate()` predicates to check requirements (e.g., project exists, task type matches).
+    - **Dependency Injection**: Repository and storage automatically injected into tool context.
+- **`agent/` (Agent Logic Layer)**:
+  - Responsibility: Agent graph definition and tool implementations.
+  - Key Folders: `tools/` (individual tool implementations and factory exports).
 - **`data/` (Infrastructure Layer - Persistence)**:
   - Responsibility: Implementing repository interfaces using specific providers (e.g., Prisma).
   - Key Files: `repositories/` (`PrismaAgentJobsRepository`).
@@ -144,7 +172,7 @@ To ensure long-term maintainability and prevent "Big Ball of Mud" anti-patterns,
 - **Error Handling**: Graceful handling of missing directories or permission issues
 - **Sorting**: Skills automatically sorted alphabetically for consistent presentation
 
-**Key Concepts:**
+**Key Concepts (Users):**
 - **User Types**: `HUMAN` (project owners, job creators) and `AGENT` (autonomous personas like "Coding Agent").
 - **Default Users**: The system automatically creates:
   - "Human" (id: 1, type: HUMAN) - Default project owner and job creator.
@@ -153,6 +181,60 @@ To ensure long-term maintainability and prevent "Big Ball of Mud" anti-patterns,
   - Every `Project` has an `ownerId` pointing to a User.
   - Every `AgentJob` has a `createdById` (required, who created it) and optional `assignedAgentId` (which agent is executing it).
   - When creating a job without `createdById`, the system auto-populates it from the project's owner.
+
+### 1.8 Tool Registry Architecture
+
+The **Tool Registry** provides centralized management of agent capabilities with conditional activation based on job context.
+
+#### Core Components
+
+- **ToolRegistryService** (NestJS Injectable):
+  - Central registry storing all tool factories.
+  - Creates tool instances with proper context and dependencies.
+  - Validates tool requirements and activation predicates.
+  - Provides category-based tool filtering.
+
+- **ToolFactory Interface**:
+  - Metadata: name, description, category, requirements.
+  - Activation predicate: `canActivate(context) => boolean`.
+  - Creation function: `create(context) => DynamicStructuredTool`.
+
+- **ToolContext Interface**:
+  - Job context: jobId, job entity, projectId, projectRootPath.
+  - Dependencies: repository, artifactStorage (injected by registry).
+  - Event callbacks: onLog, onArtifact, onComment.
+
+- **Tool Categories**:
+  - **CORE**: log_progress, save_artifact (always available).
+  - **FILESYSTEM**: file_system (requires project context).
+  - **ORCHESTRATION**: spawn_job (requires orchestrator task type).
+  - **COMMUNICATION**: post_comment, read_comments (always available).
+
+#### Tool Lifecycle
+
+1. **Registration**: Tools registered during module initialization via `OnModuleInit` hook.
+2. **Selection**: Runner calls `getRequestedTools()` based on job type and context.
+3. **Creation**: Registry calls `createTools()` with tool names and rich context.
+4. **Activation**: Registry checks `canActivate()` for each tool, skips those that fail.
+5. **Injection**: Repository and storage automatically injected into context.
+6. **Execution**: Tools receive full context with event callbacks for real-time updates.
+
+#### Extensibility
+
+- **Add New Tools**: Register factory in module without modifying runner code.
+- **Custom Tool Sets**: Configure different tools for different agent configurations.
+- **Plugin System**: Future support for dynamic tool discovery and hot-reload.
+- **Tool Permissions**: Future user-level restrictions on tool availability.
+
+#### Example: Conditional Activation
+
+```typescript
+// file_system tool only activates when project exists
+canActivate: (context) => !!context.projectRootPath && !!context.artifactStorage
+
+// spawn_job tool only activates for orchestrator jobs
+canActivate: (context) => context.job?.taskType === TaskType.ORCHESTRATOR
+```
 
 ### 1.7 Workspace Awareness (Projects)
 

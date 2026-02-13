@@ -24,7 +24,8 @@ Autonomous software orchestration platform with pluggable agent architecture, pr
 - **Deep Mode (`DockerAgentRunner`)**: ✅ Complete - Isolated Claude SDK in Docker with verified tool use
 
 **Infrastructure:**
-- ✅ Centralized mocking system, 90+ tests passing
+- ✅ Tool Registry: Centralized tool management with conditional activation
+- ✅ Centralized mocking system, 110 tests passing
 - ✅ Blackboard schema, project system, Docker verified
 - ✅ SSE events: `log_added`, `artifact_added`, `status_changed`, `comment_added`
 - ✅ Domain isolation (Prisma decoupled from domain events)
@@ -45,6 +46,39 @@ Autonomous software orchestration platform with pluggable agent architecture, pr
 
 ## Recent Accomplishments
 
+### Feb 13, 2026 - Tool Registry System
+✅ **Centralized Tool Management:**
+- `ToolRegistryService`: Single source of truth for all agent tools
+- `ToolFactory` pattern: Declarative tool definitions with metadata, activation predicates, creation logic
+- Tool categories: CORE, FILESYSTEM, ORCHESTRATION, COMMUNICATION
+- Conditional activation: Tools only available when requirements are met
+
+✅ **Tool Registry Features:**
+- Project-aware activation (file_system requires project context)
+- Task-type activation (spawn_job only for orchestrator jobs)
+- Dependency injection (repository, storage auto-injected)
+- Rich context with job details, event callbacks, project paths
+- Category-based filtering and organization
+
+✅ **Orchestrator Tools (Phase 2 Foundation):**
+- `spawn_job` tool for creating child jobs
+- Automatic comment posting on job spawn
+- Child job tracking via parentJobId
+- Ready for multi-agent coordination
+
+✅ **LocalAgentRunner Integration:**
+- Replaced manual tool creation with registry-based approach
+- Context-aware tool selection via `getRequestedTools()`
+- Tools automatically activated based on job type and project availability
+- Zero breaking changes, all 110 tests passing
+
+✅ **Testing & Documentation:**
+- 14 new registry tests, 6 new integration tests
+- Comprehensive implementation guide (`docs/tool-registry-implementation.md`)
+- Full backward compatibility maintained
+
+**Impact:** Foundation for parallel execution, orchestrator agents, and easy tool extensibility
+
 ### Feb 13, 2026 - Parallel Execution Phase 1
 ✅ **Database Schema:**
 - Job hierarchy: `parentJobId`, `childJobs` relation
@@ -56,7 +90,7 @@ Autonomous software orchestration platform with pluggable agent architecture, pr
 - Security: `execFile` (no command injection), branch name validation
 - 15 new tests, 90 total passing, zero breaking changes
 
-**Next:** Phase 2 (Orchestrator Tools + Docker Clone)
+**Next:** Phase 2 (Multi-Agent Coordination + Docker Clone)
 
 ### Feb 12, 2026 - Comments, Configs, Skills, Users
 
@@ -113,9 +147,10 @@ Autonomous software orchestration platform with pluggable agent architecture, pr
 ## Next Steps
 
 ### Parallel Execution Phase 2
-- Orchestrator agent tools
-- Docker clone isolation
-- Multi-agent coordination
+- Additional orchestrator tools (`check_child_status`, `collect_results`)
+- Docker clone isolation for branch-based execution
+- Multi-agent coordination and result aggregation
+- Orchestrator agent prompt templates
 
 ### Agent Configuration
 - Detail panel for viewing/editing

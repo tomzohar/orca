@@ -5,6 +5,7 @@ import * as path from 'path';
 import { glob } from 'glob';
 import { execSync } from 'child_process';
 import type { IArtifactStorage } from '../../domain/interfaces/artifact-storage.interface';
+import { ToolFactory, ToolCategory, ToolContext } from '../../registry/tool-registry.service';
 
 export const createFileSystemTool = (
     rootPath: string,
@@ -260,4 +261,29 @@ export const createFileSystemTool = (
             }
         },
     });
+};
+
+// Factory for registry
+export const fileSystemToolFactory: ToolFactory = {
+    metadata: {
+        name: 'file_system',
+        description: 'Read, write, and manipulate files in the project directory',
+        category: ToolCategory.FILESYSTEM,
+        requirements: { projectRequired: true, storageRequired: true },
+    },
+    canActivate: (context: ToolContext) => {
+        return !!context.projectRootPath && !!context.artifactStorage;
+    },
+    create: (context: ToolContext) => {
+        if (!context.projectRootPath) {
+            throw new Error('projectRootPath is required to create file_system tool');
+        }
+
+        return createFileSystemTool(
+            context.projectRootPath,
+            context.jobId,
+            context.artifactStorage,
+            context.eventCallbacks.onArtifact
+        );
+    },
 };

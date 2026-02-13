@@ -1,6 +1,7 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { IAgentJobsRepository } from '../../domain/interfaces/agent-jobs.repository.interface';
+import { ToolFactory, ToolCategory, ToolContext } from '../../registry/tool-registry.service';
 
 export const createLogTool = (
   jobId: number,
@@ -20,4 +21,22 @@ export const createLogTool = (
       return 'Log added';
     },
   });
+};
+
+// Factory for registry
+export const logProgressToolFactory: ToolFactory = {
+  metadata: {
+    name: 'log_progress',
+    description: 'Log progress messages to inform the user of agent actions',
+    category: ToolCategory.CORE,
+    requirements: { repositoryRequired: true },
+  },
+  canActivate: (context: ToolContext) => !!context.repository,
+  create: (context: ToolContext) => {
+    return createLogTool(
+      context.jobId,
+      context.repository,
+      context.eventCallbacks.onLog
+    );
+  },
 };

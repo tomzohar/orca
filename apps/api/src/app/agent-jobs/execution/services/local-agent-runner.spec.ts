@@ -5,6 +5,7 @@ import {
   AgentJobEntity,
   AgentJobStatus,
   AgentType,
+  TaskType,
 } from '../../domain/entities/agent-job.entity';
 import {
   AGENT_JOBS_REPOSITORY,
@@ -16,6 +17,7 @@ import {
 } from '../../domain/interfaces/artifact-storage.interface';
 import { LocalAgentRunner } from './local-agent-runner';
 import { createLlmServiceMock } from '../../../../test-utils/mocks/llm-service.mock';
+import { ToolRegistryService } from '../../registry/tool-registry.service';
 
 jest.mock('../../agent/agent.graph', () => ({
   createAgentGraph: jest.fn().mockReturnValue({
@@ -30,17 +32,22 @@ jest.mock('../../agent/agent.graph', () => ({
 describe('LocalAgentRunner', () => {
   let runner: LocalAgentRunner;
   let repository: jest.Mocked<IAgentJobsRepository>;
-  let artifactStorage: jest.Mocked<IArtifactStorage>;
   let eventEmitter: EventEmitter2;
   let llmService: any;
+  let toolRegistry: ToolRegistryService;
 
   const mockJob = new AgentJobEntity({
     id: 1,
     prompt: 'test prompt',
     status: AgentJobStatus.PENDING,
     type: AgentType.FILE_SYSTEM,
+    taskType: TaskType.CODING,
     logs: [],
     artifacts: [],
+    comments: [],
+    createdById: 1,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   });
 
   beforeEach(async () => {
@@ -64,6 +71,7 @@ describe('LocalAgentRunner', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         LocalAgentRunner,
+        ToolRegistryService,
         { provide: AGENT_JOBS_REPOSITORY, useValue: mockRepo },
         { provide: ARTIFACT_STORAGE, useValue: mockStorage },
         { provide: EventEmitter2, useValue: { emit: jest.fn() } },
@@ -73,9 +81,9 @@ describe('LocalAgentRunner', () => {
 
     runner = module.get<LocalAgentRunner>(LocalAgentRunner);
     repository = module.get(AGENT_JOBS_REPOSITORY);
-    artifactStorage = module.get(ARTIFACT_STORAGE);
     eventEmitter = module.get(EventEmitter2);
     llmService = module.get(LlmService);
+    toolRegistry = module.get(ToolRegistryService);
   });
 
   it('should be defined', () => {
@@ -117,5 +125,97 @@ describe('LocalAgentRunner', () => {
         newStatus: AgentJobStatus.FAILED,
       }),
     );
+  });
+
+  describe('Tool Registry Integration', () => {
+    it('should use registry to create tools', async () => {
+      const createToolsSpy = jest.spyOn(toolRegistry, 'createTools');
+
+      await runner.run(mockJob);
+
+      expect(createToolsSpy).toHaveBeenCalledWith(
+        expect.arrayContaining(['log_progress', 'save_artifact', 'post_comment', 'read_comments']),
+        expect.objectContaining({ jobId: mockJob.id })
+      );
+    });
+
+    it('should request file_system tool for jobs with project', async () => {
+      const jobWithProject = new AgentJobEntity({
+        ...mockJob,
+        projectId: 1,
+        project: { rootPath: '/test/path', includes: [], excludes: [] },
+      });
+      const createToolsSpy = jest.spyOn(toolRegistry, 'createTools');
+
+      await runner.run(jobWithProject);
+
+      expect(createToolsSpy).toHaveBeenCalledWith(
+        expect.arrayContaining(['file_system']),
+        expect.any(Object)
+      );
+    });
+
+    it('should not request file_system tool for jobs without project', async () => {
+      const createToolsSpy = jest.spyOn(toolRegistry, 'createTools');
+
+      await runner.run(mockJob);
+
+      const calledTools = createToolsSpy.mock.calls[0][0];
+      expect(calledTools).not.toContain('file_system');
+    });
+
+    it('should request spawn_job tool for orchestrator jobs', async () => {
+      const orchestratorJob = new AgentJobEntity({
+        ...mockJob,
+        taskType: TaskType.ORCHESTRATOR,
+      });
+      const createToolsSpy = jest.spyOn(toolRegistry, 'createTools');
+
+      await runner.run(orchestratorJob);
+
+      expect(createToolsSpy).toHaveBeenCalledWith(
+        expect.arrayContaining(['spawn_job']),
+        expect.any(Object)
+      );
+    });
+
+    it('should not request spawn_job tool for coding jobs', async () => {
+      const codingJob = new AgentJobEntity({
+        ...mockJob,
+        taskType: TaskType.CODING,
+      });
+      const createToolsSpy = jest.spyOn(toolRegistry, 'createTools');
+
+      await runner.run(codingJob);
+
+      const calledTools = createToolsSpy.mock.calls[0][0];
+      expect(calledTools).not.toContain('spawn_job');
+    });
+
+    it('should pass correct context to registry', async () => {
+      const jobWithProject = new AgentJobEntity({
+        ...mockJob,
+        projectId: 1,
+        project: { rootPath: '/test/path', includes: [], excludes: [] },
+      });
+      const createToolsSpy = jest.spyOn(toolRegistry, 'createTools');
+
+      await runner.run(jobWithProject);
+
+      expect(createToolsSpy).toHaveBeenCalledWith(
+        expect.any(Array),
+        expect.objectContaining({
+          jobId: jobWithProject.id,
+          job: jobWithProject,
+          projectId: 1,
+          projectRootPath: '/test/path',
+          eventCallbacks: expect.objectContaining({
+            onLog: expect.any(Function),
+            onArtifact: expect.any(Function),
+            onComment: expect.any(Function),
+          }),
+        })
+      );
+    });
   });
 });

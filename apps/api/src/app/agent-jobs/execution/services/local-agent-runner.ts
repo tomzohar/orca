@@ -1,19 +1,13 @@
 import { HumanMessage } from '@langchain/core/messages';
-import { DynamicStructuredTool } from '@langchain/core/tools';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { LlmService } from '../../../shared/llm/llm.service';
 import { createAgentGraph } from '../../agent/agent.graph';
-import { createLogTool } from '../../agent/tools/log-progress.tool';
-import { createSaveArtifactTool } from '../../agent/tools/save-artifact.tool';
-import { createFileSystemTool } from '../../agent/tools/file-system.tool';
-import {
-  createPostCommentTool,
-  createReadCommentsTool,
-} from '../../agent/tools/comment.tools';
 import {
   AgentJobEntity,
   AgentJobStatus,
+  TaskType,
+  AgentJobComment,
 } from '../../domain/entities/agent-job.entity';
 import {
   JobArtifactAddedEvent,
@@ -30,6 +24,7 @@ import {
   ARTIFACT_STORAGE,
   type IArtifactStorage,
 } from '../../domain/interfaces/artifact-storage.interface';
+import { ToolRegistryService } from '../../registry/tool-registry.service';
 
 @Injectable()
 export class LocalAgentRunner implements IAgentRunner {
@@ -42,6 +37,7 @@ export class LocalAgentRunner implements IAgentRunner {
     private readonly artifactStorage: IArtifactStorage,
     private readonly eventEmitter: EventEmitter2,
     private readonly llmService: LlmService,
+    private readonly toolRegistry: ToolRegistryService,
   ) { }
 
   async run(job: AgentJobEntity): Promise<void> {
@@ -54,80 +50,61 @@ export class LocalAgentRunner implements IAgentRunner {
       // 1. Initialize Model
       const model = this.llmService.getModel();
 
-      // 2. Initialize Tools
-      const logTool = createLogTool(job.id, this.repository, (msg) => {
-        this.logger.debug(`[Tool: log_progress] message="${msg.substring(0, 100)}${msg.length > 100 ? '...' : ''}"`);
-        // We also emit the event here if the tool is called
-        const log = {
-          id: 0,
-          jobId: job.id,
-          message: msg,
-          timestamp: new Date(),
-        }; // Mock ID/Date for event
-        this.eventEmitter.emit(
-          'agent-job.log-added',
-          new JobLogAddedEvent(job.id, log),
-        );
-      });
-
-      const artifactTool = createSaveArtifactTool(
-        job.id,
-        this.artifactStorage,
-        (artifactId, path, filename) => {
-          this.logger.log(`[Tool: save_artifact] filename="${filename}", id=${artifactId}`);
-          // Emit event with artifact details returned from storage
-          this.eventEmitter.emit(
-            'agent-job.artifact-added',
-            new JobArtifactAddedEvent(job.id, artifactId, filename, path),
-          );
-        },
-      );
-
-      const postCommentTool = createPostCommentTool(
-        job.id,
-        job.assignedAgentId ?? job.createdById,
-        this.repository,
-      );
-
-      const readCommentsTool = createReadCommentsTool(
-        job.id,
-        this.repository,
-      );
-
-      const tools: DynamicStructuredTool[] = [
-        logTool,
-        artifactTool,
-        postCommentTool,
-        readCommentsTool,
-      ];
-
-      if (job.project) {
-        this.logger.log(`[Setup] Adding file system tool for project root: ${job.project.rootPath}`);
-        // Pass jobId and artifactStorage so write action can also save as artifact
-        const fsTool = createFileSystemTool(
-          job.project.rootPath,
-          job.id,
-          this.artifactStorage,
-          (artifactId, path, filename) => {
-            this.logger.log(`[Tool: file_system write] Created file and artifact: filename="${filename}", id=${artifactId}`);
-            // Emit event with artifact details
+      // 2. Build tool context
+      const toolContext = {
+        jobId: job.id,
+        job,
+        projectId: job.projectId,
+        projectRootPath: job.project?.rootPath,
+        eventCallbacks: {
+          onLog: (msg: string) => {
+            this.logger.debug(`[Tool: log_progress] message="${msg.substring(0, 100)}${msg.length > 100 ? '...' : ''}"`);
+            const log = {
+              id: 0,
+              jobId: job.id,
+              message: msg,
+              timestamp: new Date(),
+            };
+            this.eventEmitter.emit(
+              'agent-job.log-added',
+              new JobLogAddedEvent(job.id, log),
+            );
+          },
+          onArtifact: (artifactId: number, path: string, filename: string) => {
+            this.logger.log(`[Tool: artifact] filename="${filename}", id=${artifactId}`);
             this.eventEmitter.emit(
               'agent-job.artifact-added',
               new JobArtifactAddedEvent(job.id, artifactId, filename, path),
             );
-          }
-        );
-        tools.push(fsTool);
-        this.logger.log(`[Setup] Total tools available: ${tools.length} (log_progress, save_artifact, file_system)`);
+          },
+          onComment: (comment: AgentJobComment) => {
+            this.logger.log(`[Tool: comment] By ${comment.authorId}`);
+            this.eventEmitter.emit(
+              'agent-job.comment-added',
+              new JobCommentAddedEvent(job.id, comment),
+            );
+          },
+        },
+      };
+
+      // 3. Get requested tools for this job
+      const requestedTools = this.getRequestedTools(job);
+      this.logger.log(`[Setup] Requesting tools: ${requestedTools.join(', ')}`);
+
+      // 4. Create tools using registry
+      const tools = this.toolRegistry.createTools(requestedTools, toolContext);
+      this.logger.log(`[Setup] Created ${tools.length} tools for job ${job.id}`);
+
+      if (job.project) {
+        this.logger.log(`[Setup] Project context: ${job.project.rootPath}`);
       } else {
         this.logger.warn(`Job ${job.id} has no project context. File system tool disabled.`);
-        this.logger.log(`[Setup] Total tools available: ${tools.length} (log_progress, save_artifact)`);
       }
 
-      // 3. Create Graph
+      // 5. Create Graph
       const graph = createAgentGraph(model, tools);
 
-      // 4. Execute
+      // 6. Execute
       const inputs = {
         messages: [new HumanMessage(job.prompt)],
         jobId: job.id,
@@ -172,7 +149,7 @@ export class LocalAgentRunner implements IAgentRunner {
         }
       }
 
-      // 5. Complete
+      // 7. Complete
       const endTime = Date.now();
       const durationMs = endTime - startTime;
       const durationSec = (durationMs / 1000).toFixed(2);
@@ -207,5 +184,28 @@ export class LocalAgentRunner implements IAgentRunner {
       'agent-job.log-added',
       new JobLogAddedEvent(jobId, { ...log, jobId }),
     );
+  }
+
+  private getRequestedTools(job: AgentJobEntity): string[] {
+    // Base tools for all jobs
+    const baseTools = [
+      'log_progress',
+      'save_artifact',
+      'post_comment',
+      'read_comments',
+    ];
+
+    // Add filesystem tool (registry checks if project exists)
+    if (job.projectId) {
+      baseTools.push('file_system');
+    }
+
+    // Add orchestration tools for orchestrator jobs
+    if (job.taskType === TaskType.ORCHESTRATOR) {
+      baseTools.push('spawn_job');
+      // Future: 'check_child_status', 'collect_results', etc.
+    }
+
+    return baseTools;
   }
 }

@@ -40,6 +40,7 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
     projectId?: number;
     parentJobId?: number;
     taskType?: TaskType;
+    status?: AgentJobStatus;
   }): Promise<AgentJobEntity> {
     const job = await this.prisma.agentJob.create({
       data: {
@@ -54,6 +55,7 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
         taskType: data.taskType
           ? PrismaTaskType[data.taskType]
           : PrismaTaskType.CODING,
+        status: data.status || AgentJobStatus.PENDING,
       },
       include: {
         logs: true,
@@ -218,10 +220,10 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
       projectId: dbJob.projectId ?? undefined,
       project: dbJob.project
         ? {
-            rootPath: dbJob.project.rootPath,
-            includes: dbJob.project.includes,
-            excludes: dbJob.project.excludes,
-          }
+          rootPath: dbJob.project.rootPath,
+          includes: dbJob.project.includes,
+          excludes: dbJob.project.excludes,
+        }
         : undefined,
       createdById: dbJob.createdById,
       assignedAgentId: dbJob.assignedAgentId ?? undefined,

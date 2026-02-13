@@ -1,6 +1,7 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import { IArtifactStorage } from '../../domain/interfaces/artifact-storage.interface';
+import { ToolFactory, ToolCategory, ToolContext } from '../../registry/tool-registry.service';
 
 export const createSaveArtifactTool = (
   jobId: number,
@@ -21,4 +22,22 @@ export const createSaveArtifactTool = (
       return `Artifact saved to ${artifact.path}`;
     },
   });
+};
+
+// Factory for registry
+export const saveArtifactToolFactory: ToolFactory = {
+  metadata: {
+    name: 'save_artifact',
+    description: 'Save code snippets and artifacts to the database',
+    category: ToolCategory.CORE,
+    requirements: { storageRequired: true },
+  },
+  canActivate: (context: ToolContext) => !!context.artifactStorage,
+  create: (context: ToolContext) => {
+    return createSaveArtifactTool(
+      context.jobId,
+      context.artifactStorage,
+      context.eventCallbacks.onArtifact
+    );
+  },
 };

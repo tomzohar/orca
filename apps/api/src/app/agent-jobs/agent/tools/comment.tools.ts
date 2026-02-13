@@ -1,6 +1,7 @@
 import { DynamicStructuredTool } from '@langchain/core/tools';
 import { z } from 'zod';
 import type { IAgentJobsRepository } from '../../domain/interfaces/agent-jobs.repository.interface';
+import { ToolFactory, ToolCategory, ToolContext } from '../../registry/tool-registry.service';
 
 /**
  * Create a tool for posting comments to a job
@@ -18,7 +19,7 @@ export const createPostCommentTool = (
     schema: z.object({
       content: z.string().describe('The comment text to post'),
       metadata: z
-        .any()
+        .record(z.string(), z.any())
         .optional()
         .describe('Optional structured data as JSON object (e.g., {"status": "complete"})'),
     }),
@@ -86,4 +87,30 @@ export const createReadCommentsTool = (
       }
     },
   });
+};
+
+// Factories for registry
+export const postCommentToolFactory: ToolFactory = {
+  metadata: {
+    name: 'post_comment',
+    description: 'Post comments to job threads for communication',
+    category: ToolCategory.COMMUNICATION,
+    requirements: { repositoryRequired: true },
+  },
+  create: (context: ToolContext) => {
+    const authorId = context.job?.assignedAgentId ?? context.job?.createdById ?? 0;
+    return createPostCommentTool(context.jobId, authorId, context.repository);
+  },
+};
+
+export const readCommentsToolFactory: ToolFactory = {
+  metadata: {
+    name: 'read_comments',
+    description: 'Read comments from job threads for monitoring and coordination',
+    category: ToolCategory.COMMUNICATION,
+    requirements: { repositoryRequired: true },
+  },
+  create: (context: ToolContext) => {
+    return createReadCommentsTool(context.jobId, context.repository);
+  },
 };
