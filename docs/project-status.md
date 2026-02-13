@@ -1,350 +1,142 @@
 # Project Status
 
-**Last Updated:** February 13, 2026 (Phase 1 Parallel Execution Complete)
+**Last Updated:** February 13, 2026
 
-## 1. Overview
+## Overview
 
-Orca is an autonomous software orchestration platform. We have successfully implemented the **Pluggable Agent Architecture** and a specialized **Projects Module**, enabling agents to operate with full project awareness and localized file system access. The platform now features **fully automatic project initialization** and a comprehensive **Orchestration Dashboard** with real-time job monitoring and management.
+Autonomous software orchestration platform with pluggable agent architecture, project-aware file system access, and real-time dashboard monitoring.
 
-## 2. Current Architecture State
+## Architecture
 
 ### Backend (`apps/api`)
+**Stack:** NestJS + Prisma + PostgreSQL
 
-- **Framework:** NestJS + Prisma (PostgreSQL).
-- **Core Modules:**
-  - `agent-jobs`: Core execution engine.
-  - `projects`: Manages file system project metadata and access.
-  - `users`: User identity and attribution system.
-  - `agent-configurations`: Reusable agent persona configurations with system prompts and execution preferences.
-  - `skills`: Reads and manages Claude skills from project's `.claude/skills/` directory.
-- **Architecture:** **Pluggable Strategy Pattern**
-  - `AgentRunnerFactory`: Dispatches jobs based on `AgentType`.
-  - **Quick Mode (`LocalAgentRunner`)**: ✅ **Production-Ready** - In-process LangGraph execution with:
-    - Robust error handling and status management
-    - Enhanced stream processing with agent response capture
-    - Execution timing and tool invocation monitoring
-    - Glob pattern file search (recursion limit: 50)
-    - Dual file creation (filesystem + database artifacts)
-    - Full project-aware filesystem access with security validation
-  - **Testing Infrastructure:**
-    - Centralized mocking system for LLMs, Runners, and Repositories.
-    - Automated test execution via Nx (monorepo-safe).
-- [x] **Deep Mode (Dockerized Agent)**:
-  - [x] Create `apps/agent-scaffold` with Claude Agent SDK.
-  - [x] Implement `DockerAgentRunner` in backend.
-  - [x] Integrate with `AgentJobs` module.
-  - [x] Verify tool use (File System, Bash).
-  - [x] Robust error handling and configuration validation.
-- [x] **Project Awareness**:
-  - [x] Implement `Projects` module (CRUD for project metadata).
-  - [x] **Auto-Initialization**: `GET /projects/detect` automatically detects AND creates projects (idempotent).
-  - [x] **Smart Slug Generation**: Uses parent directory + basename for unique project slugs.
-  - [x] Integrate `projectId` into `AgentJob` schema.
-  - [x] Inject project `rootPath` into agent tools (File System Tool).
-- [x] **Log Formatting**: Parse raw JSON logs into human-readable updates.
-- [x] **Artifact Capture**: Store agent file outputs (`Write` & `Edit` via `fs.watch`) in DB.
-- [x] **Feedback Loop**: Agent can request user input (`AskUserQuestion`), triggering `WAITING_FOR_USER` status.
-- **Data Model:**
-  - `User`: Identity system with HUMAN and AGENT types, system prompt support (future).
-  - `AgentJob`: Includes `agentType`, `projectId`, `createdById`, and `assignedAgentId` for full attribution.
-  - `Project`: Defines root paths, includes, excludes, and owner for agent access.
-  - `AgentConfiguration`: Stores reusable agent personas with system prompts, rules, skills, and execution preferences.
-  - `AgentJobLog` & `AgentJobArtifact`: Relational tables for streaming outputs.
-- **Status:**
-  - ✅ "Blackboard" Schema implemented.
-  - ✅ Project management system integrated.
-  - ✅ Docker Infrastructure verified (Image built, permissions configured).
-  - ✅ Granular SSE event stream (`log_added`, `artifact_added`, `status_changed`).
-  - ✅ Domain Isolation: Prisma models decoupled from domain events.
-  - ✅ Test Coverage: High coverage (50 tests passing) for execution services and project module.
-  - ✅ **LocalAgentRunner Production-Ready**: Full codebase interaction (read, write, search) with robust error handling and observability.
+**Modules:**
+- `agent-jobs`: Execution engine with pluggable strategy pattern
+- `projects`: Project metadata, auto-initialization, smart slug generation
+- `users`: Identity system (HUMAN/AGENT types), attribution tracking
+- `agent-configurations`: Reusable agent personas with prompts/rules/skills
+- `skills`: Reads/manages Claude skills from `.claude/skills/`
+
+**Agent Execution:**
+- **Quick Mode (`LocalAgentRunner`)**: ✅ Production-ready in-process LangGraph execution
+  - Recursion limit: 50, glob search, dual file creation (disk + DB), full security validation
+- **Deep Mode (`DockerAgentRunner`)**: ✅ Complete - Isolated Claude SDK in Docker with verified tool use
+
+**Infrastructure:**
+- ✅ Centralized mocking system, 90+ tests passing
+- ✅ Blackboard schema, project system, Docker verified
+- ✅ SSE events: `log_added`, `artifact_added`, `status_changed`, `comment_added`
+- ✅ Domain isolation (Prisma decoupled from domain events)
 
 ### Frontend (`apps/web`)
+**Stack:** Angular 18+ (Zoneless/Signals) + Angular Material
 
-- **Framework:** Angular 18+ (Zoneless/Signals) + Angular Material.
-- **Core Libraries:**
-  - `libs/core/projects`: Project detection services and TanStack Query integration.
-  - `libs/design-system`: Atomic UI components (Sidebar, Topbar, Card, Tabs, Spinner, etc.).
-- **Components:**
-  - `App`: Main application component managing global project detection and layout state.
-  - **Orchestration Dashboard**:
-    - `KanbanViewComponent`: Visualizes job lifecycle with integrated drag-and-drop.
-    - `JobDetailsPanelComponent`: **Input-driven architecture** (removed shared state service). Merges query data with real-time SSE updates for logs and artifacts.
-- **Status:**
-  - ✅ Connects to backend via proxy.
-  - ✅ Consumes SSE stream for live updates.
-  - ✅ **Routing & Navigation:** Deep-linkable job details (`/orchestration/:jobId`) with query parameter support for tab states (`?tab=logs`).
-  - ✅ **State Management:** TanStack Query + Signals for high-performance reactive updates.
-  - ✅ **Design System:** Reusable `TabsComponent` and improved `KanbanViewComponent`.
-  - ✅ **Automatic Initialization:** Seamless workspace onboarding.
-  - ✅ Monorepo-safe test suite (non-watch mode by default).
+**Libraries:**
+- `libs/core/projects`: TanStack Query + project detection
+- `libs/design-system`: Atomic UI components (30+ components)
 
-## 3. Recent Accomplishments
+**Features:**
+- ✅ Kanban job board with drag-and-drop
+- ✅ Input-driven job details panel with SSE real-time updates
+- ✅ Deep-linkable routes (`/orchestration/:jobId?tab=logs`)
+- ✅ Automatic project initialization
+- ✅ 45+ tests passing
 
-- **Parallel Execution - Phase 1: Database Schema & Git Service (Feb 13, 2026):**
-  - **Implemented database foundation for parallel agent orchestration:**
-    - Database Schema Changes:
-      - Added `TaskType` enum (ORCHESTRATOR, CODING, REVIEW) for job classification
-      - Added `MergeStatus` enum (PENDING, READY, CONFLICT, MERGED) for merge workflow tracking
-      - Added job hierarchy fields to `AgentJob`: `parentJobId` and `childJobs` relation
-      - Added git isolation field: `gitBranch` for tracking agent branches
-      - Added classification fields: `taskType` and `mergeStatus` to `AgentJob`
-      - Created and applied migration `20260213084725_add_job_hierarchy_and_git_tracking`
-    - Domain Layer Updates:
-      - Updated `AgentJobEntity` with new enums and fields
-      - Updated repository interface with parentJobId and taskType support
-      - Updated Prisma repository implementation to handle new Prisma enums
-    - GitService Implementation:
-      - Created complete `GitService` with security-first design
-      - `getDiff()`: Get diff between branches with configurable base branch
-      - `getChangedFiles()`: List files modified in a branch vs base
-      - `detectConflicts()`: Analyze multiple job branches for overlapping file changes
-      - Security features: Uses `execFile` instead of `exec` to prevent command injection
-      - Branch name validation: Rejects suspicious patterns to prevent shell injection
-      - Comprehensive error handling with proper logging
-    - Testing & Quality:
-      - 15 new GitService tests covering all methods and edge cases
-      - 90 total tests passing (75 existing + 15 new)
-      - Solved complex Jest mocking issue with hoisting and temporal dead zones
-      - Zero breaking changes to existing functionality
-    - Module Integration:
-      - Created `GitModule` and added to `AppModule`
-      - Service ready for Phase 2 orchestration integration
-  - **Status:** ✅ Phase 1 Complete - Database schema and git infrastructure ready for orchestration. Phase 2 (Orchestrator Tools + Docker Clone) ready to begin.
+## Recent Accomplishments
 
-- **Job Comments System (Feb 12, 2026 - Evening):**
-  - **Implemented complete commenting system for agent jobs:**
-    - `AgentJobComment` model with user attribution and metadata support
-    - Full database schema with foreign keys to `User` and `AgentJob`
-    - Cascade delete on job removal to prevent orphaned comments
-    - Optional metadata field for structured data (JSON)
-  - **Backend Implementation:**
-    - Domain layer: `AgentJobComment` interface and `JobCommentAddedEvent`
-    - Repository layer: `addComment()` and `getComments()` methods with DESC sorting (newest first)
-    - Service layer: `JobCommentsService` with validation and event emission
-    - API layer: POST/GET endpoints at `/agent-jobs/:id/comments`
-    - SSE integration: Real-time `comment_added` events broadcast to all clients
-  - **Agent Tools:**
-    - `postComment`: Allows agents to post comments to job threads
-    - `readComments`: Allows agents to read existing comments
-    - Full integration with agent execution context (jobId and authorId injected)
-  - **Frontend Implementation:**
-    - Type definitions: `JobComment` interface in orchestration-types
-    - Data access: TanStack Query hooks for comments (`injectCommentsQuery`, `injectAddCommentMutation`)
-    - UI components: `JobCommentsComponent` with markdown editor for viewing
-    - Form component: `JobCommentFormComponent` with markdown editor for creating
-    - Integration: Comments section in job overview tab with scrollable list and sticky input form
-  - **Markdown Support:**
-    - Full markdown editor for creating comments (edit mode with toolbar and preview toggle)
-    - Markdown preview for viewing comments (read-only mode)
-    - Proper formatting for code blocks, lists, links, and emphasis
-  - **UX Enhancements:**
-    - Comments list is scrollable with custom-styled scrollbar
-    - Comment input form sticks to bottom of container
-    - Comments sorted newest first for better conversation flow
-    - Real-time updates via SSE for collaborative commenting
-    - Optimistic updates for instant feedback
-  - **Testing & Quality:**
-    - All backend tests passing (58/58 including new comment service and controller tests)
-    - All frontend tests passing (45/45 including new comment component tests)
-    - TanStack Query providers properly mocked in tests
-    - Strict typing throughout (no `any` types)
-  - **Status:** ✅ Phase 1 Complete - Users and agents can comment on jobs with real-time updates. Phase 2 (Resume functionality) planned for next iteration.
+### Feb 13, 2026 - Parallel Execution Phase 1
+✅ **Database Schema:**
+- Job hierarchy: `parentJobId`, `childJobs` relation
+- Enums: `TaskType` (ORCHESTRATOR/CODING/REVIEW), `MergeStatus` (PENDING/READY/CONFLICT/MERGED)
+- Git isolation: `gitBranch` field for branch tracking
 
-- **Agent Configuration System (Feb 12, 2026 - Afternoon):**
-  - **Implemented complete agent configuration management:**
-    - `AgentConfiguration` model with system prompts, rules, skills array, and execution preferences
-    - Full CRUD API with project-scoped configurations
-    - Automatic slug generation for URL-friendly identifiers
-    - User attribution via `userId` (linked to project owner)
-    - Active/inactive state management for configuration lifecycle
-  - **Database Schema:**
-    - Created `AgentConfiguration` table with relations to `User` and `Project`
-    - Supports both `DOCKER` and `FILE_SYSTEM` agent types
-    - Skills stored as string array for referencing Claude skills
-    - Text fields for system prompts and rules (unlimited length)
-    - Cascade delete on project removal
-  - **Module Architecture:**
-    - Domain layer: Pure TypeScript entities following DDD patterns
-    - Data layer: Prisma repository with proper type mapping
-    - Application layer: Business logic with slug uniqueness validation
-    - API layer: RESTful endpoints with flexible ID/slug lookup
-  - **Frontend Integration:**
-    - Agent configurations list view (`/agents`) with project filtering
-    - Create dialog with form validation and multiselect skills dropdown
-    - TanStack Query integration for real-time updates
-    - TypeScript interfaces synced with backend
-    - User ID automatically retrieved from project owner
-    - Skills dropdown populated from project's `.claude/skills/` directory
-  - **Automatic Initialization:**
-    - Default "Coding Agent" configuration created on project setup
-    - Hardcoded professional defaults (system prompt, rules, Docker execution)
-    - Idempotent: checks for existing config before creation
-    - Non-blocking: won't fail project creation if config creation fails
-  - **API Endpoints:**
-    - `POST /api/agent-configurations` - Create configuration
-    - `GET /api/agent-configurations?projectId=<id>` - List all or filter by project
-    - `GET /api/agent-configurations/:idOrSlug` - Get by ID or slug
-    - `PUT /api/agent-configurations/:id` - Update configuration
-    - `DELETE /api/agent-configurations/:id` - Delete configuration
-  - **Testing & Verification:**
-    - All builds passing (backend and frontend)
-    - Module dependencies properly configured with forwardRef
-    - Database migrations applied successfully
-  - **Status:** ✅ Complete - Foundation ready for agent persona management and job-config linking
+✅ **GitService:**
+- Methods: `getDiff()`, `getChangedFiles()`, `detectConflicts()`
+- Security: `execFile` (no command injection), branch name validation
+- 15 new tests, 90 total passing, zero breaking changes
 
-- **Skills Management System (Feb 12, 2026 - Afternoon):**
-  - **Implemented complete skills discovery and management:**
-    - Skills module reads from project's `.claude/skills/` directory structure
-    - Supports nested directory structure: `.claude/skills/skill-name/SKILL.md`
-    - API endpoint for listing available skills with automatic sorting
-    - Error handling for missing directories or permission issues
-  - **Module Architecture:**
-    - Service layer: Business logic for filesystem operations (proper separation of concerns)
-    - Controller layer: Thin HTTP request handlers delegating to service
-    - Repository pattern not needed (read-only filesystem operations)
-  - **Frontend Integration:**
-    - TanStack Query hooks for skills state management (`injectSkillsQuery`)
-    - Reusable skills state accessible from multiple components
-    - 10-minute cache with automatic invalidation
-    - Multiselect dropdown in agent configuration dialog
-    - Loading states during skills fetch
-  - **API Endpoint:**
-    - `GET /api/skills` - Returns array of available skills with names and file paths
-  - **Design System Enhancement:**
-    - Added `multiple` support to `DropdownComponent` for multiselect behavior
-    - Backend returns sorted skills for consistent UI presentation
-  - **Architecture Principle Applied:**
-    - Controllers only handle HTTP concerns (request/response)
-    - Services contain all business logic (filesystem reading, directory traversal)
-    - Clear separation enables better testability and maintainability
-  - **Status:** ✅ Complete - Skills can be discovered, listed, and selected during agent configuration
+**Next:** Phase 2 (Orchestrator Tools + Docker Clone)
 
-- **Users Module - Phase 1: Core Attribution (Feb 12, 2026 - Morning):**
-  - **Implemented complete identity and attribution system:**
-    - `User` model with `HUMAN` and `AGENT` types
-    - Automatic initialization creates default users ("Human" and "Coding Agent")
-    - All jobs now track who created them (`createdById`)
-    - Support for agent assignment (`assignedAgentId`)
-    - All projects track their owner (`ownerId`)
-  - **Database Schema:**
-    - Added `UserType` enum (HUMAN, AGENT)
-    - Created `User` table with full relations
-    - Updated `Project` with `ownerId` foreign key
-    - Updated `AgentJob`: removed `assignee` string, added `createdById` (required) and `assignedAgentId` (optional)
-    - Migration applied with default user seeding
-  - **Module Architecture:**
-    - Domain layer: Pure TypeScript entities with factory methods
-    - Data layer: Prisma repository implementation with proper type mapping
-    - Application layer: Business logic for user management and initialization
-    - Initialization service: Creates default users on app startup via `OnModuleInit`
-  - **API Changes:**
-    - `POST /agent-jobs` now accepts optional `createdById` (auto-populated from project owner if not provided)
-    - `POST /agent-jobs` supports optional `assignedAgentId` for orchestrator assignments
-    - All job responses now include user attribution data
-  - **Integration:**
-    - Projects module automatically creates owner users during project initialization
-    - AgentJobs module validates users and requires attribution
-    - Backward-compatible: `createdById` auto-populates from project owner when not provided
-  - **Testing & Verification:**
-    - All 50+ existing tests still passing
-    - Migration verified with default users created (Human id:1, Coding Agent id:2)
-    - API validation working correctly
-    - Server initialization logs confirm successful user setup
-  - **Status:** ✅ Phase 1 complete - Foundation ready for future phases (Agent Personas API, Job Comments, Authentication)
+### Feb 12, 2026 - Comments, Configs, Skills, Users
 
-- **Bulk Filesystem Operations (Feb 11, 2026 - Evening):**
-  - **Enhanced file_system tool** with bulk operations to dramatically reduce recursion:
-    - `read_multiple`: Read multiple files in a single call (limit: 20 files)
-    - `tree`: Get directory structure with configurable depth (default: 3 levels)
-    - `git_diff`: Get uncommitted or staged changes directly
-    - `read_matching`: Read all files matching a glob pattern (limit: 15 files)
-  - **Reduced Tool Calls:** Review tasks now use 3-5 calls instead of 25+
-  - **Updated System Prompt:** Agent now prioritizes bulk operations
-  - **Benefits:** Lower recursion, faster execution, reduced API costs, better context
-  - **Status:** ✅ Implemented and tested (all 50 tests passing)
+✅ **Job Comments:**
+- Backend: `AgentJobComment` model, POST/GET endpoints, SSE `comment_added` events
+- Agent tools: `postComment`, `readComments`
+- Frontend: Markdown editor, scrollable list, optimistic updates
+- 58 backend + 45 frontend tests passing
 
-- **AgentType Enum Rename (Feb 11, 2026 - Evening):**
-  - Renamed enum values for clarity: `LANGGRAPH` → `FILE_SYSTEM`, `CLAUDE_SDK` → `DOCKER`
-  - Updated 24 files across backend, frontend, tests, and documentation
-  - Database migrated with new enum values
-  - All tests passing after migration
+✅ **Agent Configurations:**
+- CRUD API, auto slug generation, project-scoped
+- Default "Coding Agent" created on project init
+- Frontend: list view, create dialog, multiselect skills dropdown
 
-- **LocalAgentRunner Production Readiness (Feb 11, 2026):**
-  - **Fixed Critical Bugs:**
-    - Artifact storage interface now returns structured objects (id + path) instead of fragile string parsing.
-    - Enhanced error handling in fire-and-forget pattern with proper status updates and logging.
-    - Clarified and validated project loading strategy with fail-fast validation.
-  - **Enhanced Observability:**
-    - Stream processing now captures and logs agent responses to database (visible in UI).
-    - Added execution timing (start time, duration) with millisecond precision.
-    - Tool invocations now logged with arguments for debugging.
-    - Agent intermediate thoughts/actions now visible in logs.
-  - **Improved Agent Capabilities:**
-    - Increased recursion limit from 25 to 50 for complex tasks.
-    - Added `find` action to file_system tool with glob pattern support (`**/*.ts`).
-    - Automatically excludes `node_modules`, `.git`, `.nx`, `dist` from searches.
-    - Limits search results to 500 files to prevent overwhelming output.
-  - **Dual File Creation:**
-    - File system tool's `write` action now creates both:
-      - Actual files on disk (primary behavior)
-      - Artifacts in database for UI viewing (automatic)
-    - Events emitted for both filesystem writes and artifact creation.
-  - **Test Coverage:**
-    - All 50 unit tests passing.
-    - Updated tool descriptions for clarity (file_system vs save_artifact).
-    - Enhanced system prompt to guide agent tool selection.
-  - **Status:** ✅ LocalAgentRunner is now **production-ready** for reading files, writing files, performing codebase searches, and creating artifacts.
+✅ **Skills Management:**
+- Reads `.claude/skills/` directory
+- Endpoint: `GET /api/skills`
+- Multiselect dropdown support added to design system
 
-- **Input-Driven Job Details & Advanced Routing (Feb 11, 2026):**
-  - Refactored `JobDetailsPanelComponent` to be purely input-driven, eliminating the complex `JobDetailsStateService`.
-  - Implemented deep-linkable job routes and query-parameter-based tab switching (Overview, Logs, Artifacts).
-  - Integrated real-time SSE updates directly into the detail panel using Angular Signals.
-  - Cleaned up redundant imports and modernized component lifecycle handling using `effect` and `onCleanup`.
+✅ **Users Module Phase 1:**
+- `User` model (HUMAN/AGENT types)
+- Attribution: `createdById`, `assignedAgentId` on jobs
+- Auto-initialization: default users created on app startup
 
-- **Real-Time Orchestration (Feb 11, 2026):**
-  - Completed the full Job Management lifecycle with backend repository decoupling.
-  - Implemented SSE (Server-Sent Events) for real-time status, log, and artifact updates.
-  - Launched the Job Creation dialog and the Detail Panel infrastructure.
+### Feb 11, 2026 - Agent Runner Enhancements
 
-- **Kanban & Project Foundation (Feb 10, 2026):**
-  - Initial implementation of the Kanban board and automatic project initialization.
-  - Refactored project initialization to be zero-intervention and idempotent.
+✅ **Bulk Filesystem Operations:**
+- Tools: `read_multiple` (20 files), `tree` (depth: 3), `git_diff`, `read_matching` (15 files)
+- Reduced tool calls from 25+ to 3-5 per review task
 
-## 4. Next Steps (Orchestration & UI)
+✅ **AgentType Rename:**
+- `LANGGRAPH` → `FILE_SYSTEM`, `CLAUDE_SDK` → `DOCKER`
+- 24 files updated, migration complete
 
-1.  **Agent Configuration Enhancements:**
-    - ✅ ~~Basic CRUD and automatic initialization~~ (Complete)
-    - Add detail panel for viewing/editing individual configurations
-    - Implement delete confirmation dialog
-    - Add agent testing/preview functionality
-    - Link jobs to configurations (optional agent selection during job creation)
-    - Validate skills against `.claude/skills/` directory
-    - Create configuration templates library
-    - Add version history tracking for configurations
+✅ **LocalAgentRunner Production:**
+- Recursion limit: 50, glob search with `find` action
+- Dual file creation (disk + DB artifacts)
+- Enhanced observability: execution timing, tool logging, agent responses captured
+- Artifact interface returns structured objects (id + path)
 
-2.  **Users Module - Phase 2: Job Comments:**
-    - ✅ ~~Implement `AgentJobComment` model with user attribution~~ (Complete)
-    - ✅ ~~Add commenting API endpoints~~ (Complete)
-    - ✅ ~~Create UI for adding/viewing comments on jobs~~ (Complete)
-    - ✅ ~~Real-time comment updates via SSE~~ (Complete)
-    - ✅ ~~Agent tools for posting and reading comments~~ (Complete)
-    - ✅ ~~Markdown support for comment formatting~~ (Complete)
+✅ **UI Improvements:**
+- Input-driven `JobDetailsPanelComponent` (removed state service)
+- Deep-linkable routes with query params (`/orchestration/:jobId?tab=logs`)
+- SSE real-time updates with Angular Signals
 
-3.  **Users Module - Phase 3: Job Resume Functionality:**
-    - Implement job lineage tracking (baseJobId self-reference)
-    - Add `resumeJob()` service method with context enrichment
-    - Create Resume Job Dialog component
-    - Build enriched context prompt from logs, artifacts, and comments
-    - Add "Resume with Feedback" button to completed/failed jobs
-    - Real-time resume events via SSE
+### Feb 10-11, 2026 - Foundation
 
-4.  **Resume & Feedback UI:** Implement the `WAITING_FOR_USER` interaction (display question, accept input, API to resume).
+✅ **Core Infrastructure:**
+- Kanban board with drag-and-drop
+- Automatic project initialization (idempotent)
+- SSE events for status/logs/artifacts
+- Job creation dialog and detail panel
 
-5.  **Generic List Components:** Utilize the new `ListItem` and `ListConfig` types to build specialized log and artifact lists.
+## Next Steps
 
-6.  **Project Management UI:** Create frontend views for managing/editing existing projects (rename, update excludes).
+### Parallel Execution Phase 2
+- Orchestrator agent tools
+- Docker clone isolation
+- Multi-agent coordination
 
-7.  **Artifact Previews:** Enhance the Artifacts tab with code highlighting or HTML previews for generated files.
+### Agent Configuration
+- Detail panel for viewing/editing
+- Delete confirmation dialog
+- Testing/preview functionality
+- Link jobs to configs (optional selection during creation)
+- Skill validation against `.claude/skills/`
+- Configuration templates library
+- Version history tracking
 
-8.  **Job Interaction:** Fully implement drag-and-drop logic to update job status/priority via API.
+### Job Resume (Users Phase 3)
+- Job lineage tracking (`baseJobId` self-reference)
+- `resumeJob()` service with context enrichment
+- Resume dialog component
+- Enriched prompt builder (logs + artifacts + comments)
+- "Resume with Feedback" button on completed/failed jobs
+- SSE resume events
+
+### UI Enhancements
+- `WAITING_FOR_USER` interaction (display question, accept input, resume API)
+- Generic list components using `ListItem`/`ListConfig` types
+- Project management views (rename, update excludes)
+- Artifact previews (code highlighting, HTML preview)
+- Drag-and-drop status/priority updates via API
