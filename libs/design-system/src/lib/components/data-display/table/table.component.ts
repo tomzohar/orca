@@ -16,6 +16,7 @@ import { MenuComponent } from '../../menu/menu.component';
 import { EmptyStateComponent } from '../../feedback/empty-state/empty-state.component';
 import { SpinnerComponent } from '../../feedback/spinner/spinner.component';
 import { RelativeTimePipe } from '../../../pipes/relative-time.pipe';
+import { FillAvailableHeightDirective } from '../../../directives/fill-available-height.directive';
 import { TableConfig, TableColumn, MenuItem } from '../../../types/component.types';
 
 const DEFAULT_CONFIG: TableConfig = {
@@ -40,6 +41,7 @@ const DEFAULT_CONFIG: TableConfig = {
     SpinnerComponent,
     RelativeTimePipe,
     DatePipe,
+    FillAvailableHeightDirective,
   ],
   templateUrl: './table.component.html',
   styleUrl: './table.component.scss',
@@ -137,4 +139,12 @@ export class TableComponent<T = any> {
   isSortable(column: TableColumn<T>): boolean {
     return this.config().sortable !== false && column.sortable !== false;
   }
+
+  // Computed property for fill available height margin
+  readonly fillHeightMargin = computed(() => {
+    const fillHeight = this.config().fillAvailableHeight;
+    if (fillHeight === true) return 0;
+    if (typeof fillHeight === 'number') return fillHeight;
+    return null;
+  });
 }

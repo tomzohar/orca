@@ -14,10 +14,15 @@
     @for (comment of comments(); track comment.id) {
       <div class="comment">
         <div class="comment-header">
-          <span class="comment-author">User #{{ comment.authorId }}</span>
-          <span class="comment-date">{{
-            comment.createdAt | date: 'short'
-          }}</span>
+          <div class="comment-author-info">
+            <orca-avatar [config]="getAvatarConfig(comment)" />
+            <div class="comment-meta">
+              <span class="comment-author">{{ getAuthorName(comment) }}</span>
+              <span class="comment-date">{{
+                comment.createdAt | date: 'short'
+              }}</span>
+            </div>
+          </div>
         </div>
         <div class="comment-content">
           <orca-markdown-editor

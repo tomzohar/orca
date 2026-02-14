@@ -1,0 +1,150 @@
+@use '../../../styles/orca-styles' as *;
+
+.orca-avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background-color: var(--avatar-bg, #e0e0e0);
+  color: var(--avatar-text, #666);
+  font-weight: 500;
+  user-select: none;
+
+  // Size variants
+  &.avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: $tokens-font-size-xs;
+  }
+
+  &.avatar-md {
+    width: 48px;
+    height: 48px;
+    font-size: $tokens-font-size-sm;
+  }
+
+  &.avatar-lg {
+    width: 64px;
+    height: 64px;
+    font-size: $tokens-font-size-md;
+  }
+
+  &.avatar-xl {
+    width: 96px;
+    height: 96px;
+    font-size: 18px; // Custom size for xl
+  }
+
+  // Shape variants
+  &.avatar-circular {
+    border-radius: 50%;
+  }
+
+  &.avatar-square {
+    border-radius: $tokens-radius-sm;
+  }
+
+  // Avatar image
+  .avatar-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  // Initials
+  .avatar-initials {
+    font-weight: $typography-font-weight-semibold;
+    line-height: 1;
+  }
+
+  // Icon
+  .avatar-icon {
+    opacity: 0.7;
+  }
+
+  // Status indicator
+  &.has-status {
+    .status-indicator {
+      position: absolute;
+      border: 2px solid white;
+      border-radius: 50%;
+
+      // Size based on avatar size
+      .avatar-sm & {
+        width: 10px;
+        height: 10px;
+        bottom: -1px;
+        right: -1px;
+      }
+
+      .avatar-md & {
+        width: 12px;
+        height: 12px;
+        bottom: 0;
+        right: 0;
+      }
+
+      .avatar-lg & {
+        width: 16px;
+        height: 16px;
+        bottom: 2px;
+        right: 2px;
+      }
+
+      .avatar-xl & {
+        width: 20px;
+        height: 20px;
+        bottom: 4px;
+        right: 4px;
+      }
+
+      // Status colors
+      &.status-online {
+        background-color: $tokens-status-online;
+      }
+
+      &.status-offline {
+        background-color: #9e9e9e;
+      }
+
+      &.status-away {
+        background-color: #ff9800;
+      }
+
+      &.status-busy {
+        background-color: $tokens-error-color;
+      }
+    }
+  }
+}
+
+// Default color variants for initials when no custom colors provided
+.orca-avatar:not([style*="background-color"]) {
+
+  // Generate consistent colors based on content
+  &:nth-of-type(5n+1) {
+    background-color: #e3f2fd;
+    color: #1976d2;
+  }
+
+  &:nth-of-type(5n+2) {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+  }
+
+  &:nth-of-type(5n+3) {
+    background-color: #e8f5e8;
+    color: #388e3c;
+  }
+
+  &:nth-of-type(5n+4) {
+    background-color: #fff3e0;
+    color: #f57c00;
+  }
+
+  &:nth-of-type(5n+5) {
+    background-color: #fce4ec;
+    color: #c2185b;
+  }
+}

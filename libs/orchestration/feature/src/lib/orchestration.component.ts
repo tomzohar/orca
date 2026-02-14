@@ -125,7 +125,7 @@ export class OrchestrationComponent {
 
     // Open side panel with job details component
     // The component will use router-outlet to render child tab components
-    const overlayRef = this.sidePanelService.open(JobDetailsPanelComponent, {
+    const sidePanelRef = this.sidePanelService.open(JobDetailsPanelComponent, {
       data: { jobId },
       title: 'Job Details',
       size: 'xl',
@@ -133,7 +133,7 @@ export class OrchestrationComponent {
     });
 
     // When panel closes, navigate back and reset state
-    overlayRef.detachments().subscribe(() => {
+    sidePanelRef.closed$.subscribe(() => {
       this.currentPanelJobId = null;
       this.router.navigate(['/orchestration']);
     });

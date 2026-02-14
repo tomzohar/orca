@@ -10,31 +10,6 @@
       </div>
     </div>
 
-    <div class="detail-section">
-      <h4 class="section-title">Status</h4>
-      <span class="status-badge" [attr.data-status]="currentJob.status">
-        {{ currentJob.status }}
-      </span>
-    </div>
-
-    <div class="detail-section">
-      <h4 class="section-title">Timestamps</h4>
-      <div class="timestamp-group">
-        <div class="timestamp-item">
-          <span class="timestamp-label">Created:</span>
-          <span class="timestamp-value">{{
-            currentJob.createdAt | date: 'medium'
-          }}</span>
-        </div>
-        <div class="timestamp-item">
-          <span class="timestamp-label">Updated:</span>
-          <span class="timestamp-value">{{
-            currentJob.updatedAt | date: 'medium'
-          }}</span>
-        </div>
-      </div>
-    </div>
-
     @if (currentJob.assignee) {
       <div class="detail-section">
         <h4 class="section-title">Assignee</h4>
@@ -42,10 +17,9 @@
       </div>
     }
 
-    <div class="detail-section comments-section">
+    <div class="detail-section comments-section" [orcaFillAvailableHeight]="0">
       @if (comments() && comments().length > 0) {
-        <h4 class="section-title">Comments</h4>
-        <div class="comments-list-container">
+        <div #commentsListContainer class="comments-list-container">
           <orca-job-comments
             [comments]="comments()"
             [loading]="commentsLoading()"

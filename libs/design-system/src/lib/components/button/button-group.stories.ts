@@ -3,7 +3,7 @@ import { ButtonGroupComponent } from './button-group.component';
 import { IconName } from '../../types/component.types';
 
 const meta: Meta<ButtonGroupComponent> = {
-  title: 'Button/Button Group',
+  title: 'Components/Button Group',
   component: ButtonGroupComponent,
   tags: ['autodocs'],
   argTypes: {

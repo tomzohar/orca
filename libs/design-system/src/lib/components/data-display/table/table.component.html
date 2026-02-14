@@ -1,4 +1,8 @@
-<div class="orca-table-container">
+<div
+  class="orca-table-container"
+  [class.fill-height]="fillHeightMargin() !== null"
+  [orcaFillAvailableHeight]="fillHeightMargin() ?? 0"
+>
   <!-- Loading State -->
   @if (showLoading()) {
     <div class="orca-table-state">
@@ -9,14 +13,21 @@
   <!-- Error State -->
   @if (showError()) {
     <div class="orca-table-state">
-      <orca-empty-state [config]="{ title: 'Error', description: config().error || 'An error occurred' }" />
+      <orca-empty-state
+        [config]="{
+          title: 'Error',
+          description: config().error || 'An error occurred',
+        }"
+      />
     </div>
   }
 
   <!-- Empty State -->
   @if (showEmpty()) {
     <div class="orca-table-state">
-      <orca-empty-state [config]="{ title: config().emptyMessage || 'No data available' }" />
+      <orca-empty-state
+        [config]="{ title: config().emptyMessage || 'No data available' }"
+      />
     </div>
   }
 
@@ -27,23 +38,34 @@
         <ng-container [matColumnDef]="column.key.toString()">
           <!-- Header -->
           @if (isSortable(column)) {
-            <th mat-header-cell *matHeaderCellDef
-                [mat-sort-header]="column.key.toString()"
-                [style.width]="column.width || 'auto'">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              [mat-sort-header]="column.key.toString()"
+              [style.width]="column.width || 'auto'"
+            >
               {{ column.label }}
             </th>
           } @else {
-            <th mat-header-cell *matHeaderCellDef
-                [style.width]="column.width || 'auto'">
+            <th
+              mat-header-cell
+              *matHeaderCellDef
+              [style.width]="column.width || 'auto'"
+            >
               {{ column.label }}
             </th>
           }
 
           <!-- Cell -->
-          <td mat-cell *matCellDef="let row"
-              [style.width]="column.width || 'auto'"
-              [class.actions-cell]="column.type === 'actions'"
-              (click)="column.type === 'actions' ? $event.stopPropagation() : null">
+          <td
+            mat-cell
+            *matCellDef="let row"
+            [style.width]="column.width || 'auto'"
+            [class.actions-cell]="column.type === 'actions'"
+            (click)="
+              column.type === 'actions' ? $event.stopPropagation() : null
+            "
+          >
             @switch (column.type) {
               @case ('badge') {
                 @if (column.badgeConfig) {
@@ -57,7 +79,12 @@
               }
               @case ('custom') {
                 @if (column.template) {
-                  <ng-container *ngTemplateOutlet="column.template; context: { $implicit: row }" />
+                  <ng-container
+                    *ngTemplateOutlet="
+                      column.template;
+                      context: { $implicit: row }
+                    "
+                  />
                 }
               }
               @default {
@@ -75,13 +102,20 @@
       }
 
       <!-- Header Row -->
-      <tr mat-header-row *matHeaderRowDef="displayedColumns()"></tr>
+      <tr
+        mat-header-row
+        *matHeaderRowDef="displayedColumns()"
+        class="orca-table-header"
+      ></tr>
 
       <!-- Data Rows -->
-      <tr mat-row *matRowDef="let row; columns: displayedColumns()"
-          class="orca-table-row"
-          [class.clickable]="config().onRowClick"
-          (click)="onRowClick(row)"></tr>
+      <tr
+        mat-row
+        *matRowDef="let row; columns: displayedColumns()"
+        class="orca-table-row"
+        [class.clickable]="config().onRowClick"
+        (click)="onRowClick(row)"
+      ></tr>
     </table>
   }
 </div>

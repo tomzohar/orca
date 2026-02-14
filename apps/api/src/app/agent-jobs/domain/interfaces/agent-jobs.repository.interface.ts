@@ -28,7 +28,7 @@ export interface IAgentJobsRepository {
   ): Promise<AgentJobEntity>;
   addComment(
     jobId: number,
-    data: { authorId: number; content: string; metadata?: Record<string, any> },
+    data: { authorId: number; content: string; metadata?: Record<string, unknown> },
   ): Promise<AgentJobComment>;
   getComments(jobId: number): Promise<AgentJobComment[]>;
 }

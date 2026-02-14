@@ -10,6 +10,7 @@
     "@angular/cdk": "^21.1.0",
     "@angular/platform-browser": "^21.1.0",
     "ngx-markdown": "^21.1.0",
+    "rxjs": "^7.8.0",
     "vitest": "^4.0.8"
   },
   "sideEffects": false

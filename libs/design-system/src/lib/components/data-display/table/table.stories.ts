@@ -279,3 +279,115 @@ export const Clickable: Story = {
     },
   },
 };
+
+// Generate more mock data for scrolling demo
+const manyMockJobs: JobData[] = Array.from({ length: 50 }, (_, i) => ({
+  id: i + 1,
+  status: ['COMPLETED', 'RUNNING', 'FAILED', 'PENDING'][i % 4],
+  type: ['FILE_SYSTEM', 'DOCKER'][i % 2],
+  prompt: `Job task ${i + 1}: ${['Create feature', 'Fix bug', 'Deploy', 'Test'][i % 4]}`,
+  createdAt: new Date(Date.now() - i * 5 * 60 * 1000).toISOString(),
+}));
+
+export const FillAvailableHeight: Story = {
+  render: (args) => ({
+    props: args,
+    template: `
+      <div style="padding: 20px; height: 100vh; display: flex; flex-direction: column;">
+        <h2 style="margin: 0 0 8px 0; color: #fff;">Page Header</h2>
+        <p style="margin: 0 0 20px 0; color: #999;">
+          The table below automatically fills the remaining vertical space
+        </p>
+        <orca-table [config]="config" />
+      </div>
+    `,
+  }),
+  args: {
+    config: {
+      data: manyMockJobs,
+      columns: [
+        {
+          key: 'id',
+          label: 'ID',
+          sortable: true,
+          width: '80px',
+        },
+        {
+          key: 'status',
+          label: 'Status',
+          type: 'badge',
+          sortable: true,
+          width: '120px',
+          badgeConfig: (job) => getStatusBadgeConfig(job.status),
+        },
+        {
+          key: 'prompt',
+          label: 'Prompt',
+          sortable: true,
+        },
+        {
+          key: 'createdAt',
+          label: 'Created',
+          pipe: 'relativeTime',
+          sortable: true,
+          width: '150px',
+        },
+      ],
+      fillAvailableHeight: true, // Enable fill available height
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Table automatically fills the available vertical space. Try resizing your browser window to see it adapt.',
+      },
+    },
+  },
+};
+
+export const FillAvailableHeightWithMargin: Story = {
+  render: (args) => ({
+    props: args,
+    template: `
+      <div style="padding: 20px; height: 100vh; display: flex; flex-direction: column;">
+        <h2 style="margin: 0 0 8px 0; color: #fff;">Dashboard</h2>
+        <p style="margin: 0 0 20px 0; color: #999;">
+          Table with 40px bottom margin for better spacing
+        </p>
+        <orca-table [config]="config" />
+      </div>
+    `,
+  }),
+  args: {
+    config: {
+      data: manyMockJobs,
+      columns: [
+        {
+          key: 'status',
+          label: 'Status',
+          type: 'badge',
+          width: '120px',
+          badgeConfig: (job) => getStatusBadgeConfig(job.status),
+        },
+        {
+          key: 'prompt',
+          label: 'Prompt',
+        },
+        {
+          key: 'createdAt',
+          label: 'Created',
+          pipe: 'relativeTime',
+          width: '150px',
+        },
+      ],
+      fillAvailableHeight: 40, // Fill with 40px bottom margin
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Table fills available space with a 40px margin from the bottom of the viewport.',
+      },
+    },
+  },
+};

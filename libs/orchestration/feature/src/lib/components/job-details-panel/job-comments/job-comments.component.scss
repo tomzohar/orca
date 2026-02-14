@@ -21,8 +21,27 @@
   @include typography-typography-body-2;
 }
 
+.comment-author-info {
+  display: flex;
+  align-items: center;
+  gap: $tokens-spacing-sm;
+}
+
+.comment-meta {
+  display: flex;
+  flex-direction: column;
+  margin-top: $tokens-spacing-xs;
+}
+
+.comment-author {
+  font-weight: $typography-font-weight-semibold;
+  color: $tokens-text-primary;
+  line-height: 1;
+}
+
 .comment-date {
   color: $tokens-text-secondary;
+  font-size: $tokens-font-size-xs;
 }
 
 .comment-content {

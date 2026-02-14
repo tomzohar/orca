@@ -13,6 +13,7 @@ import {
   AgentJobComment,
   TaskType,
   MergeStatus,
+  UserType,
 } from '../../domain/entities/agent-job.entity';
 import type { IAgentJobsRepository } from '../../domain/interfaces/agent-jobs.repository.interface';
 
@@ -20,7 +21,11 @@ type AgentJobWithRelations = Prisma.AgentJobGetPayload<{
   include: {
     logs: true;
     artifacts: true;
-    comments: true;
+    comments: {
+      include: {
+        author: true;
+      };
+    };
     project: true;
     createdBy: true;
     assignedAgent: true;
@@ -60,7 +65,11 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
       include: {
         logs: true,
         artifacts: true,
-        comments: true,
+        comments: {
+          include: {
+            author: true,
+          },
+        },
         project: true,
         createdBy: true,
         assignedAgent: true,
@@ -76,7 +85,11 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
       include: {
         logs: true,
         artifacts: true,
-        comments: true,
+        comments: {
+          include: {
+            author: true,
+          },
+        },
         project: true,
         createdBy: true,
         assignedAgent: true,
@@ -111,7 +124,11 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
       include: {
         logs: true,
         artifacts: true,
-        comments: true,
+        comments: {
+          include: {
+            author: true,
+          },
+        },
         project: true,
         createdBy: true,
         assignedAgent: true,
@@ -137,7 +154,11 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
       include: {
         logs: true,
         artifacts: true,
-        comments: true,
+        comments: {
+          include: {
+            author: true,
+          },
+        },
         project: true,
         createdBy: true,
         assignedAgent: true,
@@ -176,22 +197,30 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
 
   async addComment(
     jobId: number,
-    data: { authorId: number; content: string; metadata?: Record<string, any> },
+    data: { authorId: number; content: string; metadata?: Record<string, unknown> },
   ): Promise<AgentJobComment> {
     const comment = await this.prisma.agentJobComment.create({
       data: {
         jobId,
         authorId: data.authorId,
         content: data.content,
-        metadata: data.metadata,
+        metadata: data.metadata as Prisma.InputJsonValue,
+      },
+      include: {
+        author: true,
       },
     });
     return {
       id: comment.id,
       jobId: comment.jobId,
       authorId: comment.authorId,
+      author: {
+        id: comment.author.id,
+        name: comment.author.name,
+        type: comment.author.type as unknown as UserType,
+      },
       content: comment.content,
-      metadata: comment.metadata as Record<string, any> | undefined,
+      metadata: comment.metadata as Record<string, unknown> | undefined,
       createdAt: comment.createdAt,
     };
   }
@@ -199,14 +228,22 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
   async getComments(jobId: number): Promise<AgentJobComment[]> {
     const comments = await this.prisma.agentJobComment.findMany({
       where: { jobId },
-      orderBy: { createdAt: 'desc' }, // Newest first
+      include: {
+        author: true,
+      },
+      orderBy: { createdAt: 'asc' }, // Newest last
     });
     return comments.map((c) => ({
       id: c.id,
       jobId: c.jobId,
       authorId: c.authorId,
+      author: {
+        id: c.author.id,
+        name: c.author.name,
+        type: c.author.type as unknown as UserType,
+      },
       content: c.content,
-      metadata: c.metadata as Record<string, any> | undefined,
+      metadata: c.metadata as Record<string, unknown> | undefined,
       createdAt: c.createdAt,
     }));
   }
@@ -256,8 +293,13 @@ export class PrismaAgentJobsRepository implements IAgentJobsRepository {
         id: c.id,
         jobId: c.jobId,
         authorId: c.authorId,
+        author: {
+          id: c.author.id,
+          name: c.author.name,
+          type: c.author.type as unknown as UserType,
+        },
         content: c.content,
-        metadata: c.metadata as Record<string, any> | undefined,
+        metadata: c.metadata as Record<string, unknown> | undefined,
         createdAt: c.createdAt,
       })),
       createdAt: dbJob.createdAt,

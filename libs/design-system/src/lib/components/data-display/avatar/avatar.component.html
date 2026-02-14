@@ -1,0 +1,32 @@
+<div class="orca-avatar" [ngClass]="avatarClasses()" [ngStyle]="avatarStyle()">
+  <!-- Image display -->
+  @if (showImage()) {
+    <img
+      [src]="config().src"
+      [alt]="config().alt || 'Avatar'"
+      class="avatar-image"
+      (error)="onImageError($event)"
+    >
+  }
+
+  <!-- Initials display -->
+  @if (showInitials()) {
+    <span class="avatar-initials">{{ displayInitials() }}</span>
+  }
+
+  <!-- Icon display -->
+  @if (showIcon()) {
+    <orca-icon
+      [config]="{ name: avatarIcon(), size: iconSize() }"
+      class="avatar-icon"
+    ></orca-icon>
+  }
+
+  <!-- Custom content projection -->
+  <ng-content></ng-content>
+
+  <!-- Status indicator -->
+  @if (config().showStatus && config().status) {
+    <div class="status-indicator" [ngClass]="statusClasses()"></div>
+  }
+</div>

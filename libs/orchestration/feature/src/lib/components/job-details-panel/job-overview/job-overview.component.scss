@@ -3,7 +3,7 @@
 .overview-tab {
     display: flex;
     flex-direction: column;
-    gap: $tokens-spacing-lg;
+    gap: $tokens-spacing-sm;
     height: 100%;
     overflow: hidden;
 
@@ -66,31 +66,8 @@
         }
     }
 
-    .timestamp-group {
-        display: flex;
-        flex-direction: column;
-        gap: $tokens-spacing-xs;
-    }
-
-    .timestamp-item {
-        display: flex;
-        gap: $tokens-spacing-sm;
-
-        .timestamp-label {
-            font-weight: $typography-font-weight-semibold;
-            color: $tokens-text-secondary;
-        }
-
-        .timestamp-value {
-            color: $tokens-text-primary;
-        }
-    }
-
     &.comments-section {
-        flex: 1;
         min-height: 0;
-        display: flex;
-        flex-direction: column;
         position: relative;
 
         .comments-list-container {
@@ -99,6 +76,13 @@
             margin-top: $tokens-spacing-md;
             margin-bottom: 130px;
             padding-right: $tokens-spacing-xs;
+
+            ::ng-deep {
+                .orca-markdown-preview {
+                    background-color: $tokens-secondary-color;
+                }
+
+            }
 
             &::-webkit-scrollbar {
                 width: 6px;

@@ -15,7 +15,7 @@ export class JobCommentsService {
     @Inject(AGENT_JOBS_REPOSITORY)
     private readonly repository: IAgentJobsRepository,
     private readonly eventEmitter: EventEmitter2,
-  ) {}
+  ) { }
 
   /**
    * Add a comment to a job
@@ -29,7 +29,7 @@ export class JobCommentsService {
     jobId: number,
     authorId: number,
     content: string,
-    metadata?: Record<string, any>,
+    metadata?: Record<string, unknown>,
   ): Promise<AgentJobComment> {
     // Validate job exists
     const job = await this.repository.findById(jobId);

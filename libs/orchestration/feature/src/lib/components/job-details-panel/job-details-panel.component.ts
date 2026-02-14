@@ -1,10 +1,10 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, viewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute, RouterModule, NavigationEnd } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs';
-import { SIDE_PANEL_DATA, TabsComponent } from '@orca/design-system';
-import type { TabsConfig } from '@orca/design-system';
+import { BadgeComponent, SidePanelRef, SIDE_PANEL_DATA, TabsComponent } from '@orca/design-system';
+import type { BadgeConfig, TabsConfig } from '@orca/design-system';
 import { injectJobsQuery, JobEventsService, mapJobToUIModel } from '@orca/orchestration-data';
 import { injectProjectDetection } from '@orca/core/projects';
 import { type Job, type JobLog, type JobArtifact, JobStatus } from '@orca/orchestration-types';
@@ -19,6 +19,7 @@ import { JobArtifactsComponent } from './job-artifacts/job-artifacts.component';
         CommonModule,
         RouterModule,
         TabsComponent,
+        BadgeComponent,
         JobOverviewComponent,
         JobLogsComponent,
         JobArtifactsComponent
@@ -30,9 +31,13 @@ import { JobArtifactsComponent } from './job-artifacts/job-artifacts.component';
 })
 export class JobDetailsPanelComponent {
     private readonly panelData = inject(SIDE_PANEL_DATA) as { jobId: number };
+    private readonly sidePanelRef = inject(SidePanelRef);
     private readonly jobEventsService = inject(JobEventsService);
     private readonly router = inject(Router);
     private readonly route = inject(ActivatedRoute);
+
+    // Template for side panel header
+    readonly headerTemplate = viewChild<TemplateRef<unknown>>('headerTemplate');
 
     // Project context
     private readonly projectDetection = injectProjectDetection();
@@ -66,6 +71,16 @@ export class JobDetailsPanelComponent {
             logs: this.logs(),
             artifacts: this.artifacts(),
         };
+    });
+
+    /**
+     * Effect to update side panel header with title and status badge
+     */
+    private readonly updateHeaderEffect = effect(() => {
+        const template = this.headerTemplate();
+        if (template) {
+            this.sidePanelRef.updateConfig({ headerTemplate: template });
+        }
     });
 
     private readonly tabRoutes = ['overview', 'logs', 'artifacts'];
@@ -170,5 +185,19 @@ export class JobDetailsPanelComponent {
 
     private isValidTab(tab: string): boolean {
         return this.tabRoutes.includes(tab);
+    }
+
+    /**
+     * Gets badge configuration for job status
+     */
+    getStatusBadgeConfig(status: JobStatus): BadgeConfig {
+        const configs: Record<JobStatus, BadgeConfig> = {
+            [JobStatus.PENDING]: { text: 'Pending', variant: 'neutral' },
+            [JobStatus.RUNNING]: { text: 'Running', variant: 'info' },
+            [JobStatus.WAITING_FOR_USER]: { text: 'Waiting', variant: 'warning' },
+            [JobStatus.COMPLETED]: { text: 'Completed', variant: 'success' },
+            [JobStatus.FAILED]: { text: 'Failed', variant: 'error' },
+        };
+        return configs[status];
     }
 }

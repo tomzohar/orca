@@ -34,6 +34,7 @@ export class OrchestrationTableComponent {
     loading: this.loading(),
     error: this.error(),
     emptyMessage: 'No jobs yet. Create your first job to get started.',
+    fillAvailableHeight: 24,
     columns: [
       {
         key: 'status',

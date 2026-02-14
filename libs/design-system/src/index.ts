@@ -1,5 +1,6 @@
 export * from './lib/types/component.types';
 export * from './lib/pipes/relative-time.pipe';
+export * from './lib/directives/fill-available-height.directive';
 export * from './lib/components/button/button.component';
 export * from './lib/components/button/button-group.component';
 export * from './lib/components/input/input.component';
@@ -34,3 +35,4 @@ export * from './lib/components/menu/menu.component';
 export * from './lib/components/tabs/tabs.component';
 export * from './lib/components/markdown-editor/markdown-editor.component';
 export * from './lib/components/data-display/table/table.component';
+export * from './lib/components/data-display/avatar/avatar.component';

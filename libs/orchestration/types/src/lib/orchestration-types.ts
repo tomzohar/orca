@@ -17,6 +17,12 @@ export enum AgentType {
   FILE_SYSTEM = 'FILE_SYSTEM',
 }
 
+export enum UserType {
+  HUMAN = 'HUMAN',
+  AGENT = 'AGENT',
+}
+
+
 /**
  * Job log entry
  */
@@ -37,14 +43,24 @@ export interface JobArtifact {
 }
 
 /**
+ * Comment author details
+ */
+export interface CommentAuthor {
+  id: number;
+  name: string;
+  type: UserType;
+}
+
+/**
  * Job comment
  */
 export interface JobComment {
   id: number;
   jobId: number;
   authorId: number;
+  author?: CommentAuthor;
   content: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -53,6 +69,7 @@ export interface JobComment {
  */
 export interface Job {
   id: string;
+  title?: string;
   type: AgentType;
   prompt: string;
   status: JobStatus;

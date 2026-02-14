@@ -1,3 +1,12 @@
+<ng-template #headerTemplate>
+  <div class="job-details-header">
+    <h4>{{ job()?.title || 'Job Details' }}</h4>
+    @if (job()?.status) {
+      <orca-badge [config]="getStatusBadgeConfig(job()!.status)" />
+    }
+  </div>
+</ng-template>
+
 <div class="job-details-container">
   <orca-tabs [config]="tabsConfig()" (tabChanged)="onTabChanged($event)" />
 

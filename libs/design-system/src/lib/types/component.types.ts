@@ -66,7 +66,7 @@ export interface ButtonGroupItem {
     disabled?: boolean;
 }
 
-export interface TableConfig<T = any> {
+export interface TableConfig<T = unknown> {
     data: T[];
     columns: TableColumn<T>[];
     loading?: boolean;
@@ -74,9 +74,10 @@ export interface TableConfig<T = any> {
     emptyMessage?: string;
     sortable?: boolean;
     onRowClick?: (row: T) => void;
+    fillAvailableHeight?: boolean | number; // true to fill, or number for bottom margin
 }
 
-export interface TableColumn<T = any> {
+export interface TableColumn<T = unknown> {
     key: keyof T | string;
     label: string;
     sortable?: boolean;
@@ -88,7 +89,7 @@ export interface TableColumn<T = any> {
     template?: TemplateRef<{ $implicit: T }>;
 }
 
-export interface TableAction<T = any> {
+export interface TableAction<T = unknown> {
     label: string;
     icon?: IconName;
     onClick: (row: T) => void;
@@ -170,7 +171,8 @@ export enum IconName {
     format_quote = 'format_quote',
     logout = "logout",
     person = "person",
-    comment = "comment"
+    comment = "comment",
+    smart_toy = "smart_toy"
 }
 
 export type DialogSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
@@ -258,6 +260,7 @@ export interface SidePanelConfig {
     hasBackdrop?: boolean;
     backdropClass?: string;
     injector?: Injector;
+    headerTemplate?: TemplateRef<any>;
 }
 
 export interface ListItem {
@@ -275,6 +278,25 @@ export interface ListConfig {
     expandable?: boolean;
     showIcons?: boolean;
     multipleExpanded?: boolean;
+}
+
+export type AvatarSize = 'sm' | 'md' | 'lg' | 'xl';
+export type AvatarShape = 'circular' | 'square';
+export type AvatarStatus = 'online' | 'offline' | 'away' | 'busy';
+
+export interface AvatarConfig {
+    size?: AvatarSize;
+    shape?: AvatarShape;
+    src?: string;
+    alt?: string;
+    initials?: string;
+    name?: string; // Used to generate initials if initials not provided
+    showIcon?: boolean; // Show icon when no image/initials
+    icon?: IconName; // Custom icon (defaults to person)
+    status?: AvatarStatus;
+    showStatus?: boolean;
+    backgroundColor?: string;
+    textColor?: string;
 }
 
 export * from '../components/markdown-editor/markdown-editor.types';

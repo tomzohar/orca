@@ -1,11 +1,17 @@
 @use 'component' as *;
 
+.job-details-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    h4 {
+        margin: 0;
+    }
+}
+
 .job-details-container {
     display: flex;
     flex-direction: column;
     height: 100%;
-}
-
-.tab-content {
-    flex: 1;
 }

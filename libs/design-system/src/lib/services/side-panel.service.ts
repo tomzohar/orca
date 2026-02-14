@@ -1,9 +1,38 @@
-import { Injectable, inject, Type, ComponentRef, Injector, EnvironmentInjector, createComponent, ApplicationRef } from '@angular/core';
+import { Injectable, inject, Type, ComponentRef, Injector, EnvironmentInjector, createComponent, ApplicationRef, signal, untracked } from '@angular/core';
 import { Overlay, OverlayRef, OverlayConfig } from '@angular/cdk/overlay';
 import { ComponentPortal } from '@angular/cdk/portal';
+import { Subject } from 'rxjs';
 import { SidePanelConfig } from '../types/component.types';
 import { SidePanelComponent } from '../components/feedback/side-panel/side-panel.component';
 import { SIDE_PANEL_DATA } from './side-panel.tokens';
+
+export class SidePanelRef<D = unknown> {
+    private readonly containerRef = signal<ComponentRef<SidePanelComponent> | null>(null);
+    private readonly closedSubject = new Subject<void>();
+    readonly closed$ = this.closedSubject.asObservable();
+
+    constructor(private readonly overlayRef: OverlayRef) { }
+
+    setContainerRef(ref: ComponentRef<SidePanelComponent>) {
+        this.containerRef.set(ref);
+    }
+
+    updateConfig(config: Partial<SidePanelConfig>): void {
+        const container = this.containerRef();
+        if (container) {
+            untracked(() => {
+                const currentConfig = container.instance.config();
+                container.setInput('config', { ...currentConfig, ...config });
+            });
+        }
+    }
+
+    close(): void {
+        this.overlayRef.dispose();
+        this.closedSubject.next();
+        this.closedSubject.complete();
+    }
+}
 
 @Injectable({
     providedIn: 'root'
@@ -13,15 +42,16 @@ export class SidePanelService {
     private injector = inject(Injector);
     private environmentInjector = inject(EnvironmentInjector);
     private appRef = inject(ApplicationRef);
-    private openPanels: OverlayRef[] = [];
+    private openPanels: { overlayRef: OverlayRef, sidePanelRef: SidePanelRef<any> }[] = [];
 
     open<D = unknown>(
         component: Type<unknown>,
         config: SidePanelConfig & { data?: D } = {}
-    ): OverlayRef {
+    ): SidePanelRef<D> {
         // Create overlay configuration
         const overlayConfig = this.createOverlayConfig(config);
         const overlayRef = this.overlay.create(overlayConfig);
+        const sidePanelRef = new SidePanelRef<D>(overlayRef);
 
         // Create side panel container
         const containerPortal = new ComponentPortal(SidePanelComponent);
@@ -29,11 +59,13 @@ export class SidePanelService {
 
         // Configure container
         containerRef.setInput('config', config);
+        sidePanelRef.setContainerRef(containerRef);
 
         // Create and attach user component inside the container
         this.createUserComponent(
             component,
             containerRef,
+            sidePanelRef,
             config.data,
             config.injector
         );
@@ -51,21 +83,22 @@ export class SidePanelService {
         }
 
         // Track open panel
-        this.openPanels.push(overlayRef);
+        this.openPanels.push({ overlayRef, sidePanelRef });
 
-        return overlayRef;
+        return sidePanelRef;
     }
 
     closeAll(): void {
-        this.openPanels.forEach(ref => this.closePanelRef(ref));
+        this.openPanels.forEach(p => this.closePanelRef(p.overlayRef));
     }
 
     private closePanelRef(overlayRef: OverlayRef): void {
-        const index = this.openPanels.indexOf(overlayRef);
+        const index = this.openPanels.findIndex(p => p.overlayRef === overlayRef);
         if (index > -1) {
+            const panel = this.openPanels[index];
             this.openPanels.splice(index, 1);
+            panel.sidePanelRef.close();
         }
-        overlayRef.dispose();
     }
 
     private createOverlayConfig(config: SidePanelConfig): OverlayConfig {
@@ -85,14 +118,16 @@ export class SidePanelService {
     private createUserComponent<D>(
         component: Type<unknown>,
         containerRef: ComponentRef<SidePanelComponent>,
+        sidePanelRef: SidePanelRef<D>,
         data?: D,
         parentInjector?: Injector
     ): ComponentRef<unknown> {
-        // Create custom injector with data
+        // Create custom injector with data and side panel ref
         const injector = Injector.create({
             parent: parentInjector || this.injector,
             providers: [
-                { provide: SIDE_PANEL_DATA, useValue: data }
+                { provide: SIDE_PANEL_DATA, useValue: data },
+                { provide: SidePanelRef, useValue: sidePanelRef }
             ]
         });
 

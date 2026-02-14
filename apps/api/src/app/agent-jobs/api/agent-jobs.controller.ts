@@ -13,7 +13,7 @@ import { OnEvent } from '@nestjs/event-emitter';
 import { Observable, Subject, filter, map } from 'rxjs';
 import { AgentJobsService } from '../agent-jobs.service';
 import { JobCommentsService } from '../application/job-comments.service';
-import { AgentType } from '../domain/entities/agent-job.entity';
+import { AgentJobEntity, AgentJobLog, AgentJobComment, AgentType } from '../domain/entities/agent-job.entity';
 import {
   JobArtifactAddedEvent,
   JobCreatedEvent,
@@ -25,11 +25,11 @@ import { CreateAgentJobDto } from './dto/create-agent-job.dto';
 import { CreateCommentDto } from './dto/create-comment.dto';
 
 type AgentJobEventPayload =
-  | { type: 'job_created'; payload: any; jobId: number }
-  | { type: 'status_changed'; payload: { status: string; job: any }; jobId: number }
-  | { type: 'log_added'; payload: any; jobId: number }
+  | { type: 'job_created'; payload: AgentJobEntity; jobId: number }
+  | { type: 'status_changed'; payload: { status: string; job: AgentJobEntity }; jobId: number }
+  | { type: 'log_added'; payload: AgentJobLog; jobId: number }
   | { type: 'artifact_added'; payload: { artifactId: number; filename: string; path: string }; jobId: number }
-  | { type: 'comment_added'; payload: any; jobId: number };
+  | { type: 'comment_added'; payload: AgentJobComment; jobId: number };
 
 @Controller('agent-jobs')
 export class AgentJobsController {
@@ -126,16 +126,35 @@ export class AgentJobsController {
   }
 
   @Post(':id/comments')
-  addComment(
+  async addComment(
     @Param('id', ParseIntPipe) jobId: number,
     @Body() dto: CreateCommentDto,
     @Query('authorId', ParseIntPipe) authorId: number,
   ) {
-    return this.commentsService.addComment(jobId, authorId, dto.content, dto.metadata);
+    const comment = await this.commentsService.addComment(jobId, authorId, dto.content, dto.metadata);
+    // Return comment in the same format as GET endpoint
+    return {
+      id: comment.id,
+      jobId: comment.jobId,
+      authorId: comment.authorId,
+      author: comment.author,
+      content: comment.content,
+      metadata: comment.metadata,
+      createdAt: comment.createdAt.toISOString(),
+    };
   }
 
   @Get(':id/comments')
-  getComments(@Param('id', ParseIntPipe) jobId: number) {
-    return this.commentsService.getComments(jobId);
+  async getComments(@Param('id', ParseIntPipe) jobId: number) {
+    const comments = await this.commentsService.getComments(jobId);
+    return comments.map((comment) => ({
+      id: comment.id,
+      jobId: comment.jobId,
+      authorId: comment.authorId,
+      author: comment.author,
+      content: comment.content,
+      metadata: comment.metadata,
+      createdAt: comment.createdAt.toISOString(),
+    }));
   }
 }

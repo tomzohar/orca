@@ -6,6 +6,17 @@
   background-color: $surface-color;
   border-radius: $radius-md;
   border: 1px solid $border-color;
+  max-height: 600px;
+
+  // When using fillAvailableHeight, remove max-height and let the directive control it
+  &.fill-height {
+    max-height: none;
+    overflow-y: auto;
+    transition: height 0.2s ease-out;
+
+    // Prevent layout shift during initial load
+    min-height: 200px;
+  }
 
   .orca-table-state {
     display: flex;
@@ -18,6 +29,14 @@
   .orca-table {
     width: 100%;
     background-color: $surface-color;
+    position: relative;
+
+    .orca-table-header {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      z-index: 9999999;
+    }
 
     .mat-mdc-header-cell {
       color: $text-secondary;

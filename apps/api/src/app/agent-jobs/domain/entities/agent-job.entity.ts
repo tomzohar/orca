@@ -1,3 +1,6 @@
+import { UserType } from '@orca/orchestration-types';
+export { UserType };
+
 export enum AgentJobStatus {
   PENDING = 'PENDING',
   RUNNING = 'RUNNING',
@@ -37,12 +40,19 @@ export interface AgentJobArtifact {
   createdAt: Date;
 }
 
+export interface CommentAuthor {
+  id: number;
+  name: string;
+  type: UserType; // 'HUMAN' | 'AGENT'
+}
+
 export interface AgentJobComment {
   id: number;
   jobId: number;
   authorId: number;
+  author?: CommentAuthor;
   content: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   createdAt: Date;
 }
 

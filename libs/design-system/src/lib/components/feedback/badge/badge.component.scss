@@ -1,10 +1,10 @@
-@import '../../../styles/tokens';
+@use '../../../styles/tokens' as *;
 
 .orca-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: $radius-xl;
+  border-radius: $radius-md;
   font-family: $font-family;
   font-weight: 500;
   white-space: nowrap;

@@ -13,6 +13,7 @@ import { Job, JobUIModel } from '@orca/orchestration-types';
 export function mapJobToUIModel(job: Job): JobUIModel {
     return {
         ...job,
+        title: job.title || `Job ${job.id}`,
         formattedCreatedAt: formatDate(job.createdAt)
     };
 }
